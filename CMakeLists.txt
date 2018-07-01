@@ -88,6 +88,28 @@ else()
     find_package(Stir)
 endif()
 
+# Then check if we should download.
+if(Stir_DOWNLOAD)
+        set(Stir_LOCAL "OFF")
+
+        configure_file(${CMAKE_MODULE_PATH}/stir.txt.in stir-download/CMakeLists.txt)
+        execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+                WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/stir-download" )
+        execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+                WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/stir-download" )
+        add_subdirectory("${CMAKE_BINARY_DIR}/stir-src"
+                "${CMAKE_BINARY_DIR}/stir-build")
+
+        INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/stir-src/include)
+        # Finally the library itself
+        find_library(Stir_LIBRARY
+          NAMES IO buildblock
+          PATHS ${CMAKE_BINARY_DIR}/stir-src/lib ${Stir_PKGCONF_LIBRARY_DIRS}
+        )
+
+        set(Stir_FOUND ON)
+endif()
+
 if (NOT Qwt_LOCAL)
     if(NOT Qwt_DOWNLOAD)
         message(STATUS "${PROJECT_NAME} depends on QWT. You must either have it installed locally or download them.")
@@ -95,6 +117,28 @@ if (NOT Qwt_LOCAL)
 else()
     set(Qwt_DIR "" CACHE PATH "Root path of QWT.")
     find_package(Qwt)
+endif()
+
+# Then check if we should download.
+if(Qwt_DOWNLOAD)
+        set(Qwt_LOCAL "OFF")
+
+#        configure_file(${CMAKE_MODULE_PATH}/qwt.txt.in qwt-download/CMakeLists.txt)
+        execute_command(COMMAND qmake -pro "${CMAKE_GENERATOR}" .
+                WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/ /qwt-download" )
+        execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+                WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/qwt-download" )
+        add_subdirectory("${CMAKE_BINARY_DIR}/qwt-src"
+                "${CMAKE_BINARY_DIR}/qwt-build")
+
+        INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/qwt-src/include)
+        # Finally the library itself
+        find_library(Qwt_LIBRARY
+          NAMES qwt
+          PATHS ${CMAKE_BINARY_DIR}/qwt-src/lib ${Qwt_PKGCONF_LIBRARY_DIRS}
+        )
+
+        set(Qwt_FOUND ON)
 endif()
 
 #
