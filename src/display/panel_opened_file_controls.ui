@@ -1,0 +1,21 @@
+<ui version="4.0">
+ <author/>
+ <comment/>
+ <exportmacro/>
+ <class>Panel_opened_file_controls</class>
+ <widget class="QWidget" name="Panel_opened_file_controls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+ </widget>
+ <pixmapfunction/>
+ <connections/>
+</ui>
