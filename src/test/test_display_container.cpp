@@ -6,6 +6,8 @@
 
 #include "src/IO/io_manager.h"
 
+using namespace stir;
+
 class Test_display_container: public QObject
 {
     Q_OBJECT
@@ -26,12 +28,12 @@ private:
 void Test_display_container::check_pass_1d()
 {
 
-    Display_container_1d* foo = new Display_container_1d();
+    Display_container_1d* foo = new Display_container_1d(0);
 
-    const IndexRange<1> range(-30,30);
+    const stir::IndexRange<1> range(-30,30);
     stir::Array<1, float> test1(range);
 
-    for (int i = -30; i <= 30 ; ++i)
+    for (int i = test1.get_min_index(); i <= test1.get_max_index() ; ++i)
         test1[i] = i;
 
     QVector<double> vtest1(test1.size());
@@ -39,56 +41,48 @@ void Test_display_container::check_pass_1d()
     io_manager::Array2QVector(test1, vtest1);
 
     // Pass by reference.
-    foo->set_array(vtest1, -30);
+    foo->set_array(vtest1, test1.get_min_index());
 
-    for (int i = -30; i <= 30; ++i)
+    for (int i = test1.get_min_index(); i <= test1.get_max_index(); ++i)
         QCOMPARE(foo->at(i), i);
 
-    foo->empty();
+    foo->clear();
 
     QVector<double> * p_test1 = &vtest1;
+    // Pass by pointer.
+    foo->set_array(p_test1, test1.get_min_index());
 
-    foo->set_array(p_test1, -30);
-
-    for (int i = -30; i <= 30; ++i)
+    for (int i = test1.get_min_index(); i <= test1.get_max_index(); ++i)
         QCOMPARE(foo->at(i), i);
 
 }
 
 void Test_display_container::check_pass_2d()
 {
-    //    Display_container_1d* foo = new Display_container_1d();
 
-    //    //    const IndexRange<2> range(Coordinate2D<int>(0,0),Coordinate2D<int>(9,9));
-    //    //    stir::Array<2, float> test1(range);
+    Display_container_2d *foo = new Display_container_2d(0);
 
-    //    const IndexRange<1> range(0, 200);
-    //    stir::Array<1, float> test1(range);
+    const IndexRange<2> range(stir::Coordinate2D<int>(-100,-100),stir::Coordinate2D<int>(99,99));
+    stir::Array<2, float> test1(range);
 
-    //    test1.fill(0.0);
-    //    for (int i = 0; i <= 200; ++i)
-    //        test1[i] = 100 - i ;
+    for (int i = test1.get_min_index(); i <= test1.get_max_index() ; ++i)
+        for (int j = test1[i].get_min_index(); j <= test1[i].get_max_index() ; ++j)
+            test1[i][j] = i*100 - j*50;
 
-    //    foo->set_array(test1);
-    //    for (int i = 0; i <= 200; ++i)
-    //        QCOMPARE(foo->at(i), 100-i);
+    int size = test1.size();
+    QVector<QVector<double> > vtest1(size);
 
-    //    Display_container_2d* foo2 = new Display_container_2d();
+    for (int i = 0; i < size; ++i)
+        vtest1[i].resize(size);
 
-    //    const IndexRange<2> range2(Coordinate2D<int>(0,0),Coordinate2D<int>(200,200));
-    //    stir::Array<2, float> test2(range2);
+    io_manager::Array2QVector(test1, vtest1);
 
-    //    test2.fill(0.0);
-    //    for (int i = 0; i <= 200; ++i)
-    //        for (int j = 0; j <= 200; ++j)
-    //        {
-    //            test2[i][j] = 200*200 - i*j;
-    //        }
+    foo->set_display(vtest1);
+    foo->set_sizes(test1.get_min_index(), test1[0].get_min_index());
 
-    //    foo2->set_array(test2);
-    //    for (int i = 0; i <= 200; ++i)
-    //        for (int j = 0; j <= 200; ++j)
-    //            QCOMPARE(foo2->at(i,j), 200*200 - i*j);
+    for (int i =foo->get_min_index_v(); i < foo->get_max_index_v() ; ++i)
+        for (int j = foo->get_min_index_h(); j < foo->get_max_index_h() ; ++j)
+            QCOMPARE(foo->at(i , j), (i*100 - j*50));
 
 }
 

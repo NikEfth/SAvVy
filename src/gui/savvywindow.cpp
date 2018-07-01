@@ -2,10 +2,11 @@
 #include "ui_savvywindow.h"
 #include "src/IO/io_manager.h"
 #include "src/display/display_container_1d.h"
+#include "src/display/display_container_2d.h"
 
 #include "stir/is_null_ptr.h"
-#include "stir/FilePath.h"
 #include "stir/common.h"
+#include "stir/Coordinate2D.h"
 
 #include <QFileDialog>
 #include <QSettings>
@@ -22,14 +23,9 @@ SavvyWindow::SavvyWindow(QWidget *parent) :
     QSettings settings;
 
     restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
-    // create docks, toolbars, etc…
     restoreState(settings.value("mainWindowState").toByteArray());
 
-    QDir init_dir = QDir::homePath();
-    initial_open_path = init_dir.absolutePath();
-    this->setWindowIcon(QIcon(":resources/icons8-microbeam-radiation-therapy-80.png"));
-
-    next_window_id = 1;
+    next_window_id = 0;
 
     create_interface();
 
@@ -60,7 +56,6 @@ void SavvyWindow::closeEvent(QCloseEvent *event)
     }
 }
 
-
 /*
  *
  *
@@ -83,40 +78,45 @@ void SavvyWindow::on_actionOpen_triggered()
     if (fileNames.size() == 0)
         return;
 
-
     for (QString fileName : fileNames)
+        open_file(fileName);
+}
+
+/*
+ *
+ *
+ *
+ * FILE OPERATIONS
+ *
+ *
+ *
+ */
+
+bool SavvyWindow::open_file(const QString& fileName)
+{
+    int num_of_data = 1;
+
+    Array<3, float>* tmp
+            = io_manager::open_array(fileName.toStdString(), num_of_data);
+
+    if(!is_null_ptr(tmp))
     {
-        // Some basic checks
-        stir::FilePath current_file(fileName.toStdString()) ;
-
-        if (current_file.get_extension() == "hv")
-        {
-
-            int num_of_data    = 0;
-            int array_x_dim     = 0;
-            int array_y_dim     = 0;
-            int array_z_dim     = 0;
-
-            Array<3, float>* tmp
-                    = io_manager::open_array(fileName.toStdString(), num_of_data,
-                                             array_x_dim,
-                                             array_y_dim,
-                                             array_z_dim);
-
-            if(!is_null_ptr(tmp))
-            {
-                //error opening file!!
-            }
-
-            QWidget *child = createMdiChild();
-
-            if (is_null_ptr(child))
-                return;
-
-            //           if(dynamic_cast<Display_container_1d*>(child)->set_array(tmp))
-            //               append_to_workspace(child);
-        }
+        //error opening file!!
     }
+
+    Display_container *child = createMdiChild();
+
+    if (is_null_ptr(child))
+        return false;
+
+    //           if(dynamic_cast<Display_container_1d*>(child)->set_array(tmp))
+    //               append_to_workspace(child);
+
+    pnl_opened_files->appendToOpenedList(child);
+
+    prependToRecentFiles(fileName);
+
+    return true;
 }
 
 /*
@@ -131,43 +131,73 @@ void SavvyWindow::updateGUI(QMdiSubWindow * activeSubWindow)
 {
     bool hasMdiChild = (ui->mdiArea->subWindowList().size() != 0);
 
+    if (! stir::is_null_ptr(activeSubWindow))
+    {
+        Display_container * active_display_container =
+                qobject_cast<Display_container *>(activeSubWindow->widget());
+
+        if (active_display_container != previous_active)
+        {
+            pnl_opened_file_controls->show_panel(active_display_container->get_num_dimensions());
+
+            previous_active = active_display_container;
+        }
+    }
+
+    //    int current_view_mode = ui->mdi
+    //    pnl_opened_file_controls->show_panel();
+
 }
 
 
-QWidget *SavvyWindow::createMdiChild(int num_dims)
+Display_container *SavvyWindow::createMdiChild(int num_dims)
 {
-    if(num_dims == 1)
-        return new Display_container_1d(this);
+    next_window_id++;
 
-    new std::nullptr_t;
+    if(num_dims == 1)
+        return new Display_container_1d(next_window_id-1, this);
+    else if(num_dims == 2)
+        return new Display_container_2d(next_window_id-1, this);
+
+    return NULL;
 }
 
-bool SavvyWindow::append_to_workspace(QWidget *child,
+bool SavvyWindow::append_to_workspace(Display_container *child,
                                       bool prepend_to_recent,
                                       bool minimized)
 {
-    //    QObject::connect(child, SIGNAL(aboutToClose()), this,SLOT(removeFromOpenedList()));
+    QObject::connect(child, &Display_container::aboutToClose, this, &SavvyWindow::remove_from_workspace);
     //    QObject::connect(child, SIGNAL(aboutToClose()), this,SLOT(removeFromGroupedList()));
-    //    QObject::connect(child, SIGNAL(updatedContainer()), this,SLOT(updateMenus()));
+    //   QObject::connect(child, SIGNAL(updatedContainer()), this,SLOT(updateMenus()));
 
-    ui->mdiArea->addSubWindow(child);
+    ui->mdiArea->addSubWindow(child)->setWindowTitle(child->get_file_name());
     ui->mdiArea->setFocusPolicy(Qt::StrongFocus);
+    pnl_opened_files->appendToOpenedList(child);
 
     if (!minimized)
         child->show();
     else
         child->showMinimized();
 
-    //    appendToOpenedList(child);
-
-    //    if(prepend_to_recent)
-    //        MainWindow::prependToRecentFiles(child->getFullFilePath());
-
     return true;
 }
 
+void SavvyWindow::remove_from_workspace()
+{
+    // Find who send this
+    Display_container* src = qobject_cast<Display_container *>(sender());
 
-
+    pnl_opened_files->removeFromOpenedList(src);
+    // Disconnect from tool
+    //            toolMan->unsetScreen();
+    // Disconnect from contrast window
+    //            contrastMan->unsetScreen();
+    // The Math Manager must have an up-to-date list of the opened
+    // files.
+    //        mathMan->updateOpenedFiles();
+    // If another similar type of connection exist in the future
+    // it has to be disconnected here.
+}
 
 /*
  *
@@ -178,8 +208,13 @@ bool SavvyWindow::append_to_workspace(QWidget *child,
 
 void SavvyWindow::create_interface()
 {
+    QDir init_dir = QDir::homePath();
+    initial_open_path = init_dir.absolutePath();
+    this->setWindowIcon(QIcon(":resources/icons8-microbeam-radiation-therapy-80.png"));
+
     create_docks();
 
+    create_actions();
 }
 
 void SavvyWindow::create_docks()
@@ -212,7 +247,157 @@ void SavvyWindow::create_docks()
     this->addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, dc_opened_file_controls);
 }
 
+static inline QString recentFilesKey() { return QStringLiteral("recentFileList"); }
+static inline QString fileKey() { return QStringLiteral("file"); }
 
+static void writeRecentFiles(const QStringList &files, QSettings &settings)
+{
+    const int count = files.size();
+    settings.beginWriteArray(recentFilesKey());
+    for (int i = 0; i < count; ++i) {
+        settings.setArrayIndex(i);
+        settings.setValue(fileKey(), files.at(i));
+    }
+    settings.endArray();
+}
+
+static QStringList readRecentFiles(QSettings &settings)
+{
+    QStringList result;
+    const int count = settings.beginReadArray(recentFilesKey());
+    for (int i = 0; i < count; ++i) {
+        settings.setArrayIndex(i);
+        result.append(settings.value(fileKey()).toString());
+    }
+    settings.endArray();
+    return result;
+}
+
+void SavvyWindow::create_actions()
+{
+    ui->menuFile->addSeparator();
+
+    QMenu *recentMenu = ui->menuFile->addMenu(tr("Recent..."));
+    connect(recentMenu, &QMenu::aboutToShow, this, &SavvyWindow::updateRecentFileActions);
+    recentFileSubMenuAct = recentMenu->menuAction();
+
+    for (int i = 0; i < MaxRecentFiles; ++i) {
+        recentFileActs[i] = recentMenu->addAction(QString(), this, &SavvyWindow::openRecentFile);
+        recentFileActs[i]->setVisible(false);
+    }
+
+    recentFileSeparator = ui->menuFile->addSeparator();
+
+    setRecentFilesVisible(SavvyWindow::hasRecentFiles());
+
+    tileAct = new QAction(tr("&Tile"), this);
+    tileAct->setStatusTip(tr("Tile the windows"));
+    connect(tileAct, &QAction::triggered, ui->mdiArea, &QMdiArea::tileSubWindows);
+    ui->menuWindow->addAction(tileAct);
+
+    tileVerticalAct = new QAction(tr("Tile Vertically"), this);
+    tileVerticalAct->setStatusTip(tr("Tile the windows vertically"));
+    connect(tileVerticalAct, &QAction::triggered, this, &SavvyWindow::tileSubWindowsVertically);
+    ui->menuWindow->addAction(tileVerticalAct);
+
+    tileHorizontalAct = new QAction(tr("Tile Horizontally"), this);
+    tileHorizontalAct->setStatusTip(tr("Tile the windows horizontally"));
+    connect(tileHorizontalAct, &QAction::triggered, this, &SavvyWindow::tileSubWindowsHorizontally);
+    ui->menuWindow->addAction(tileHorizontalAct);
+
+    cascadeAct = new QAction(tr("&Cascade"), this);
+    cascadeAct->setStatusTip(tr("Cascade the windows"));
+    connect(cascadeAct, &QAction::triggered, ui->mdiArea, &QMdiArea::cascadeSubWindows);
+    ui->menuWindow->addAction(cascadeAct);
+
+    ui->menuWindow->addSeparator();
+
+    closeAllAct = new QAction(tr("&Close All"), this);
+    closeAllAct->setStatusTip(tr("Close all windows"));
+    connect(closeAllAct, &QAction::triggered, ui->mdiArea, &QMdiArea::closeAllSubWindows);
+    ui->menuWindow->addAction(closeAllAct);
+}
+
+void SavvyWindow::tileSubWindowsVertically()
+{
+    if (ui->mdiArea->subWindowList().isEmpty())
+        return;
+
+    QPoint position(0, 0);
+
+    foreach (QMdiSubWindow *window, ui->mdiArea->subWindowList()) {
+        QRect rect(0, 0, ui->mdiArea->width(), ui->mdiArea->height() / ui->mdiArea->subWindowList().count());
+        window->setGeometry(rect);
+        window->move(position);
+        position.setY(position.y() + window->height());
+    }
+}
+
+void SavvyWindow::tileSubWindowsHorizontally()
+{
+    if (ui->mdiArea->subWindowList().isEmpty())
+        return;
+
+    QPoint position(0, 0);
+
+    foreach (QMdiSubWindow *window, ui->mdiArea->subWindowList()) {
+        QRect rect(0, 0, ui->mdiArea->width() / ui->mdiArea->subWindowList().count(), ui->mdiArea->height());
+        window->setGeometry(rect);
+        window->move(position);
+        position.setX(position.x() + window->width());
+    }
+}
+
+bool SavvyWindow::hasRecentFiles()
+{
+    QSettings settings;
+    const int count = settings.beginReadArray(recentFilesKey());
+    settings.endArray();
+    return count > 0;
+}
+
+void SavvyWindow::prependToRecentFiles(const QString &fileName)
+{
+    QSettings settings;
+
+    const QStringList oldRecentFiles = readRecentFiles(settings);
+    QStringList recentFiles = oldRecentFiles;
+    recentFiles.removeAll(fileName);
+    recentFiles.prepend(fileName);
+    if (oldRecentFiles != recentFiles)
+        writeRecentFiles(recentFiles, settings);
+
+    setRecentFilesVisible(!recentFiles.isEmpty());
+}
+
+void SavvyWindow::setRecentFilesVisible(bool visible)
+{
+    recentFileSubMenuAct->setVisible(visible);
+    recentFileSeparator->setVisible(visible);
+}
+
+void SavvyWindow::updateRecentFileActions()
+{
+    QSettings settings;
+
+    const QStringList recentFiles = readRecentFiles(settings);
+    const int count = qMin(int(MaxRecentFiles), recentFiles.size());
+    int i = 0;
+    for ( ; i < count; ++i) {
+        const QString fileName = QFileInfo(recentFiles.at(i)).fileName();
+        recentFileActs[i]->setText(tr("&%1 %2").arg(i + 1).arg(fileName));
+        recentFileActs[i]->setData(recentFiles.at(i));
+        recentFileActs[i]->setVisible(true);
+    }
+    for ( ; i < MaxRecentFiles; ++i)
+        recentFileActs[i]->setVisible(false);
+}
+
+void SavvyWindow::openRecentFile()
+{
+    if (const QAction *action = qobject_cast<const QAction *>(sender()))
+        open_file(action->data().toString());
+}
 
 /*
  *
@@ -228,24 +413,31 @@ void SavvyWindow::on_actionStart_GUI_tests_triggered()
 
     all_tests = test_display_1d_data();
 
-    all_tests = ask(QString("A sinc function is displayed."));
+    //all_tests = ask(QString("Is this the output of a sinc function? "));
+
+    all_tests = test_display_1d_data_physical();
+
+    all_tests = test_display_2d_data();
+
+    //all_tests = ask(QString("Does the image look like a ripple? "));
 
 }
 
 bool SavvyWindow::test_display_1d_data()
 {
     Display_container_1d *child = dynamic_cast<Display_container_1d *>(createMdiChild());
+    child->set_file_name("test1 - Indices dimensions");
 
     if (is_null_ptr(child))
         return false;
 
-    const IndexRange<1> range(-30,30);
+    const IndexRange<1> range(-60,60);
     stir::Array<1, float> test1(range);
 
-    for (int i = -30; i <= 30 ; ++i)
+    for (int i = test1.get_min_index(); i <= test1.get_max_index() ; ++i)
     {
         if(i != 0)
-            test1[i] = sin(i) / i;
+            test1[i] = sin(0.5*i) / (i*0.5);
         else
             test1[i] = 1;
     }
@@ -254,19 +446,88 @@ bool SavvyWindow::test_display_1d_data()
 
     io_manager::Array2QVector(test1, vtest1);
 
-    child->set_display(vtest1, -30);
+    child->set_display(vtest1, test1.get_min_index());
 
     append_to_workspace(child);
 
     return true;
 }
 
+bool SavvyWindow::test_display_1d_data_physical()
+{
+    Display_container_1d *child = dynamic_cast<Display_container_1d *>(createMdiChild());
+    child->set_file_name("test1 - Physical dimensions");
+
+    if (is_null_ptr(child))
+        return false;
+
+    const IndexRange<1> range(-60,60);
+    stir::Array<1, float> test1(range);
+
+    for (int i = test1.get_min_index(); i <= test1.get_max_index() ; ++i)
+    {
+        if(i != 0)
+            test1[i] = sin(0.5*i) / (i*0.5);
+        else
+            test1[i] = 1;
+    }
+
+    QVector<double> vtest1(test1.size());
+
+    io_manager::Array2QVector(test1, vtest1);
+
+    child->set_physical_display(vtest1,
+                                test1.get_min_index(), -30, 30);
+
+    append_to_workspace(child);
+
+    return true;
+}
+
+bool SavvyWindow::test_display_2d_data()
+{
+    Display_container_2d *child = dynamic_cast<Display_container_2d *>(createMdiChild(2));
+    child->set_file_name("test2");
+
+    if (is_null_ptr(child))
+        return false;
+
+    const IndexRange<2> range(stir::Coordinate2D<int>(-100,-100),stir::Coordinate2D<int>(99,99));
+    stir::Array<2, float> test1(range);
+
+    for (int i = test1.get_min_index(); i <= test1.get_max_index() ; ++i)
+        for (int j = test1[i].get_min_index(); j <= test1[i].get_max_index() ; ++j)
+        {
+            float f = sqrt(i*i + j*j);
+            if( f != 0)
+                test1[i][j] = sin(f) / f;
+            else
+                test1[i][j] = 1;
+        }
+
+    int size = test1.size();
+    QVector<QVector<double> > vtest1(size);
+
+    for (int i = 0; i < size; ++i)
+        vtest1[i].resize(size);
+
+    io_manager::Array2QVector(test1, vtest1);
+
+    child->set_physical_display(vtest1,
+                                test1.get_min_index(),
+                                test1[0].get_min_index());
+
+    append_to_workspace(child);
+
+    return true;
+}
+
+
 int SavvyWindow::ask(QString question)
 {
     QMessageBox msgBox;
     msgBox.setText(question);
-    msgBox.setInformativeText("Is this correct?");
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::Yes);
-   return msgBox.exec();
+    return msgBox.exec();
 }

@@ -7,8 +7,8 @@
 
 #include "src/display/display_container.h"
 
-
-using namespace  stir;
+#include <qwt_plot_spectrogram.h>
+#include <qwt_matrix_raster_data.h>
 
 //!
 //! \brief The Display_container class
@@ -20,33 +20,83 @@ class Display_container_2d : public Display_container
 {
     Q_OBJECT
 public:
-    explicit Display_container_2d(QWidget *parent = nullptr);
+    explicit Display_container_2d(int, QWidget *parent = nullptr);
 
-   void set_array(stir::Array<2, float>* );
-
-   void set_array(const stir::Array<2, float>& );
+    /** \addtogroup Setters
+     *  @{
+     */
+    //! Set the data array and initialise x_data by pointer
+    virtual void set_array(QVector<double>* , int _row_size = 0);
+    //! Set the data array and initialise x_data by reference
+    virtual void set_array(const QVector<double>&, int _row_size = 0 );
+    //! Set the data array and update() display, by pointer
+    virtual void set_display(QVector<double> * , int _row_size = 0 );
+    //! Set the data array and update() display, by reference
+    virtual void set_display(const QVector<double>& , int _row_size = 0 );
+    //! Set the data array from a 2D array and update() display, by reference
+    void set_display(const QVector<QVector<double> >& );
+    //! Set physical sizes of the data
+    void set_sizes(int _offset_h = 0, int _offset_v = 0,
+                   float _h_spacing = 1.f, float _v_spacing = 1.f,
+                   float _origin_x = 0.f, float  _origin_y = 0.f);
+    //! Set data and physical sizes
+    void set_physical_display(const QVector<QVector<double> >&,
+                          int _offset_h = 0, int _offset_v = 0,
+                          float _h_spacing = 1.f, float _v_spacing = 1.f,
+                          float _origin_x = 0.f, float  _origin_y = 0.f);
+    /** @}*/
 
     /** \addtogroup Members to get access to the data
      *  @{
      */
-    stir::Array<2, float>::full_iterator get_beging();
 
-    stir::Array<2, float>::const_full_iterator get_beging_const() const ;
+    inline int get_min_index_h() const
+    {return offset_h; }
 
-    stir::Array<2, float>::full_iterator  get_end();
+    inline int get_max_index_h()
+    {return offset_h + row_size;}
 
-    stir::Array<2, float>::const_full_iterator  get_end_const() const ;
+    inline int get_min_index_v() const
+    {return offset_v;}
 
-     float at(int col, int row) const;
+    inline int get_max_index_v()
+    {return offset_v + row_num; }
+
+    double at(int row, int col);
     /** @}*/
 
-signals:
+    virtual void update_scene();
 
-public slots:
+    void clear();
 
 private:
+    //! QVector of y data
+    QVector<double> data;
 
-    stir::Array<2, float> data;
+    int row_size;
+
+    int row_num;
+
+    QwtPlotSpectrogram *d_spectrogram;
+
+    QwtMatrixRasterData *p_raster;
+
+    int offset_h;
+
+    int offset_v;
+    //! Pixel spacing, Horizontal, this will follow the convension in the header
+    float h_spacing;
+    //! Pixel spacing, Vertical, this will follow the convensions in the header
+    float v_spacing;
+
+    float origin_x;
+
+    float  origin_y;
+
+    double min_value;
+
+    double max_value;
+
 };
 
 #endif // DISPLAY_CONTAINER_H

@@ -16,6 +16,12 @@
     <height>0</height>
    </size>
   </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>306</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -36,11 +42,17 @@
     <number>3</number>
    </property>
    <item>
-    <widget class="QListWidget" name="listWidget">
+    <widget class="QListWidget" name="listOpenedFiles">
      <property name="minimumSize">
       <size>
        <width>270</width>
        <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>300</height>
       </size>
      </property>
     </widget>

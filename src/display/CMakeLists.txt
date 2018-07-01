@@ -1,5 +1,6 @@
 target_sources(savvy_display
     PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/common_display.h"
     "${CMAKE_CURRENT_LIST_DIR}/display_container.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/display_container.h"
     "${CMAKE_CURRENT_LIST_DIR}/display_container_1d.cpp"
