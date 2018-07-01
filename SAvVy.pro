@@ -25,10 +25,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        savvywindow.cpp
+        src/gui/savvywindow.cpp
 
 HEADERS += \
-        savvywindow.h
+        src/include/savvywindow.h \
+        src/include/savvy.h
 
 FORMS += \
-        savvywindow.ui
+        src/gui/savvywindow.ui

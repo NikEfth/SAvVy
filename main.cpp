@@ -1,4 +1,4 @@
-#include "savvywindow.h"
+#include "src/gui/savvywindow.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
