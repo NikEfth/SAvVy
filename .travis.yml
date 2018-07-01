@@ -1,0 +1,46 @@
+# Language selection
+language: cpp
+
+cache: ccache
+
+# Environment variables:
+# To avoid too many builds, we mix some options (although independent tests would have been better)
+matrix:
+ include:
+   #### linux
+ - os: linux
+   env: EXTRA_BUILD_FLAGS="-DStir_Download=ON -DQwt_DOWNLOAD=ON -DBUILD_DOC=OFF" CC=gcc-5 CXX=g++-5
+
+   ####  osx
+   # note: cannot use OpenMP on OSX yet, see https://github.com/UCL/STIR/issues/117
+ - os: osx
+   env: EXTRA_BUILD_FLAGS="-DStir_Download=ON -DQwt_DOWNLOAD=ON -DBUILD_DOC=OFF" CC=gcc CXX=g++
+
+env:
+  global:
+  - BUILD_FLAGS="-DENABLE_TESTING=ON -DCMAKE_BUILD_TYPE=Release"
+
+
+# Ubuntu 14.04 LTS (trusty)
+dist: trusty
+
+# No need for sudo
+sudo: false
+
+# Compilation dependencies
+addons:
+  apt:
+    sources:
+      - llvm-toolchain-trusty-5.0
+    packages:
+      - qtbase5-dev
+
+# Actual compilation script
+      
+install:
+  - mkdir build install
+  - cd build
+  - cmake $BUILD_FLAGS $EXTRA_BUILD_FLAGS -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/install ..
+  - make -j 2 all
+  - make test
+  - make install
