@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-#include "src/display/display_container.h"
+#include "display_container.h"
 
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
@@ -31,8 +31,6 @@ public:
     void set_physical_display(const QVector<double>& , int offset = 0, float _min_x = 0.f, float  _max_x= 0.f);
     /** @}*/
 
-    //! Update the display contents
-    //! \details Try to keep this as minimal as possible
     virtual void update_scene();
 
     //! Clear the data and x_data
@@ -50,9 +48,9 @@ protected:
      *  @{
      */
     //! Set the data array and initialise x_data by pointer
-    virtual void set_array(QVector<double>* , int _offset = 0);
+    void set_array(QVector<double>* , int _offset = 0);
     //! Set the data array and initialise x_data by reference
-    virtual void set_array(const QVector<double>&, int _offset = 0 );
+    void set_array(const QVector<double>&, int _offset = 0 );
     /** @}*/
 
 private:
@@ -62,14 +60,14 @@ private:
     QVector<double> x_data;
     //! Offset of the x axis
     int data_offset;
-
-    QwtPlotCurve* curve;
     //! The minimum x value in physical dimensions
     double min_x;
     //! The maximum x value in physical dimensions
     double max_x;
     //! The incremental step along the x axis
     double inc_x;
+
+    QwtPlotCurve* curve;
 
 };
 

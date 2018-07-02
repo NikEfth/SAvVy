@@ -7,6 +7,8 @@ target_sources(savvy_display
     "${CMAKE_CURRENT_LIST_DIR}/display_container_1d.h"
     "${CMAKE_CURRENT_LIST_DIR}/display_container_2d.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/display_container_2d.h"
+    "${CMAKE_CURRENT_LIST_DIR}/display_container_3d.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/display_container_3d.h"
     )
 
 include_directories( ${Qwt_INCLUDE_DIRS})

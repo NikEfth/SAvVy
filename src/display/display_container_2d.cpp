@@ -1,7 +1,8 @@
 #include "display_container_2d.h"
 
 
-Display_container_2d::Display_container_2d(int _my_id, QWidget *parent) : Display_container(_my_id, parent,2)
+Display_container_2d::Display_container_2d(int _my_id, QWidget *parent, int dims) :
+    Display_container(_my_id, parent, dims)
 {
     d_spectrogram = new QwtPlotSpectrogram();
     d_spectrogram->setRenderThreadCount(0);

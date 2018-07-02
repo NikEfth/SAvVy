@@ -5,6 +5,7 @@
 #include "stir/Coordinate2D.h"
 
 #include "src/IO/io_manager.h"
+#include "src/include/savvy.h"
 
 using namespace stir;
 
@@ -38,7 +39,7 @@ void Test_display_container::check_pass_1d()
 
     QVector<double> vtest1(test1.size());
 
-    io_manager::Array2QVector(test1, vtest1);
+   savvy::Array2QVector(test1, vtest1);
 
     // Pass by reference.
     foo->set_display(vtest1, test1.get_min_index());
@@ -75,7 +76,7 @@ void Test_display_container::check_pass_2d()
     for (int i = 0; i < size; ++i)
         vtest1[i].resize(size);
 
-    io_manager::Array2QVector(test1, vtest1);
+    savvy::Array2QVector(test1, vtest1);
 
     foo->set_display(vtest1);
     foo->set_sizes(test1.get_min_index(), test1[0].get_min_index());

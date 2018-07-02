@@ -5,8 +5,6 @@
 #include <QDockWidget>
 #include <QMdiSubWindow>
 
-#include "src/include/savvy.h"
-
 // GUI elements
 #include "src/gui/panel_opened_files.h"
 #include "src/gui/panel_opened_file_controls.h"
@@ -16,9 +14,9 @@ namespace Ui {
 class SavvyWindow;
 }
 
-namespace savvy {
-class SavvyWindow;
-}
+//namespace savvy {
+//class SavvyWindow;
+//}
 
 //!
 //! \brief The SavvyWindow class

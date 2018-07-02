@@ -20,7 +20,7 @@ class Display_container_2d : public Display_container
 {
     Q_OBJECT
 public:
-    explicit Display_container_2d(int, QWidget *parent = nullptr);
+    explicit Display_container_2d(int, QWidget *parent = nullptr, int dims = 2);
 
     /** \addtogroup Setters
      *  @{
@@ -72,13 +72,12 @@ protected:
      */
     //! Set the data array and initialise x_data by pointer
     //! \warning In order to find the row_num a division is performed!
-    virtual void set_array(QVector<double>* , int _row_size = 0);
+    void set_array(QVector<double>* , int _row_size = 0);
     //! Set the data array and initialise x_data by reference
     //! \warning In order to find the row_num a division is performed!
-    virtual void set_array(const QVector<double>&, int _row_size = 0 );
+    void set_array(const QVector<double>&, int _row_size = 0 );
     /** @}*/
 
-private:
     //! QVector of y data
     QVector<double> data;
 

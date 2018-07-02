@@ -3,7 +3,7 @@
 
 #include <qwt_plot.h>
 
-#include "common_display.h"
+//#include "common_display.h"
 
 //!
 //! \brief The Display_container class
@@ -55,15 +55,6 @@ signals:
     void aboutToClose();
 
 protected:
-    /** \addtogroup Setters
-     *  @{
-     */
-    //! Set the data array and initialise x_data by pointer
-    virtual void set_array(QVector<double>* , int i = 0) = 0;
-    //! Set the data array and initialise x_data by reference
-    virtual void set_array(const QVector<double>&, int i = 0 ) = 0;
-    /** @}*/
-
     //! File name and path
     QString fullFileName;
     //! We hack this QEvent because upon close we emit aboutToClose()

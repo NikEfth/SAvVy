@@ -1,3 +1,4 @@
+#include "src/include/savvy.h"
 #include "savvywindow.h"
 #include "ui_savvywindow.h"
 #include "src/IO/io_manager.h"
@@ -13,7 +14,7 @@
 #include <QCloseEvent>
 #include <QMessageBox>
 
-using namespace stir;
+USING_NAMESPACE_STIR
 
 SavvyWindow::SavvyWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -476,7 +477,7 @@ bool SavvyWindow::test_display_1d_data()
 
     QVector<double> vtest1(test1.size());
 
-    io_manager::Array2QVector(test1, vtest1);
+    savvy::Array2QVector(test1, vtest1);
 
     child->set_display(vtest1, test1.get_min_index());
 
@@ -509,7 +510,7 @@ bool SavvyWindow::test_display_1d_data_physical()
 
     QVector<double> vtest1(test1.size());
 
-    io_manager::Array2QVector(test1, vtest1);
+    savvy::Array2QVector(test1, vtest1);
 
     child->set_physical_display(vtest1,
                                 test1.get_min_index(), -30, 30);
@@ -546,7 +547,7 @@ bool SavvyWindow::test_display_2d_data()
     for (int i = 0; i < size; ++i)
         vtest1[i].resize(size);
 
-    io_manager::Array2QVector(test1, vtest1);
+    savvy::Array2QVector(test1, vtest1);
 
     child->set_display(vtest1,
                        test1.get_min_index(), test1[0].get_min_index());
@@ -583,7 +584,7 @@ bool SavvyWindow::test_display_2d_data_alt()
     for (int i = 0; i < size; ++i)
         vtest1[i].resize(size);
 
-    io_manager::Array2QVector(test1, vtest1);
+    savvy::Array2QVector(test1, vtest1);
 
     QVector<double> svtest1;
     savvy::serialize_QVector(vtest1, svtest1);
@@ -625,7 +626,7 @@ bool SavvyWindow::test_display_2d_data_physical()
     for (int i = 0; i < size; ++i)
         vtest1[i].resize(size);
 
-    io_manager::Array2QVector(test1, vtest1);
+    savvy::Array2QVector(test1, vtest1);
 
     child->set_physical_display(vtest1,
                                 test1.get_min_index(), test1[0].get_min_index(),
