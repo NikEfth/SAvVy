@@ -17,5 +17,8 @@ target_sources(savvy_gui
     "${CMAKE_CURRENT_LIST_DIR}/controls3dimage.h"
     )
     
+include_directories( ${Stir_INCLUDE_DIRS})
+link_directories(${Stir_LIBRARIES_DIR})
+
 #target_include_directories(savvy_gui PUBLIC "${SAVVY_INCLUDE_DIR}")
-target_link_libraries(savvy_gui PUBLIC Qt5::Core Qt5::Widgets Qt5::Gui)
+target_link_libraries(savvy_gui PUBLIC Qt5::Core Qt5::Widgets Qt5::Gui buildblock)

@@ -32,6 +32,10 @@ public:
     explicit SavvyWindow(QWidget *parent = 0);
     ~SavvyWindow();
 
+public slots:
+    //! Call this function when you want to focus to another window
+    void focus_sub_window(QString);
+
 protected:
     void closeEvent(QCloseEvent *event) override;
 
@@ -67,6 +71,8 @@ private:
     /** \addtogroup Members for creating and handling QMDI windows
      *  @{
      */
+    //! Find and \return a pointer to the QMdiSubWindow with the _id
+    QMdiSubWindow *findMdiChild(const QString &_id) const;
     //! Create a new Display_container with num_dims the number of dimensions
     Display_container *createMdiChild(int num_dims = 1);
     /** @}*/
@@ -144,12 +150,19 @@ private:
      */
     //! Ask a question to the user
     int ask(QString);
-    //! Test display of 1D data
+    //! This function will create a sinc plot. The plot will have 121 points with
+    //! offset -60.
     bool test_display_1d_data();
-
+    //! Similar to test_display_1d_data() but the array has 121 points, with
+    //! sampling distance 0.5 (mm) therefore the boundaties are [-30,30).
     bool test_display_1d_data_physical();
-
+    //! Creates a 2D sinc plot in a matrix [200, 200], from (-100, -100) to (99, 99)
     bool test_display_2d_data();
+
+    bool test_display_2d_data_alt();
+    //! Similar to test_display_2d_data() but the physical sampling is every 0.5 (mm)
+    //! therefore the size of the image boundaries are (-50, -50) to (49,49) mm .
+    bool test_display_2d_data_physical();
 
     /** @}*/
 };

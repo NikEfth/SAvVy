@@ -41,7 +41,7 @@ void Test_display_container::check_pass_1d()
     io_manager::Array2QVector(test1, vtest1);
 
     // Pass by reference.
-    foo->set_array(vtest1, test1.get_min_index());
+    foo->set_display(vtest1, test1.get_min_index());
 
     for (int i = test1.get_min_index(); i <= test1.get_max_index(); ++i)
         QCOMPARE(foo->at(i), i);
@@ -50,7 +50,7 @@ void Test_display_container::check_pass_1d()
 
     QVector<double> * p_test1 = &vtest1;
     // Pass by pointer.
-    foo->set_array(p_test1, test1.get_min_index());
+    foo->set_display(p_test1, test1.get_min_index());
 
     for (int i = test1.get_min_index(); i <= test1.get_max_index(); ++i)
         QCOMPARE(foo->at(i), i);

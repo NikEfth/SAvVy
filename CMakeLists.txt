@@ -155,6 +155,8 @@ add_library(savvy_gui)
 add_library(savvy_IO)
 add_library(savvy_display)
 
+qt5_add_resources(PROJECT_RESOURCE resources.qrc)
+
 include(src/CMakeLists.txt)
 
 add_executable(${PROJECT_NAME} main.cpp ${PROJECT_RESOURCE})

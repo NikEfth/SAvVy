@@ -27,7 +27,7 @@ void Display_container_2d::set_array(QVector<double>* _array,
 {
     data = * _array;
     row_size = _row_size;
-
+    row_num = data.size() / row_size;
     max_value = *std::max_element(data.begin(), data.end());
     min_value = *std::min_element(data.begin(), data.end());
 }
@@ -37,30 +37,59 @@ void Display_container_2d::set_array(const QVector<double> &_array,
 {
     data = _array;
     row_size = _row_size;
-
+    row_num = data.size() / row_size;
     max_value = *std::max_element(data.begin(), data.end());
     min_value = *std::min_element(data.begin(), data.end());
 }
 
 void Display_container_2d::set_display(QVector<double>* _array,
-                                       int _row_size)
+                                       int _row_size, int _offset_h, int _offset_v)
 {
     set_array(_array, _row_size);
-    update();
+
+    offset_h = _offset_h;
+    offset_v = _offset_v;
+
+    p_raster->setInterval( Qt::YAxis,
+                           QwtInterval( static_cast<double>(offset_v),
+                                        static_cast<double>( offset_v + row_num),
+                                        QwtInterval::ExcludeBorders ) );
+    p_raster->setInterval( Qt::XAxis, QwtInterval(static_cast<double>(offset_h),
+                                                  static_cast<double>(offset_h + row_size),
+                                                  QwtInterval::ExcludeBorders ) );
+
+    update_scene();
 }
 
 void Display_container_2d::set_display(const QVector<double> &_array,
-                                       int _row_size)
+                                       int _row_size,
+                                       int _offset_h, int _offset_v)
 {
     set_array(_array, _row_size);
-    update();
+
+    offset_h = _offset_h;
+    offset_v = _offset_v;
+
+    p_raster->setInterval( Qt::YAxis,
+                           QwtInterval( static_cast<double>(offset_v),
+                                        static_cast<double>( offset_v + row_num),
+                                        QwtInterval::ExcludeBorders ) );
+    p_raster->setInterval( Qt::XAxis, QwtInterval(static_cast<double>(offset_h),
+                                                  static_cast<double>(offset_h + row_size),
+                                                  QwtInterval::ExcludeBorders ) );
+
+    update_scene();
 }
 
 
-void Display_container_2d::set_display(const QVector<QVector<double> > &_array)
+void Display_container_2d::set_display(const QVector<QVector<double> > &_array,
+                                       int _offset_h, int _offset_v)
 {
     row_num = _array.size();
     row_size = _array[0].size();
+
+    offset_h = _offset_h;
+    offset_v = _offset_v;
 
     data.resize(row_size*row_size);
 
@@ -78,6 +107,14 @@ void Display_container_2d::set_display(const QVector<QVector<double> > &_array)
             if(data[idx] < min_value)
                 min_value = data[idx] ;
         }
+
+    p_raster->setInterval( Qt::YAxis,
+                           QwtInterval( static_cast<double>(offset_v),
+                                        static_cast<double>( offset_v + row_num),
+                                        QwtInterval::ExcludeBorders ) );
+    p_raster->setInterval( Qt::XAxis, QwtInterval(static_cast<double>(offset_h),
+                                                  static_cast<double>(offset_h + row_size),
+                                                  QwtInterval::ExcludeBorders ) );
 
     update_scene();
 }
@@ -98,11 +135,11 @@ void Display_container_2d::set_sizes(
     origin_y = _origin_y;
 
     p_raster->setInterval( Qt::YAxis,
-                           QwtInterval( static_cast<double>(offset_v),
-                                        static_cast<double>( offset_v + row_num),
+                           QwtInterval( static_cast<double>(offset_v*v_spacing),
+                                        static_cast<double>( (offset_v + row_num) * v_spacing),
                                         QwtInterval::ExcludeBorders ) );
-    p_raster->setInterval( Qt::XAxis, QwtInterval(static_cast<double>(offset_h),
-                                                  static_cast<double>(offset_h + row_size),
+    p_raster->setInterval( Qt::XAxis, QwtInterval(static_cast<double>(offset_h*h_spacing),
+                                                  static_cast<double>( (offset_h + row_size) * h_spacing),
                                                   QwtInterval::ExcludeBorders ) );
 
     //    setAxisScale(QwtPlot::xBottom, min_x, max_x, h_spacing);
@@ -111,9 +148,9 @@ void Display_container_2d::set_sizes(
 }
 
 void Display_container_2d::set_physical_display(const QVector<QVector<double> > &_array,
-                                            int _offset_h, int _offset_v,
-                                            float _h_spacing, float _v_spacing,
-                                            float _origin_x, float  _origin_y)
+                                                int _offset_h, int _offset_v,
+                                                float _h_spacing, float _v_spacing,
+                                                float _origin_x, float  _origin_y)
 {
     set_display(_array);
     set_sizes(_offset_h, _offset_v, _h_spacing, _v_spacing, _origin_x,  _origin_y);

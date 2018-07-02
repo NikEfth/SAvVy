@@ -25,25 +25,21 @@ public:
     /** \addtogroup Setters
      *  @{
      */
-    //! Set the data array and initialise x_data by pointer
-    virtual void set_array(QVector<double>* , int _row_size = 0);
-    //! Set the data array and initialise x_data by reference
-    virtual void set_array(const QVector<double>&, int _row_size = 0 );
     //! Set the data array and update() display, by pointer
-    virtual void set_display(QVector<double> * , int _row_size = 0 );
+    void set_display(QVector<double> * , int _row_size = 0, int _offset_h = 0, int _offset_v = 0);
     //! Set the data array and update() display, by reference
-    virtual void set_display(const QVector<double>& , int _row_size = 0 );
+    void set_display(const QVector<double>& , int _row_size = 0 , int _offset_h = 0, int _offset_v = 0);
     //! Set the data array from a 2D array and update() display, by reference
-    void set_display(const QVector<QVector<double> >& );
+    void set_display(const QVector<QVector<double> >& , int _offset_h = 0, int _offset_v = 0);
     //! Set physical sizes of the data
     void set_sizes(int _offset_h = 0, int _offset_v = 0,
                    float _h_spacing = 1.f, float _v_spacing = 1.f,
                    float _origin_x = 0.f, float  _origin_y = 0.f);
     //! Set data and physical sizes
     void set_physical_display(const QVector<QVector<double> >&,
-                          int _offset_h = 0, int _offset_v = 0,
-                          float _h_spacing = 1.f, float _v_spacing = 1.f,
-                          float _origin_x = 0.f, float  _origin_y = 0.f);
+                              int _offset_h = 0, int _offset_v = 0,
+                              float _h_spacing = 1.f, float _v_spacing = 1.f,
+                              float _origin_x = 0.f, float  _origin_y = 0.f);
     /** @}*/
 
     /** \addtogroup Members to get access to the data
@@ -68,6 +64,19 @@ public:
     virtual void update_scene();
 
     void clear();
+
+protected:
+
+    /** \addtogroup Setters
+     *  @{
+     */
+    //! Set the data array and initialise x_data by pointer
+    //! \warning In order to find the row_num a division is performed!
+    virtual void set_array(QVector<double>* , int _row_size = 0);
+    //! Set the data array and initialise x_data by reference
+    //! \warning In order to find the row_num a division is performed!
+    virtual void set_array(const QVector<double>&, int _row_size = 0 );
+    /** @}*/
 
 private:
     //! QVector of y data

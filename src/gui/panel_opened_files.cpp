@@ -61,3 +61,8 @@ void Panel_opened_files::removeFromOpenedList(Display_container* child)
     //        }
     //}
 }
+
+void Panel_opened_files::on_listOpenedFiles_itemDoubleClicked(QListWidgetItem *item)
+{
+    emit double_clicked_item(item->toolTip());
+}

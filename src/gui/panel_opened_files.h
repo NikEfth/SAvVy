@@ -26,12 +26,18 @@ public:
     qint16 findQListWidgetItem(QListWidget* this_list,
                                const QString& _id);
 
+signals:
+    void double_clicked_item(QString);
+
 public slots:
     //! Append a window on the  ui->listOpenedFiles
     void appendToOpenedList(Display_container* child);
 
     //! Remove item from the ui->listOpenedFiles list.
     void removeFromOpenedList(Display_container* child);
+
+private slots:
+    void on_listOpenedFiles_itemDoubleClicked(QListWidgetItem *item);
 
 private:
     Ui::Panel_opened_files *ui;

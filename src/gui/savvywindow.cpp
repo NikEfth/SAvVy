@@ -149,6 +149,12 @@ void SavvyWindow::updateGUI(QMdiSubWindow * activeSubWindow)
 
 }
 
+void SavvyWindow::focus_sub_window(QString _id)
+{
+        if (QMdiSubWindow *existing = findMdiChild(_id)) {
+            ui->mdiArea->setActiveSubWindow(existing);
+        }
+}
 
 Display_container *SavvyWindow::createMdiChild(int num_dims)
 {
@@ -160,6 +166,18 @@ Display_container *SavvyWindow::createMdiChild(int num_dims)
         return new Display_container_2d(next_window_id-1, this);
 
     return NULL;
+}
+
+QMdiSubWindow *SavvyWindow::findMdiChild(const QString &_id) const
+{
+    //QString canonicalFilePath = QFileInfo(fileName).canonicalFilePath();
+
+    for(QMdiSubWindow *window: ui->mdiArea->subWindowList()) {
+        Display_container *mdiChild = qobject_cast<Display_container *>(window->widget());
+        if (QString::number(mdiChild->get_my_id()) == _id)
+            return window;
+    }
+    return 0;
 }
 
 bool SavvyWindow::append_to_workspace(Display_container *child,
@@ -233,12 +251,13 @@ void SavvyWindow::create_docks()
 
     dc_opened_files = new QDockWidget("Opened Files", this);
     pnl_opened_files = new Panel_opened_files(this);
-    //    toolMan = new ToolManager(dc_tool_manager);
+    connect(pnl_opened_files, &Panel_opened_files::double_clicked_item,
+            this, &SavvyWindow::focus_sub_window);
+    // TODO: The other way around.
     dc_opened_files->setWidget(pnl_opened_files);
 
     dc_opened_file_controls = new QDockWidget("Controls", this);
     pnl_opened_file_controls = new Panel_opened_file_controls(this);
-    //     //    toolMan = new ToolManager(dc_tool_manager);
     dc_opened_file_controls->setWidget(pnl_opened_file_controls);
 
     this->addDockWidget(Qt::DockWidgetArea::TopDockWidgetArea, dc_contrast);
@@ -417,16 +436,26 @@ void SavvyWindow::on_actionStart_GUI_tests_triggered()
 
     all_tests = test_display_1d_data_physical();
 
+    //all_tests = ask(QString("Has the range of x axis reduced half? "));
+
     all_tests = test_display_2d_data();
 
     //all_tests = ask(QString("Does the image look like a ripple? "));
+
+    all_tests = test_display_2d_data_alt();
+
+    //all_tests = ask(QString("Was this the same as the previous? "));
+
+    all_tests = test_display_2d_data_physical();
+
+    //all_tests = ask(QString("Has the range of the image reduced half? "));
 
 }
 
 bool SavvyWindow::test_display_1d_data()
 {
     Display_container_1d *child = dynamic_cast<Display_container_1d *>(createMdiChild());
-    child->set_file_name("test1 - Indices dimensions");
+    child->set_file_name("test1 - Indiced dimensions");
 
     if (is_null_ptr(child))
         return false;
@@ -437,7 +466,10 @@ bool SavvyWindow::test_display_1d_data()
     for (int i = test1.get_min_index(); i <= test1.get_max_index() ; ++i)
     {
         if(i != 0)
-            test1[i] = sin(0.5*i) / (i*0.5);
+        {
+            float f = static_cast<float>(i);
+            test1[i] = sin(f) / f;
+        }
         else
             test1[i] = 1;
     }
@@ -467,7 +499,10 @@ bool SavvyWindow::test_display_1d_data_physical()
     for (int i = test1.get_min_index(); i <= test1.get_max_index() ; ++i)
     {
         if(i != 0)
-            test1[i] = sin(0.5*i) / (i*0.5);
+        {
+            float f = static_cast<float>(i);
+            test1[i] = sin(f) / (f);
+        }
         else
             test1[i] = 1;
     }
@@ -487,12 +522,91 @@ bool SavvyWindow::test_display_1d_data_physical()
 bool SavvyWindow::test_display_2d_data()
 {
     Display_container_2d *child = dynamic_cast<Display_container_2d *>(createMdiChild(2));
-    child->set_file_name("test2");
+    child->set_file_name("test2 - Indiced dimensions");
 
     if (is_null_ptr(child))
         return false;
 
-    const IndexRange<2> range(stir::Coordinate2D<int>(-100,-100),stir::Coordinate2D<int>(99,99));
+    const IndexRange<2> range(stir::Coordinate2D<int>(-60,-60),stir::Coordinate2D<int>(59,59));
+    stir::Array<2, float> test1(range);
+
+    for (int i = test1.get_min_index(); i <= test1.get_max_index() ; ++i)
+        for (int j = test1[i].get_min_index(); j <= test1[i].get_max_index() ; ++j)
+        {
+            float f = sqrt(i*i + j*j);
+            if( f != 0)
+                test1[i][j] = sin(f) / f;
+            else
+                test1[i][j] = 1;
+        }
+
+    int size = test1.size();
+    QVector<QVector<double> > vtest1(size);
+
+    for (int i = 0; i < size; ++i)
+        vtest1[i].resize(size);
+
+    io_manager::Array2QVector(test1, vtest1);
+
+    child->set_display(vtest1,
+                       test1.get_min_index(), test1[0].get_min_index());
+
+    append_to_workspace(child);
+
+    return true;
+}
+
+bool SavvyWindow::test_display_2d_data_alt()
+{
+    Display_container_2d *child = dynamic_cast<Display_container_2d *>(createMdiChild(2));
+    child->set_file_name("test2 - Indiced dimensions_alt");
+
+    if (is_null_ptr(child))
+        return false;
+
+    const IndexRange<2> range(stir::Coordinate2D<int>(-60,-60),stir::Coordinate2D<int>(59,59));
+    stir::Array<2, float> test1(range);
+
+    for (int i = test1.get_min_index(); i <= test1.get_max_index() ; ++i)
+        for (int j = test1[i].get_min_index(); j <= test1[i].get_max_index() ; ++j)
+        {
+            float f = sqrt(i*i + j*j);
+            if( f != 0)
+                test1[i][j] = sin(f) / f;
+            else
+                test1[i][j] = 1;
+        }
+
+    int size = test1.size();
+    QVector<QVector<double> > vtest1(size);
+
+    for (int i = 0; i < size; ++i)
+        vtest1[i].resize(size);
+
+    io_manager::Array2QVector(test1, vtest1);
+
+    QVector<double> svtest1;
+    savvy::serialize_QVector(vtest1, svtest1);
+
+    child->set_display(svtest1, size,
+                       test1.get_min_index(), test1[0].get_min_index());
+
+    append_to_workspace(child);
+
+    return true;
+}
+
+
+bool SavvyWindow::test_display_2d_data_physical()
+{
+    Display_container_2d *child = dynamic_cast<Display_container_2d *>(createMdiChild(2));
+    child->set_file_name("test2 - physical dimensions");
+
+    if (is_null_ptr(child))
+        return false;
+
+    const IndexRange<2> range(stir::Coordinate2D<int>(-60, -60),
+                              stir::Coordinate2D<int>(59,59));
     stir::Array<2, float> test1(range);
 
     for (int i = test1.get_min_index(); i <= test1.get_max_index() ; ++i)
@@ -514,8 +628,8 @@ bool SavvyWindow::test_display_2d_data()
     io_manager::Array2QVector(test1, vtest1);
 
     child->set_physical_display(vtest1,
-                                test1.get_min_index(),
-                                test1[0].get_min_index());
+                                test1.get_min_index(), test1[0].get_min_index(),
+            0.5, 0.5);
 
     append_to_workspace(child);
 
