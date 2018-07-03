@@ -4,6 +4,7 @@
 #include "src/IO/io_manager.h"
 #include "src/display/display_container_1d.h"
 #include "src/display/display_container_2d.h"
+#include "savvy_settings.h"
 
 #include "stir/is_null_ptr.h"
 #include "stir/common.h"
@@ -55,6 +56,12 @@ void SavvyWindow::closeEvent(QCloseEvent *event)
         settings.setValue("mainWindowState", saveState());
         event->accept();
     }
+}
+
+void SavvyWindow::on_actionDefault_Settings_triggered()
+{
+    Savvy_settings settings(this);
+    settings.exec();
 }
 
 /*
@@ -131,6 +138,9 @@ bool SavvyWindow::open_file(const QString& fileName)
 void SavvyWindow::updateGUI(QMdiSubWindow * activeSubWindow)
 {
     bool hasMdiChild = (ui->mdiArea->subWindowList().size() != 0);
+    if (!hasMdiChild)
+        pnl_opened_file_controls->show_panel(0);
+    pnl_opened_files->setEnabled(hasMdiChild);
 
     if (! stir::is_null_ptr(activeSubWindow))
     {
@@ -140,6 +150,7 @@ void SavvyWindow::updateGUI(QMdiSubWindow * activeSubWindow)
         if (active_display_container != previous_active)
         {
             pnl_opened_file_controls->show_panel(active_display_container->get_num_dimensions());
+            pnl_opened_files->set_active(active_display_container->get_my_id());
 
             previous_active = active_display_container;
         }
@@ -332,6 +343,13 @@ void SavvyWindow::create_actions()
 
     ui->menuWindow->addSeparator();
 
+    shadeAct = new QAction(tr("&Shade"), this);
+    shadeAct->setStatusTip(tr("Shade all windows"));
+    connect(shadeAct, &QAction::triggered, this, &SavvyWindow::shadeSubWindows);
+    ui->menuWindow->addAction(shadeAct);
+
+    ui->menuWindow->addSeparator();
+
     closeAllAct = new QAction(tr("&Close All"), this);
     closeAllAct->setStatusTip(tr("Close all windows"));
     connect(closeAllAct, &QAction::triggered, ui->mdiArea, &QMdiArea::closeAllSubWindows);
@@ -365,6 +383,16 @@ void SavvyWindow::tileSubWindowsHorizontally()
         window->setGeometry(rect);
         window->move(position);
         position.setX(position.x() + window->width());
+    }
+}
+
+void SavvyWindow::shadeSubWindows()
+{
+    if (ui->mdiArea->subWindowList().isEmpty())
+        return;
+
+    foreach (QMdiSubWindow *window, ui->mdiArea->subWindowList()) {
+        window->showShaded();
     }
 }
 

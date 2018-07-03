@@ -23,8 +23,9 @@ public:
     ~Panel_opened_files();
 
     //! Get the row of the Display_container that has _id
-    qint16 findQListWidgetItem(QListWidget* this_list,
-                               const QString& _id);
+    qint16 findQListWidgetItem( const QString& _id);
+    //! Highlight the entry with _id
+    void set_active(int _id);
 
 signals:
     void double_clicked_item(QString);

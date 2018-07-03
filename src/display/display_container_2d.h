@@ -5,15 +5,15 @@
 
 #include <memory>
 
-#include "src/display/display_container.h"
+#include "display_container.h"
+#include "common_display.h"
 
 #include <qwt_plot_spectrogram.h>
 #include <qwt_matrix_raster_data.h>
+#include <qwt_plot_rescaler.h>
 
 //!
 //! \brief The Display_container class
-//! \details The maximum dimention of the supported arrays is 4D. Thats the why the
-//!
 //!
 
 class Display_container_2d : public Display_container
@@ -65,6 +65,9 @@ public:
 
     void clear();
 
+public slots:
+    void set_color_map(int);
+
 protected:
 
     /** \addtogroup Setters
@@ -85,10 +88,6 @@ protected:
 
     int row_num;
 
-    QwtPlotSpectrogram *d_spectrogram;
-
-    QwtMatrixRasterData *p_raster;
-
     int offset_h;
 
     int offset_v;
@@ -104,6 +103,16 @@ protected:
     double min_value;
 
     double max_value;
+
+private:
+
+    QwtPlotSpectrogram *d_spectrogram;
+
+    QwtMatrixRasterData *p_raster;
+
+    QwtPlotRescaler *d_rescaler;
+    //! Current ColorMap
+    display::ColorMap *myColorMap;
 
 };
 

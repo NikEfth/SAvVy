@@ -13,15 +13,19 @@ Panel_opened_files::~Panel_opened_files()
     delete ui;
 }
 
-qint16 Panel_opened_files::findQListWidgetItem(QListWidget* this_list,
-                                               const QString& _id)
+qint16 Panel_opened_files::findQListWidgetItem(const QString& _id)
 {
-    for (qint16 i = 0; i < this_list->count(); ++i)
-        if (this_list->item(i)->toolTip() == _id)
+    for (qint16 i = 0; i <  ui->listOpenedFiles->count(); ++i)
+        if ( ui->listOpenedFiles->item(i)->toolTip() == _id)
             return i;
 
     return -1;
 }
+
+ void Panel_opened_files::set_active(int _id)
+ {
+        ui->listOpenedFiles->setCurrentRow(findQListWidgetItem(QString::number(_id)));
+ }
 
 void Panel_opened_files::appendToOpenedList(Display_container* child)
 {
@@ -37,14 +41,12 @@ void Panel_opened_files::appendToOpenedList(Display_container* child)
     ui->listOpenedFiles->addItem(tmp_itm);
     ui->listOpenedFiles->setCurrentItem(tmp_itm);
 
-    //    mathMan->updateOpenedFiles();
 }
 
 void Panel_opened_files::removeFromOpenedList(Display_container* child)
 {
     // Get sender's row number
-    qint16 rowNum = findQListWidgetItem(ui->listOpenedFiles,
-                                        QString::number(child->get_my_id()));
+    qint16 rowNum = findQListWidgetItem(QString::number(child->get_my_id()));
 
     if (rowNum >= 0)
     {

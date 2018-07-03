@@ -56,6 +56,8 @@ private slots:
     void remove_from_workspace();
     /** @}*/
 
+    void on_actionDefault_Settings_triggered();
+
 private:
 
     /** \addtogroup File Operations
@@ -111,6 +113,8 @@ private:
     void tileSubWindowsVertically();
 
     void tileSubWindowsHorizontally();
+
+    void shadeSubWindows();
     //! QDockWidget witch will hold the ToolManager
     QDockWidget* dc_tool_manager;
     //! QDockWidget for the Panel_opened_files
@@ -135,6 +139,8 @@ private:
     QAction *tileAct;
 
     QAction *cascadeAct;
+
+    QAction *shadeAct;
 
     QAction *closeAllAct;
 

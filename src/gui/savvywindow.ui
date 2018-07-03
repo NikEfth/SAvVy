@@ -19,7 +19,11 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <widget class="QMdiArea" name="mdiArea"/>
+     <widget class="QMdiArea" name="mdiArea">
+      <property name="viewMode">
+       <enum>QMdiArea::TabbedView</enum>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -44,16 +48,27 @@
     <property name="title">
      <string>Edit</string>
     </property>
+    <addaction name="separator"/>
+    <addaction name="actionDefault_Settings"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
      <string>&amp;View</string>
     </property>
+    <widget class="QMenu" name="menuSlice_Annotations">
+     <property name="title">
+      <string>Slice Annotations</string>
+     </property>
+     <addaction name="actionToggle_All_Annotations"/>
+     <addaction name="actionToggle_Crosshair"/>
+    </widget>
+    <addaction name="menuSlice_Annotations"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
      <string>Tools</string>
     </property>
+    <addaction name="actionSlicer"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
@@ -66,10 +81,34 @@
     </property>
     <addaction name="actionStart_GUI_tests"/>
    </widget>
+   <widget class="QMenu" name="menuImage">
+    <property name="title">
+     <string>I&amp;mage</string>
+    </property>
+    <widget class="QMenu" name="menuAdjust">
+     <property name="title">
+      <string>Adjust</string>
+     </property>
+     <addaction name="actionWindow_Level"/>
+    </widget>
+    <addaction name="menuAdjust"/>
+    <addaction name="separator"/>
+    <addaction name="actionShow_Info"/>
+    <addaction name="separator"/>
+    <addaction name="actionDuplicate"/>
+    <addaction name="actionRename"/>
+   </widget>
+   <widget class="QMenu" name="menuPlugins">
+    <property name="title">
+     <string>Pl&amp;ugins</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
+   <addaction name="menuImage"/>
    <addaction name="menuTools"/>
+   <addaction name="menuPlugins"/>
    <addaction name="menuWindow"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -109,10 +148,91 @@
     <string>&amp;Quit</string>
    </property>
   </action>
+  <action name="actionDefault_Settings">
+   <property name="icon">
+    <iconset resource="../../resources.qrc">
+     <normaloff>:/icons/resources/gimp-pro/images/gimp-tool-options.png</normaloff>:/icons/resources/gimp-pro/images/gimp-tool-options.png</iconset>
+   </property>
+   <property name="text">
+    <string>Default Settings</string>
+   </property>
+  </action>
+  <action name="actionToggle_All_Annotations">
+   <property name="icon">
+    <iconset resource="../../resources.qrc">
+     <normaloff>:/icons/resources/gimp-pro/images/gimp-text-dir-ltr.png</normaloff>:/icons/resources/gimp-pro/images/gimp-text-dir-ltr.png</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle All Annotations</string>
+   </property>
+  </action>
+  <action name="actionToggle_Crosshair">
+   <property name="text">
+    <string>Toggle Crosshair</string>
+   </property>
+  </action>
+  <action name="actionWindow_Level">
+   <property name="icon">
+    <iconset resource="../../resources.qrc">
+     <normaloff>:/icons/resources/gimp-pro/images/gimp-tool-levels.png</normaloff>:/icons/resources/gimp-pro/images/gimp-tool-levels.png</iconset>
+   </property>
+   <property name="text">
+    <string>Window\&amp;Level</string>
+   </property>
+  </action>
+  <action name="actionShow_Info">
+   <property name="icon">
+    <iconset resource="../../resources.qrc">
+     <normaloff>:/icons/resources/gimp-pro/images/gimp-info.png</normaloff>:/icons/resources/gimp-pro/images/gimp-info.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show Info</string>
+   </property>
+  </action>
+  <action name="actionDuplicate">
+   <property name="text">
+    <string>Duplicate</string>
+   </property>
+  </action>
+  <action name="actionRename">
+   <property name="icon">
+    <iconset resource="../../resources.qrc">
+     <normaloff>:/icons/resources/gimp-pro/images/gimp-text-dir-ltr.png</normaloff>:/icons/resources/gimp-pro/images/gimp-text-dir-ltr.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename</string>
+   </property>
+  </action>
+  <action name="actionSlicer">
+   <property name="icon">
+    <iconset resource="../../resources.qrc">
+     <normaloff>:/icons/resources/gimp-pro/images/gtk-cut.png</normaloff>:/icons/resources/gimp-pro/images/gtk-cut.png</iconset>
+   </property>
+   <property name="text">
+    <string>Slicer</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
   <include location="../../resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionQuit</sender>
+   <signal>triggered()</signal>
+   <receiver>SavvyWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>319</x>
+     <y>236</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

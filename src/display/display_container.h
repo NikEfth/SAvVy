@@ -15,7 +15,8 @@ class Display_container : public QwtPlot
 public:
     explicit Display_container(int _my_id, QWidget *parent = nullptr, int _num_dim = 1)
         :QwtPlot(parent), dims(_num_dim), my_id(_my_id)
-    { }
+    {
+    }
 
     /** \addtogroup Setters
      *  @{
@@ -48,6 +49,8 @@ public:
     //! Update the display contents
     //! \details Try to keep this as minimal as possible
     virtual void update_scene() = 0;
+
+    void enable_axis(bool state = true);
 
 signals:
     //! Signal to let the application know that this window should be

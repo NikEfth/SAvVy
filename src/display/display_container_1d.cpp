@@ -3,9 +3,13 @@
 #include <qwt_symbol.h>
 #include <qwt_color_map.h>
 
+#include <QSettings>
+
 Display_container_1d::Display_container_1d(int _my_id, QWidget *parent) :
     Display_container(_my_id, parent)
 {
+    QSettings settings;
+
     setCanvasBackground( Qt::white );
 
     QwtPlotGrid *grid = new QwtPlotGrid();
@@ -14,6 +18,13 @@ Display_container_1d::Display_container_1d(int _my_id, QWidget *parent) :
 
     curve = new QwtPlotCurve();
     curve->setPen(Qt::red,2);
+
+    if(settings.contains("showAxisDefault"))
+    {
+//        bool state = settings.value("showAxisDefault").toBool();
+//        this->enableAxis(QwtPlot::xBottom, state);
+//        this->enableAxis(QwtPlot::yLeft, state);
+    }
 
     inc_x = 1.;
 }

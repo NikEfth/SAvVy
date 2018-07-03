@@ -7,13 +7,14 @@ Panel_opened_file_controls::Panel_opened_file_controls(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ctrl_2D = new Controls2DImage(this);
-    ctrl_2D->setVisible(false);
-    ui->horizontalLayout->addWidget(ctrl_2D);
+    controls_1d = new Controls_display_1d(this);
+    controls_2d = new Controls_display_2d(this);
 
-    ctrl_3D = new Controls3DImage(this);
-    ctrl_3D->setVisible(false);
-    ui->horizontalLayout->addWidget(ctrl_3D);
+    controls_1d->setHidden(true);
+    controls_2d->setHidden(true);
+
+    ui->verticalLayout_2->addWidget(controls_1d);
+    ui->verticalLayout_2->addWidget(controls_2d);
 }
 
 Panel_opened_file_controls::~Panel_opened_file_controls()
@@ -24,21 +25,20 @@ Panel_opened_file_controls::~Panel_opened_file_controls()
 
 void Panel_opened_file_controls::show_panel(int dim)
 {
+    controls_1d->setHidden(true);
+    controls_2d->setHidden(true);
+
     switch (dim) {
-    case 0:
-        ctrl_2D->setVisible(false);
-        ctrl_3D->setVisible(false);
-        return;
+    case 1:
+        controls_1d->setHidden(false);
+        break;
     case 2:
-        ctrl_2D->setVisible(true);
-        ctrl_3D->setVisible(false);
-        return;
+        controls_2d->setHidden(false);
+        break;
     case 3:
-        ctrl_2D->setVisible(false);
-        ctrl_3D->setVisible(true);
+
+        break;
     default:
-        ctrl_2D->setVisible(false);
-        ctrl_3D->setVisible(false);
         break;
     }
 }

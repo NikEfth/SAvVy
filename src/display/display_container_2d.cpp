@@ -1,15 +1,33 @@
 #include "display_container_2d.h"
 
+#include <QSettings>
 
 Display_container_2d::Display_container_2d(int _my_id, QWidget *parent, int dims) :
     Display_container(_my_id, parent, dims)
 {
+    QSettings settings;
+
     d_spectrogram = new QwtPlotSpectrogram();
     d_spectrogram->setRenderThreadCount(0);
     d_spectrogram->setCachePolicy(QwtPlotRasterItem::CachePolicy::NoCache);
 
-    //    this->enableAxis(QwtPlot::xBottom, false);
-    //    this->enableAxis(QwtPlot::yLeft, false);
+    if(settings.contains("defaultColorMap"))
+        myColorMap = new display::ColorMap(settings.value("defaultColorMap").toInt());
+    else
+        myColorMap = new display::ColorMap();
+
+    d_spectrogram->setColorMap(myColorMap);
+
+    d_rescaler = new QwtPlotRescaler(this->canvas(),QwtPlot::xBottom, QwtPlotRescaler::Fixed);
+    d_rescaler->setExpandingDirection(QwtPlot::yLeft, QwtPlotRescaler::ExpandBoth);
+    this->setCanvasBackground(QBrush(myColorMap->get_background()));
+
+    if(settings.contains("showAxisDefault"))
+    {
+        bool state = settings.value("showAxisDefault").toBool();
+        this->enableAxis(QwtPlot::xBottom, state);
+        this->enableAxis(QwtPlot::yLeft, state);
+    }
 
     p_raster = new QwtMatrixRasterData();
 
@@ -92,13 +110,13 @@ void Display_container_2d::set_display(const QVector<QVector<double> > &_array,
     offset_h = _offset_h;
     offset_v = _offset_v;
 
-    data.resize(row_size*row_size);
+    data.resize(row_size*row_num);
 
     min_value = 100000;
     max_value = 0;
 
     int idx = 0;
-    for(int i = 0; i < row_size; ++i)
+    for(int i = 0; i < row_num; ++i)
         for(int j = 0; j < row_size; ++j, ++idx)
         {
             data[idx] = _array[i][j];
@@ -173,4 +191,19 @@ void Display_container_2d::clear()
 
     row_size = -1;
     row_num = -1;
+}
+
+void Display_container_2d::set_color_map(int index)
+{
+    myColorMap->setColormap(index);
+    d_spectrogram->setColorMap(myColorMap);
+
+    //    title.setColor(myColorMap->get_peak_color());
+    //    lOCD.setColor(myColorMap->get_peak_color());
+    //    rOCD.setColor(myColorMap->get_peak_color());
+    //    tOCD.setColor(myColorMap->get_peak_color());
+    //    bOCD.setColor(myColorMap->get_peak_color());
+    //    setCanvasBackground(QBrush(myColorMap->get_background()));
+
+    replot();
 }

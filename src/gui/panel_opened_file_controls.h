@@ -3,8 +3,8 @@
 
 #include <QWidget>
 
-#include "controls2dimage.h"
-#include "controls3dimage.h"
+#include "controls_display_1d.h"
+#include "controls_display_2d.h"
 
 namespace Ui {
 class Panel_opened_file_controls;
@@ -23,9 +23,9 @@ public:
 private:
     Ui::Panel_opened_file_controls *ui;
 
-    Controls3DImage* ctrl_3D;
+    Controls_display_1d* controls_1d;
 
-    Controls2DImage* ctrl_2D;
+    Controls_display_2d* controls_2d;
 };
 
 #endif // PANEL_OPENED_FILE_CONTROLS_H
