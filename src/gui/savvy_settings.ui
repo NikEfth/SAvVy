@@ -56,6 +56,11 @@
          <string>Slice view</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>Appearance</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item row="1" column="3">

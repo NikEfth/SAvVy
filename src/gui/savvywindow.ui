@@ -21,7 +21,10 @@
     <item>
      <widget class="QMdiArea" name="mdiArea">
       <property name="viewMode">
-       <enum>QMdiArea::TabbedView</enum>
+       <enum>QMdiArea::SubWindowView</enum>
+      </property>
+      <property name="documentMode">
+       <bool>true</bool>
       </property>
      </widget>
     </item>

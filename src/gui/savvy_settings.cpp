@@ -78,6 +78,7 @@ ViewSettings::ViewSettings(QWidget *parent) :
     {
         QLabel* lbl_preview =new QLabel("Preview:", visualisationGroup);
         visualisationGroupLayout->addWidget(lbl_preview,1,0);
+
         int size = 80;
         QVector<QVector<double> > vtest1(size);
         for (int i = 0; i < size; ++i)
@@ -87,16 +88,22 @@ ViewSettings::ViewSettings(QWidget *parent) :
                 vtest1[i][j] = sqrt(i*i + j*j);
         }
 
-        preview = new Display_container_2d(0, visualisationGroup);
+        preview = new Display_container_2d(0, 2, visualisationGroup);
         preview->set_display(vtest1);
         preview->enable_axis(false);
-        visualisationGroupLayout->addWidget(preview,2,0,1,2);
+        visualisationGroupLayout->addWidget(preview,1,1);
         connect(colorMapCombo,  static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
                 preview, &Display_container_2d::set_color_map);
     }
 
     visualisationGroup->setLayout(visualisationGroupLayout);
     mainLayout->addWidget(visualisationGroup);
+}
+
+AppearanceSettings::AppearanceSettings(QWidget *parent) :
+    QWidget(parent)
+{
+
 }
 
 Savvy_settings::Savvy_settings(QWidget *parent) :
@@ -111,6 +118,10 @@ Savvy_settings::Savvy_settings(QWidget *parent) :
 
     view_setts = new ViewSettings(this);
     ui->verticalLayout_2->addWidget(view_setts);
+
+    appearance_setts = new AppearanceSettings(this);
+    ui->verticalLayout_2->addWidget(appearance_setts);
+
     ui->verticalLayout_2->addStretch();
 
     general_setts->setHidden(true);
@@ -134,6 +145,7 @@ void Savvy_settings::on_listWidget_currentRowChanged(int currentRow)
 {
     general_setts->setHidden(true);
     view_setts->setHidden(true);
+    appearance_setts->setHidden(true);
 
     switch (currentRow) {
     case 0:
@@ -141,6 +153,9 @@ void Savvy_settings::on_listWidget_currentRowChanged(int currentRow)
         break;
     case 1:
         view_setts->setHidden(false);
+        break;
+    case 2:
+        appearance_setts->setHidden(false);
         break;
     default:
         break;

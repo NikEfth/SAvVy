@@ -2,7 +2,7 @@
 
 
 Display_container_3d::Display_container_3d(int _my_id, QWidget *parent) :
-    Display_container_2d(_my_id, parent, 3)
+    Display_container_2d(_my_id, 3, parent)
 {
 
 }

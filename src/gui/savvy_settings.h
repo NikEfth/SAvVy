@@ -50,6 +50,16 @@ public:
     Display_container_2d* preview;
 };
 
+class AppearanceSettings : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit AppearanceSettings(QWidget *parent = 0);
+
+
+};
+
 
 //!
 //! \brief The Savvy_settings class
@@ -73,6 +83,8 @@ private:
     GeneralSettings* general_setts;
     //! View related settings
     ViewSettings* view_setts;
+    //! Settings of color for different visual elements
+    AppearanceSettings* appearance_setts;
 };
 
 #endif // SAVVY_SETTINGS_H

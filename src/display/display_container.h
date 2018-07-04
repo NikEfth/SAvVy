@@ -9,11 +9,16 @@
 //! \brief The Display_container class
 //! \details The maximum dimention of the supported arrays is 4D. Thats the why the
 //!
+//! Few advice on how to create arrays:
+//!
+//! Initialising an stir::IndexRange<2>() is done with stir::Coordinate2D<int>(X, Y).
+//! A good practice to follow is from (-row_size/2) up to (-row_size/2 + row_size). That
+//! is how STIR does it.
 class Display_container : public QwtPlot
 {
     Q_OBJECT
 public:
-    explicit Display_container(int _my_id, QWidget *parent = nullptr, int _num_dim = 1)
+    explicit Display_container(int _my_id, int _num_dim, QWidget *parent = nullptr)
         :QwtPlot(parent), dims(_num_dim), my_id(_my_id)
     {
     }

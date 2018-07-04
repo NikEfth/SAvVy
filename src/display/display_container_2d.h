@@ -20,7 +20,7 @@ class Display_container_2d : public Display_container
 {
     Q_OBJECT
 public:
-    explicit Display_container_2d(int, QWidget *parent = nullptr, int dims = 2);
+    explicit Display_container_2d(int, int dims = 2, QWidget *parent = nullptr);
 
     /** \addtogroup Setters
      *  @{
@@ -40,6 +40,10 @@ public:
                               int _offset_h = 0, int _offset_v = 0,
                               float _h_spacing = 1.f, float _v_spacing = 1.f,
                               float _origin_x = 0.f, float  _origin_y = 0.f);
+    //! Set the axis. As a weird convention X axis is the
+    //! vertical axis and Y the horizontal.
+    void set_axis(int _offset_h, int _offset_v,
+                  float _h_spacing = 1, float _v_spacing = 1);
     /** @}*/
 
     /** \addtogroup Members to get access to the data
@@ -79,9 +83,12 @@ protected:
     //! Set the data array and initialise x_data by reference
     //! \warning In order to find the row_num a division is performed!
     void set_array(const QVector<double>&, int _row_size = 0 );
+    //! Set 2D data. This function will perform the transformation to 1D
+    void set_array(const QVector<QVector<double> > &_array);
     /** @}*/
 
-    //! QVector of y data
+    //! QVector of data.
+    //! \warning QWT plots column-wise.
     QVector<double> data;
 
     int row_size;

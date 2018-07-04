@@ -2,8 +2,8 @@
 
 #include <QSettings>
 
-Display_container_2d::Display_container_2d(int _my_id, QWidget *parent, int dims) :
-    Display_container(_my_id, parent, dims)
+Display_container_2d::Display_container_2d(int _my_id,  int dims, QWidget *parent) :
+    Display_container(_my_id, dims,parent)
 {
     QSettings settings;
 
@@ -18,8 +18,8 @@ Display_container_2d::Display_container_2d(int _my_id, QWidget *parent, int dims
 
     d_spectrogram->setColorMap(myColorMap);
 
-    d_rescaler = new QwtPlotRescaler(this->canvas(),QwtPlot::xBottom, QwtPlotRescaler::Fixed);
-    d_rescaler->setExpandingDirection(QwtPlot::yLeft, QwtPlotRescaler::ExpandBoth);
+    //    d_rescaler = new QwtPlotRescaler(this->canvas(),QwtPlot::yLeft, QwtPlotRescaler::Fitting);
+    //    d_rescaler->setExpandingDirection(QwtPlot::xBottom, QwtPlotRescaler::ExpandBoth);
     this->setCanvasBackground(QBrush(myColorMap->get_background()));
 
     if(settings.contains("showAxisDefault"))
@@ -55,10 +55,35 @@ void Display_container_2d::set_array(const QVector<double> &_array,
                                      int _row_size)
 {
     data = _array;
+
     row_size = _row_size;
     row_num = data.size() / row_size;
+
     max_value = *std::max_element(data.begin(), data.end());
     min_value = *std::min_element(data.begin(), data.end());
+}
+
+void Display_container_2d::set_array(const QVector<QVector<double> > &_array)
+{
+    row_num = _array.size();
+    row_size = _array[0].size();
+
+    data.resize(row_size*row_num);
+
+    min_value = 100000;
+    max_value = 0;
+
+    int idx = 0;
+    for(int i = 0; i < row_num; ++i)
+        for(int j = 0; j < row_size; ++j, ++idx)
+        {
+            data[idx] = _array[i][j];
+
+            if (data[idx] > max_value)
+                max_value = data[idx] ;
+            if(data[idx] < min_value)
+                min_value = data[idx] ;
+        }
 }
 
 void Display_container_2d::set_display(QVector<double>* _array,
@@ -66,17 +91,7 @@ void Display_container_2d::set_display(QVector<double>* _array,
 {
     set_array(_array, _row_size);
 
-    offset_h = _offset_h;
-    offset_v = _offset_v;
-
-    p_raster->setInterval( Qt::YAxis,
-                           QwtInterval( static_cast<double>(offset_v),
-                                        static_cast<double>( offset_v + row_num),
-                                        QwtInterval::ExcludeBorders ) );
-    p_raster->setInterval( Qt::XAxis, QwtInterval(static_cast<double>(offset_h),
-                                                  static_cast<double>(offset_h + row_size),
-                                                  QwtInterval::ExcludeBorders ) );
-
+    set_axis(_offset_h, _offset_v);
     update_scene();
 }
 
@@ -85,17 +100,7 @@ void Display_container_2d::set_display(const QVector<double> &_array,
                                        int _offset_h, int _offset_v)
 {
     set_array(_array, _row_size);
-
-    offset_h = _offset_h;
-    offset_v = _offset_v;
-
-    p_raster->setInterval( Qt::YAxis,
-                           QwtInterval( static_cast<double>(offset_v),
-                                        static_cast<double>( offset_v + row_num),
-                                        QwtInterval::ExcludeBorders ) );
-    p_raster->setInterval( Qt::XAxis, QwtInterval(static_cast<double>(offset_h),
-                                                  static_cast<double>(offset_h + row_size),
-                                                  QwtInterval::ExcludeBorders ) );
+    set_axis(_offset_h, _offset_v);
 
     update_scene();
 }
@@ -106,9 +111,6 @@ void Display_container_2d::set_display(const QVector<QVector<double> > &_array,
 {
     row_num = _array.size();
     row_size = _array[0].size();
-
-    offset_h = _offset_h;
-    offset_v = _offset_v;
 
     data.resize(row_size*row_num);
 
@@ -127,14 +129,7 @@ void Display_container_2d::set_display(const QVector<QVector<double> > &_array,
                 min_value = data[idx] ;
         }
 
-    p_raster->setInterval( Qt::YAxis,
-                           QwtInterval( static_cast<double>(offset_v),
-                                        static_cast<double>( offset_v + row_num),
-                                        QwtInterval::ExcludeBorders ) );
-    p_raster->setInterval( Qt::XAxis, QwtInterval(static_cast<double>(offset_h),
-                                                  static_cast<double>(offset_h + row_size),
-                                                  QwtInterval::ExcludeBorders ) );
-
+    set_axis(_offset_h, _offset_v);
     update_scene();
 }
 
@@ -143,27 +138,12 @@ void Display_container_2d::set_sizes(
         float _h_spacing, float _v_spacing,
         float _origin_x, float  _origin_y)
 {
-
-    offset_h = _offset_h;
-    offset_v = _offset_v;
-
-    h_spacing = _h_spacing;
-    v_spacing = _v_spacing;
+    set_axis(_offset_h, _offset_v,
+             _h_spacing, _v_spacing);
 
     origin_x = _origin_x;
     origin_y = _origin_y;
 
-    p_raster->setInterval( Qt::YAxis,
-                           QwtInterval( static_cast<double>(offset_v*v_spacing),
-                                        static_cast<double>( (offset_v + row_num) * v_spacing),
-                                        QwtInterval::ExcludeBorders ) );
-    p_raster->setInterval( Qt::XAxis, QwtInterval(static_cast<double>(offset_h*h_spacing),
-                                                  static_cast<double>( (offset_h + row_size) * h_spacing),
-                                                  QwtInterval::ExcludeBorders ) );
-
-    //    setAxisScale(QwtPlot::xBottom, min_x, max_x, h_spacing);
-    //    setAxisScale(QwtPlot::yLeft, offset_v * v_spacing,
-    //                 (offset_v + row_size) * v_spacing, v_spacing);
 }
 
 void Display_container_2d::set_physical_display(const QVector<QVector<double> > &_array,
@@ -171,18 +151,56 @@ void Display_container_2d::set_physical_display(const QVector<QVector<double> > 
                                                 float _h_spacing, float _v_spacing,
                                                 float _origin_x, float  _origin_y)
 {
-    set_display(_array);
+    set_array(_array);
     set_sizes(_offset_h, _offset_v, _h_spacing, _v_spacing, _origin_x,  _origin_y);
     update_scene();
 }
+
+void Display_container_2d::set_axis(int _offset_h, int _offset_v,
+                                    float _h_spacing, float _v_spacing)
+{
+
+    offset_h = _offset_h;
+    offset_v = _offset_v;
+
+    h_spacing = _h_spacing;
+    v_spacing = _v_spacing;
+
+    p_raster->setInterval( Qt::XAxis,
+                           QwtInterval( static_cast<double>(offset_v)*v_spacing,
+                                        static_cast<double>( (offset_v + row_num) )*v_spacing,
+                                        QwtInterval::IncludeBorders ) );
+    p_raster->setInterval( Qt::YAxis, QwtInterval(static_cast<double>(offset_h)*h_spacing,
+                                                  static_cast<double>(offset_h + row_size)*h_spacing,
+                                                  QwtInterval::IncludeBorders ) );
+
+    if ( static_cast<double>(offset_h + row_size)*h_spacing < static_cast<double>( (offset_v + row_num) )*v_spacing)
+    {
+        d_rescaler = new QwtPlotRescaler(this->canvas(),QwtPlot::xBottom, QwtPlotRescaler::Fixed);
+        d_rescaler->setExpandingDirection(QwtPlot::yLeft, QwtPlotRescaler::ExpandBoth);
+    }
+    else if  ( static_cast<double>(offset_h + row_size)*h_spacing > static_cast<double>( (offset_v + row_num) )*v_spacing)
+    {
+        d_rescaler = new QwtPlotRescaler(this->canvas(),QwtPlot::yLeft, QwtPlotRescaler::Fixed);
+        d_rescaler->setExpandingDirection(QwtPlot::xBottom, QwtPlotRescaler::ExpandBoth);
+    }
+    else
+    {
+        d_rescaler = new QwtPlotRescaler(this->canvas(),QwtPlot::xBottom, QwtPlotRescaler::Fixed);
+        d_rescaler->setExpandingDirection(QwtPlot::yLeft, QwtPlotRescaler::ExpandBoth);
+    }
+
+
+}
+
 
 void Display_container_2d::update_scene()
 {
     p_raster->setValueMatrix(data, row_size);
     p_raster->setInterval( Qt::ZAxis, QwtInterval(min_value,  max_value));
     d_spectrogram->setData(p_raster);
-
     replot();
+//    d_rescaler->rescale();
 }
 
 void Display_container_2d::clear()

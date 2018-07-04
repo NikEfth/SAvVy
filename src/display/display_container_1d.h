@@ -16,7 +16,7 @@ class Display_container_1d : public Display_container
 {
     Q_OBJECT
 public:
-    explicit Display_container_1d(int, QWidget *parent = nullptr);
+    explicit Display_container_1d(int, int dims = 1, QWidget *parent = nullptr);
 
     /** \addtogroup Setters
      *  @{

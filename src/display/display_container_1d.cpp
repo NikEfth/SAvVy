@@ -5,8 +5,8 @@
 
 #include <QSettings>
 
-Display_container_1d::Display_container_1d(int _my_id, QWidget *parent) :
-    Display_container(_my_id, parent)
+Display_container_1d::Display_container_1d(int _my_id, int dims, QWidget *parent) :
+    Display_container(_my_id, dims, parent)
 {
     QSettings settings;
 
