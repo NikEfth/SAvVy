@@ -201,6 +201,7 @@ void Display_container_2d::update_scene()
     d_spectrogram->setData(p_raster);
     replot();
 //    d_rescaler->rescale();
+    this->adjustSize();
 }
 
 void Display_container_2d::clear()

@@ -60,7 +60,7 @@
     </property>
     <widget class="QMenu" name="menuSlice_Annotations">
      <property name="title">
-      <string>Slice Annotations</string>
+      <string>&amp;Slice Annotations</string>
      </property>
      <addaction name="actionToggle_All_Annotations"/>
      <addaction name="actionToggle_Crosshair"/>
@@ -72,6 +72,7 @@
      <string>Tools</string>
     </property>
     <addaction name="actionSlicer"/>
+    <addaction name="actionThreshold"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
@@ -90,7 +91,7 @@
     </property>
     <widget class="QMenu" name="menuAdjust">
      <property name="title">
-      <string>Adjust</string>
+      <string>&amp;Adjust</string>
      </property>
      <addaction name="actionWindow_Level"/>
     </widget>
@@ -157,7 +158,7 @@
      <normaloff>:/icons/resources/gimp-pro/images/gimp-tool-options.png</normaloff>:/icons/resources/gimp-pro/images/gimp-tool-options.png</iconset>
    </property>
    <property name="text">
-    <string>Default Settings</string>
+    <string>&amp;Default Settings</string>
    </property>
   </action>
   <action name="actionToggle_All_Annotations">
@@ -166,12 +167,12 @@
      <normaloff>:/icons/resources/gimp-pro/images/gimp-text-dir-ltr.png</normaloff>:/icons/resources/gimp-pro/images/gimp-text-dir-ltr.png</iconset>
    </property>
    <property name="text">
-    <string>Toggle All Annotations</string>
+    <string>&amp;Toggle All Annotations</string>
    </property>
   </action>
   <action name="actionToggle_Crosshair">
    <property name="text">
-    <string>Toggle Crosshair</string>
+    <string>Toggle &amp;Crosshair</string>
    </property>
   </action>
   <action name="actionWindow_Level">
@@ -189,12 +190,12 @@
      <normaloff>:/icons/resources/gimp-pro/images/gimp-info.png</normaloff>:/icons/resources/gimp-pro/images/gimp-info.png</iconset>
    </property>
    <property name="text">
-    <string>Show Info</string>
+    <string>&amp;Show Info</string>
    </property>
   </action>
   <action name="actionDuplicate">
    <property name="text">
-    <string>Duplicate</string>
+    <string>&amp;Duplicate</string>
    </property>
   </action>
   <action name="actionRename">
@@ -203,7 +204,7 @@
      <normaloff>:/icons/resources/gimp-pro/images/gimp-text-dir-ltr.png</normaloff>:/icons/resources/gimp-pro/images/gimp-text-dir-ltr.png</iconset>
    </property>
    <property name="text">
-    <string>Rename</string>
+    <string>&amp;Rename</string>
    </property>
   </action>
   <action name="actionSlicer">
@@ -212,7 +213,16 @@
      <normaloff>:/icons/resources/gimp-pro/images/gtk-cut.png</normaloff>:/icons/resources/gimp-pro/images/gtk-cut.png</iconset>
    </property>
    <property name="text">
-    <string>Slicer</string>
+    <string>&amp;Slice</string>
+   </property>
+  </action>
+  <action name="actionThreshold">
+   <property name="icon">
+    <iconset resource="../../resources.qrc">
+     <normaloff>:/icons/resources/gimp-pro/images/gimp-tool-threshold.png</normaloff>:/icons/resources/gimp-pro/images/gimp-tool-threshold.png</iconset>
+   </property>
+   <property name="text">
+    <string>Threshold</string>
    </property>
   </action>
  </widget>

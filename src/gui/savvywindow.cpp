@@ -209,6 +209,7 @@ bool SavvyWindow::append_to_workspace(Display_container *child,
     else
         child->showMinimized();
 
+
     return true;
 }
 

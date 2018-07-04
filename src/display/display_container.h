@@ -2,6 +2,7 @@
 #define DISPLAY_CONTAINER_H
 
 #include <qwt_plot.h>
+#include <qwt_plot_layout.h>
 
 //#include "common_display.h"
 
@@ -14,6 +15,11 @@
 //! Initialising an stir::IndexRange<2>() is done with stir::Coordinate2D<int>(X, Y).
 //! A good practice to follow is from (-row_size/2) up to (-row_size/2 + row_size). That
 //! is how STIR does it.
+//!
+//! \todo There the size of the plots with/without the axis as default is inconsistent.
+//! It the axis are enabled by default then the images are larger. Otherwise the
+//! size falls to that of the minimum canvas. This creates another one inconsistency
+//! with the size of the colormap preview widget.
 class Display_container : public QwtPlot
 {
     Q_OBJECT
@@ -21,6 +27,7 @@ public:
     explicit Display_container(int _my_id, int _num_dim, QWidget *parent = nullptr)
         :QwtPlot(parent), dims(_num_dim), my_id(_my_id)
     {
+        this->canvas()->setMinimumSize(150, 150);
     }
 
     /** \addtogroup Setters
@@ -70,6 +77,7 @@ protected:
     //! from various places.
     void closeEvent(QCloseEvent *event) override;
 
+    QwtPlotLayout* layout;
 private:
     //! Number of dimensions of the data
     int dims;
