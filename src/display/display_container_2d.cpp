@@ -7,6 +7,9 @@ Display_container_2d::Display_container_2d(int _my_id,  int dims, QWidget *paren
 {
     QSettings settings;
 
+    _data.resize(1);
+    data = &_data[0];
+
     d_spectrogram = new QwtPlotSpectrogram();
     d_spectrogram->setRenderThreadCount(0);
     d_spectrogram->setCachePolicy(QwtPlotRasterItem::CachePolicy::NoCache);
@@ -38,29 +41,29 @@ Display_container_2d::Display_container_2d(int _my_id,  int dims, QWidget *paren
 
 double Display_container_2d::at(int row, int col)
 {
-    return data[(col + abs(offset_h)) + (row + abs(offset_v) )* row_size];
+    return data[0][(col + abs(offset_h)) + (row + abs(offset_v) )* row_size];
 }
 
 void Display_container_2d::set_array(QVector<double>* _array,
                                      int _row_size)
 {
-    data = * _array;
+    *data = * _array;
     row_size = _row_size;
-    row_num = data.size() / row_size;
-    max_value = *std::max_element(data.begin(), data.end());
-    min_value = *std::min_element(data.begin(), data.end());
+    row_num = data->size() / row_size;
+    max_value = *std::max_element(data[0].begin(), data[0].end());
+    min_value = *std::min_element(data[0].begin(), data[0].end());
 }
 
 void Display_container_2d::set_array(const QVector<double> &_array,
                                      int _row_size)
 {
-    data = _array;
+    * data = _array;
 
     row_size = _row_size;
-    row_num = data.size() / row_size;
+    row_num = data->size() / row_size;
 
-    max_value = *std::max_element(data.begin(), data.end());
-    min_value = *std::min_element(data.begin(), data.end());
+    max_value = *std::max_element(data->begin(), data->end());
+    min_value = *std::min_element(data->begin(), data->end());
 }
 
 void Display_container_2d::set_array(const QVector<QVector<double> > &_array)
@@ -68,7 +71,7 @@ void Display_container_2d::set_array(const QVector<QVector<double> > &_array)
     row_num = _array.size();
     row_size = _array[0].size();
 
-    data.resize(row_size*row_num);
+    data->resize(row_size*row_num);
 
     min_value = 100000;
     max_value = 0;
@@ -77,12 +80,12 @@ void Display_container_2d::set_array(const QVector<QVector<double> > &_array)
     for(int i = 0; i < row_num; ++i)
         for(int j = 0; j < row_size; ++j, ++idx)
         {
-            data[idx] = _array[i][j];
+            (*data)[idx] = _array[i][j];
 
-            if (data[idx] > max_value)
-                max_value = data[idx] ;
-            if(data[idx] < min_value)
-                min_value = data[idx] ;
+            if ((*data)[idx] > max_value)
+                max_value = (*data)[idx] ;
+            if((*data)[idx] < min_value)
+                min_value = (*data)[idx] ;
         }
 }
 
@@ -101,7 +104,6 @@ void Display_container_2d::set_display(const QVector<double> &_array,
 {
     set_array(_array, _row_size);
     set_axis(_offset_h, _offset_v);
-
     update_scene();
 }
 
@@ -109,26 +111,7 @@ void Display_container_2d::set_display(const QVector<double> &_array,
 void Display_container_2d::set_display(const QVector<QVector<double> > &_array,
                                        int _offset_h, int _offset_v)
 {
-    row_num = _array.size();
-    row_size = _array[0].size();
-
-    data.resize(row_size*row_num);
-
-    min_value = 100000;
-    max_value = 0;
-
-    int idx = 0;
-    for(int i = 0; i < row_num; ++i)
-        for(int j = 0; j < row_size; ++j, ++idx)
-        {
-            data[idx] = _array[i][j];
-
-            if (data[idx] > max_value)
-                max_value = data[idx] ;
-            if(data[idx] < min_value)
-                min_value = data[idx] ;
-        }
-
+    set_array(_array);
     set_axis(_offset_h, _offset_v);
     update_scene();
 }
@@ -196,17 +179,17 @@ void Display_container_2d::set_axis(int _offset_h, int _offset_v,
 
 void Display_container_2d::update_scene()
 {
-    p_raster->setValueMatrix(data, row_size);
+    p_raster->setValueMatrix(*data, row_size);
     p_raster->setInterval( Qt::ZAxis, QwtInterval(min_value,  max_value));
     d_spectrogram->setData(p_raster);
     replot();
-//    d_rescaler->rescale();
+    //    d_rescaler->rescale();
     this->adjustSize();
 }
 
 void Display_container_2d::clear()
 {
-    data.clear();
+    data->clear();
 
     row_size = -1;
     row_num = -1;

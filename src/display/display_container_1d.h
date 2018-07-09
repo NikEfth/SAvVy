@@ -18,6 +18,7 @@ class Display_container_1d : public Display_container
 public:
     explicit Display_container_1d(int, int dims = 1, QWidget *parent = nullptr);
 
+//    virtual Display_container_1d* clone() const;
     /** \addtogroup Setters
      *  @{
      */
@@ -36,7 +37,7 @@ public:
     //! Clear the data and x_data
     void clear();
 
-    /** \addtogroup Members to get access to the data
+    /** \addtogroup Getters
      *  @{
      */
     //! Get value at position. The offset is taken into account

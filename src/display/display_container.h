@@ -29,6 +29,8 @@ public:
     {
         this->canvas()->setMinimumSize(150, 150);
     }
+//    //! Clone function
+//    virtual Display_container* clone() const = 0;
 
     /** \addtogroup Setters
      *  @{
@@ -36,6 +38,12 @@ public:
     inline void set_file_name(QString _s)
     {
         fullFileName = _s;
+        this->setWindowTitle(_s);
+    }
+
+    inline void rename(const QString& _s)
+    {
+        set_file_name(_s);
     }
     /** @}*/
 
@@ -52,6 +60,7 @@ public:
         return fullFileName;
     }
 
+    //! \return the unique (per session) id for this window
     inline int get_my_id() const
     {
         return my_id;

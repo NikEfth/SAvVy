@@ -29,6 +29,11 @@ Display_container_1d::Display_container_1d(int _my_id, int dims, QWidget *parent
     inc_x = 1.;
 }
 
+//Display_container_1d* Display_container_1d::clone() const
+//{
+//    return new Display_container_1d(*this);
+//}
+
 double Display_container_1d::at(int val) const
 {
     return data.at(val + abs(data_offset));

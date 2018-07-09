@@ -59,6 +59,9 @@
      <string>&amp;View</string>
     </property>
     <widget class="QMenu" name="menuSlice_Annotations">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>&amp;Slice Annotations</string>
      </property>
@@ -84,12 +87,17 @@
      <string>Help</string>
     </property>
     <addaction name="actionStart_GUI_tests"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuImage">
     <property name="title">
      <string>I&amp;mage</string>
     </property>
     <widget class="QMenu" name="menuAdjust">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>&amp;Adjust</string>
      </property>
@@ -99,7 +107,6 @@
     <addaction name="separator"/>
     <addaction name="actionShow_Info"/>
     <addaction name="separator"/>
-    <addaction name="actionDuplicate"/>
     <addaction name="actionRename"/>
    </widget>
    <widget class="QMenu" name="menuPlugins">
@@ -140,7 +147,7 @@
      <normaloff>:/icons/resources/gimp-pro/images/gimp-controller-linux-input.png</normaloff>:/icons/resources/gimp-pro/images/gimp-controller-linux-input.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Start GUI tests</string>
+    <string>&amp;Start Simple GUI tests</string>
    </property>
   </action>
   <action name="actionQuit">
@@ -185,6 +192,9 @@
    </property>
   </action>
   <action name="actionShow_Info">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../resources.qrc">
      <normaloff>:/icons/resources/gimp-pro/images/gimp-info.png</normaloff>:/icons/resources/gimp-pro/images/gimp-info.png</iconset>
@@ -199,15 +209,21 @@
    </property>
   </action>
   <action name="actionRename">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../resources.qrc">
-     <normaloff>:/icons/resources/gimp-pro/images/gimp-text-dir-ltr.png</normaloff>:/icons/resources/gimp-pro/images/gimp-text-dir-ltr.png</iconset>
+     <normaloff>:/icons/resources/other_icons/rename.png</normaloff>:/icons/resources/other_icons/rename.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Rename</string>
    </property>
   </action>
   <action name="actionSlicer">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../resources.qrc">
      <normaloff>:/icons/resources/gimp-pro/images/gtk-cut.png</normaloff>:/icons/resources/gimp-pro/images/gtk-cut.png</iconset>
@@ -217,12 +233,24 @@
    </property>
   </action>
   <action name="actionThreshold">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../resources.qrc">
      <normaloff>:/icons/resources/gimp-pro/images/gimp-tool-threshold.png</normaloff>:/icons/resources/gimp-pro/images/gimp-tool-threshold.png</iconset>
    </property>
    <property name="text">
-    <string>Threshold</string>
+    <string>&amp;Threshold</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="../../resources.qrc">
+     <normaloff>:/icons/resources/other_icons/icons8-microbeam-radiation-therapy-16.png</normaloff>:/icons/resources/other_icons/icons8-microbeam-radiation-therapy-16.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;About</string>
    </property>
   </action>
  </widget>

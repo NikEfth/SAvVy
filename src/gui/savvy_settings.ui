@@ -104,11 +104,27 @@
        </property>
       </spacer>
      </item>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="pushButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Defaults</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../resources.qrc">
+         <normaloff>:/icons/resources/gimp-pro/images/gimp-reset.png</normaloff>:/icons/resources/gimp-pro/images/gimp-reset.png</iconset>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>pb_cancel</sender>

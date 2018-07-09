@@ -31,6 +31,9 @@ GeneralSettings::GeneralSettings(QWidget *parent) :
         defaultAxis = new QCheckBox("Show axis by default ", defaultsPage);
         defaultsPageLayout->addWidget(defaultAxis);
 
+        defaultTabbedMode = new QCheckBox("Use Tabbed view mode by default ", defaultsPage);
+        defaultsPageLayout->addWidget(defaultTabbedMode);
+
         defaultsPageLayout->addStretch();
         mainTab->addTab(defaultsPage,"Defaults");
         //
@@ -131,6 +134,7 @@ Savvy_settings::Savvy_settings(QWidget *parent) :
     view_setts->colorMapCombo->setCurrentIndex(settings.value("defaultColorMap").toInt());
     general_setts->autoContrast->setChecked(settings.value("AutoScaleImages").toBool());
     general_setts->defaultAxis->setChecked(settings.value("showAxisDefault").toBool());
+    general_setts->defaultTabbedMode->setChecked(settings.value("defaultTabbedViewMode").toBool());
 
     ui->listWidget->setCurrentRow(0);
     connect(ui->pb_save, &QPushButton::clicked, this, &Savvy_settings::on_save_settings);
@@ -168,6 +172,7 @@ void Savvy_settings::on_save_settings()
     settings.setValue("defaultColorMap", view_setts->colorMapCombo->currentIndex());
     settings.setValue("AutoScaleImages", general_setts->autoContrast->isChecked());
     settings.setValue("showAxisDefault", general_setts->defaultAxis->isChecked());
+    settings.setValue("defaultTabbedViewMode", general_setts->defaultTabbedMode->isChecked());
 
     this->close();
 }

@@ -13,8 +13,12 @@
 #include <qwt_plot_rescaler.h>
 
 //!
-//! \brief The Display_container class
+//! \brief The definition of Display_container_2d class
 //!
+//! \details The data in 2D are held by a 1D array with size [cols \times rows], which
+//! is encapsulated in a QVector.The outtermost vector will never have more
+//! arrays other from the first. I implemented it this way, so it can be used
+//! as a parent class for the Display_container_3d.
 
 class Display_container_2d : public Display_container
 {
@@ -46,7 +50,7 @@ public:
                   float _h_spacing = 1, float _v_spacing = 1);
     /** @}*/
 
-    /** \addtogroup Members to get access to the data
+    /** \addtogroup Getters
      *  @{
      */
 
@@ -88,8 +92,9 @@ protected:
     /** @}*/
 
     //! QVector of data.
-    //! \warning QWT plots column-wise.
-    QVector<double> data;
+    QVector< QVector<double> > _data;
+
+    QVector<double> * data;
 
     int row_size;
 

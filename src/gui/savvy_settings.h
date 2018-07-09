@@ -30,6 +30,8 @@ public:
     //! collapsed.
     QCheckBox* defaultAxis;
 
+    QCheckBox* defaultTabbedMode;
+
     QVBoxLayout* mainLayout;
 };
 

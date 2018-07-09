@@ -11,7 +11,7 @@ namespace savvy {
 
 template<class T>
 void serialize_QVector(const QVector<QVector<T> >& in,
-                      QVector<T>& out)
+                       QVector<T>& out)
 {
     assert(in.size() > 0);
     int row_num = in.size();
@@ -37,7 +37,7 @@ void serialize_QVector(const QVector<QVector<T> >& in,
 //! \warning Be carefull that [XxY] = size_row_vector
 template<class T>
 void deserialize_QVector(const QVector<T>& in,
-                      QVector<QVector<T> >& out)
+                         QVector<QVector<T> >& out)
 {
     assert(in.size() > 0);
     int size = in.size();
@@ -86,7 +86,7 @@ void Array2QVector(const stir::Array<2, float> & input,
         output.resize(input.size());
 
         for (int i = 0; i < input.size(); ++i)
-            output[i].resize(input[i].size());
+            output[i].resize(input[0].size());
     }
 
     assert(input.size() == output.size());
@@ -97,6 +97,41 @@ void Array2QVector(const stir::Array<2, float> & input,
         for (int j = input[i].get_min_index(); j <= input[i].get_max_index(); ++j, ++ij)
         {
             output[ii][ij] = static_cast<double>(input[i][j]);
+        }
+        ij = 0;
+    }
+}
+
+void Array2QVector(const stir::Array<3, float> & input,
+                   QVector<QVector<QVector<double> > > & output)
+{
+
+    if (output.size() == 0)
+    {
+        output.resize(input.size());
+
+        for (int i = 0; i < input.size(); ++i)
+        {
+            output[i].resize(input[0].size());
+
+            for (int j = 0; j < input[0][0].size(); ++j)
+                output[i][j].resize(input[0][0].size());
+        }
+    }
+
+    assert(input.size() == output.size());
+
+    int ii = 0, ij = 0, ik = 0;
+
+    for( int i = input.get_min_index(); i <= input.get_max_index(); ++i, ++ii)
+    {
+        for (int j = input[i].get_min_index(); j <= input[i].get_max_index(); ++j, ++ij)
+        {
+            for( int k = input[i][j].get_min_index(); k <= input[i][j].get_max_index(); ++k, ++ik)
+            {
+                output[ii][ij][ik] = static_cast<double>(input[i][j][k]);
+            }
+            ik = 0;
         }
         ij = 0;
     }

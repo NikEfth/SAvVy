@@ -2,6 +2,8 @@
 #define COMMON_DISPLAY_H
 
 #include <qwt_color_map.h>
+#include "display_container.h"
+
 
 namespace display {
 
@@ -702,7 +704,7 @@ private:
         4,251,235,
         5,252,240,
         5,253,245,
-        5,254,250,};
+        5,254,250};
 };
 
 }

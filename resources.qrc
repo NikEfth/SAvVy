@@ -260,5 +260,11 @@
         <file>resources/gimp-pro/images/gimp-cap-round.png</file>
         <file>resources/gimp-pro/images/gimp-cap-butt.png</file>
         <file>resources/gimp-pro/images/gimp-anchor.png</file>
+        <file>resources/other_icons/rename.png</file>
+        <file>resources/other_icons/htile.png</file>
+        <file>resources/other_icons/vtile.png</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>resources/other_icons/copy-item.png</file>
     </qresource>
 </RCC>

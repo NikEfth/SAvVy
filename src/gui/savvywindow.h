@@ -6,7 +6,8 @@
 #include <QMdiSubWindow>
 
 // GUI elements
-#include "src/gui/panel_opened_files.h"
+#include "src/gui/workspace.h"
+#include "src/gui/panel_displayed_files.h"
 #include "src/gui/panel_opened_file_controls.h"
 #include "src/display/display_container.h"
 
@@ -34,6 +35,8 @@ public slots:
     //! Call this function when you want to focus to another window
     void focus_sub_window(QString);
 
+    void display_array(std::shared_ptr<stir::ArrayInterface> _array, QString _name);
+
 protected:
     void closeEvent(QCloseEvent *event) override;
 
@@ -45,36 +48,44 @@ private slots:
     //! Update the state of the interface after every subwindown action
     void updateGUI(QMdiSubWindow *activeSubWindow = NULL);
 
-    /** \addtogroup Members for creating and handling QMDI windows
+    /** \addtogroup MDI
      *  @{
      */
     //! Append a new window in the ui->mdiArea
-    bool append_to_workspace(Display_container *child,
-                             bool prepend_to_recent=true,
+    bool append_to_mdi(Display_container *child,
+                             bool prepend_to_recent=false,
                              bool minimized = false);
 
-    void remove_from_workspace();
+    void remove_from_mdi();
     /** @}*/
 
+    /** \addtogroup GUI
+     *  @{
+     */
     void on_actionDefault_Settings_triggered();
+
+    void on_actionAbout_triggered();
+
+    void on_actionRename_triggered();
+    /** @}*/
+    void on_actionDuplicate_triggered();
 
 private:
 
-    /** \addtogroup File Operations
+    /** \addtogroup Operations
      *  @{
      */
-
     bool open_file(const QString &fileName);
-
     /** @}*/
 
-    /** \addtogroup Members for creating and handling QMDI windows
+    /** \addtogroup MDI
      *  @{
      */
     //! Find and \return a pointer to the QMdiSubWindow with the _id
     QMdiSubWindow *findMdiChild(const QString &_id) const;
     //! Create a new Display_container with num_dims the number of dimensions
-    Display_container *createMdiChild(int num_dims = 1);
+    Display_container *createDisplayContainer(int num_dims = 1);
+
     /** @}*/
 
     //! Hold the path of the last opened file
@@ -87,7 +98,7 @@ private:
     //! The QMdiSubWindow which was previously active.
     Display_container* previous_active;
 
-    /** \addtogroup Members for creating and handling the GUI
+    /** \addtogroup GUI
      *  @{
      */
     enum { MaxRecentFiles = 10 };
@@ -119,12 +130,16 @@ private:
     QDockWidget* dc_tool_manager;
     //! QDockWidget for the Panel_opened_files
     QDockWidget* dc_opened_files;
+
+    QDockWidget* dc_displayed_files;
     //! QDockWidget for Panel_opened_file_controls
     QDockWidget* dc_opened_file_controls;
 
     QDockWidget* dc_contrast;
 
-    Panel_opened_files* pnl_opened_files;
+    Panel_displayed_files* pnl_displayed_files;
+
+    Workspace* pnl_workspace;
 
     Panel_opened_file_controls* pnl_opened_file_controls;
 
@@ -149,17 +164,19 @@ private:
     QAction *tileHorizontalAct;
     /** @}*/
 
-    /** \addtogroup Testing functions
+    /** \addtogroup Testing
      *  @{
      */
     //! Ask a question to the user
     int ask(QString);
     //! This function will create a sinc plot. The plot will have 121 points with
     //! offset -60. The x axis is on indeces.
+    //! - This test function will write the test array in Workspace
     bool test_display_1d_data();
     //! Similar to test_display_1d_data() but the array has 121 points, with
     //! sampling distance 0.5 (mm) therefore the boundaties are [-30,30).
     //! The x axis is float representing a physical sampling.
+    //! - The array data are drawn from Workspace.
     bool test_display_1d_data_physical();
     //! Creates a 2D sinc plot in a matrix [200, 200], from (-100, -100) to (99, 99).
     //! This is the simplest case of 2D plotting handled by the application.
@@ -192,6 +209,8 @@ private:
     //! Tests the display with physical sizes and non square form. In this case the
     //! Y axis is shorter and the gradient should move from bottom to top.
     bool test_display_2d_data_physical_not_square();
+
+    bool test_display_3d_data();
 
     /** @}*/
 };
