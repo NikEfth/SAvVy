@@ -12,6 +12,8 @@
 #include <qwt_matrix_raster_data.h>
 #include <qwt_plot_rescaler.h>
 
+#include "stir/Array.h"
+
 //!
 //! \brief The definition of Display_container_2d class
 //!
@@ -33,8 +35,11 @@ public:
     void set_display(QVector<double> * , int _row_size = 0, int _offset_h = 0, int _offset_v = 0);
     //! Set the data array and update() display, by reference
     void set_display(const QVector<double>& , int _row_size = 0 , int _offset_h = 0, int _offset_v = 0);
-    //! Set the data array from a 2D array and update() display, by reference
+    //! Set the data array from a 2D array and update() display, by reference.
+    //! This is the fastest option with QVector
     void set_display(const QVector<QVector<double> >& , int _offset_h = 0, int _offset_v = 0);
+
+    void set_display(const stir::Array<2, float>& );
     //! Set physical sizes of the data
     void set_sizes(int _offset_h = 0, int _offset_v = 0,
                    float _h_spacing = 1.f, float _v_spacing = 1.f,
@@ -67,14 +72,15 @@ public:
     {return offset_v + row_num; }
 
     double at(int row, int col);
-    /** @}*/
 
-    virtual void update_scene();
+    /** @}*/
 
     void clear();
 
 public slots:
     void set_color_map(int);
+
+    virtual void update_scene(int i = 0);
 
 protected:
 
@@ -88,13 +94,14 @@ protected:
     //! \warning In order to find the row_num a division is performed!
     void set_array(const QVector<double>&, int _row_size = 0 );
     //! Set 2D data. This function will perform the transformation to 1D
+    //! Fastest option
     void set_array(const QVector<QVector<double> > &_array);
+
+    void set_array(const stir::Array<2,float> &_array);
     /** @}*/
 
     //! QVector of data.
-    QVector< QVector<double> > _data;
-
-    QVector<double> * data;
+    QVector< double > data;
 
     int row_size;
 
@@ -115,8 +122,6 @@ protected:
     double min_value;
 
     double max_value;
-
-private:
 
     QwtPlotSpectrogram *d_spectrogram;
 

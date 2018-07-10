@@ -114,18 +114,18 @@ bool SavvyWindow::open_file(const QString& fileName)
 {
     int num_of_data = 1;
 
-//    std::shared_ptr <stir::ArrayInterface> tmp_sptr =
-//            pnl_workspace->open_array_ptr(fileName.toStdString());
+    //    std::shared_ptr <stir::ArrayInterface> tmp_sptr =
+    //            pnl_workspace->open_array_ptr(fileName.toStdString());
 
     //    Array<3, float>* tmp
     //            = io_manager::open_array(fileName.toStdString(), num_of_data);
 
-//    if(!is_null_ptr(tmp_sptr))
-//    {
-//        //error opening file!!
-//    }
+    //    if(!is_null_ptr(tmp_sptr))
+    //    {
+    //        //error opening file!!
+    //    }
 
-//    display_array(tmp_sptr, pnl_workspace->get_current_name());
+    //    display_array(tmp_sptr, pnl_workspace->get_current_name());
 
 
     prependToRecentFiles(fileName);
@@ -152,8 +152,8 @@ void SavvyWindow::updateGUI(QMdiSubWindow * activeSubWindow)
 
     if (! stir::is_null_ptr(activeSubWindow))
     {
-        Display_container * active_display_container =
-                qobject_cast<Display_container *>(activeSubWindow->widget());
+        DisplayInterface * active_display_container =
+                dynamic_cast<DisplayInterface *>(activeSubWindow->widget());
 
         if (active_display_container != previous_active)
         {
@@ -190,6 +190,20 @@ Display_container *SavvyWindow::createDisplayContainer(int num_dims)
     return NULL;
 }
 
+Display_manager *SavvyWindow::createDisplayManager(int num_dims)
+{
+    next_window_id++;
+
+    if(num_dims == 1)
+        return new Display_manager(next_window_id-1,1, this);
+    else if(num_dims == 2)
+        return new Display_manager(next_window_id-1, 2, this);
+    else if (num_dims == 3)
+        return new Display_manager(next_window_id-1, 3, this);
+
+    return NULL;
+}
+
 QMdiSubWindow *SavvyWindow::findMdiChild(const QString &_id) const
 {
 
@@ -220,10 +234,29 @@ bool SavvyWindow::append_to_mdi(Display_container *child,
     return true;
 }
 
+bool SavvyWindow::append_to_mdi(Display_manager *child,
+                                bool prepend_to_recent,
+                                bool minimized)
+{
+    QObject::connect(child, &Display_manager::aboutToClose, this, &SavvyWindow::remove_from_mdi);
+
+    ui->mdiArea->addSubWindow(child);
+    ui->mdiArea->setFocusPolicy(Qt::StrongFocus);
+    pnl_displayed_files->appendToOpenedList(child);
+
+    if (!minimized)
+        child->show();
+    else
+        child->showMinimized();
+
+    return true;
+}
+
 void SavvyWindow::remove_from_mdi()
 {
     // Find who send this
-    Display_container* src = qobject_cast<Display_container *>(sender());
+    DisplayInterface* src =
+            dynamic_cast<DisplayInterface *>(sender());
 
     pnl_displayed_files->removeFromOpenedList(src);
     // Disconnect from tool
@@ -243,15 +276,15 @@ void SavvyWindow::display_array(std::shared_ptr<stir::ArrayInterface> _array,
 
     int dims = _array->get_num_dimensions();
 
-    Display_container *container = createDisplayContainer(dims);
-    container->set_file_name(_name);
-
-    if (is_null_ptr(container))
-        return;
-
     switch (dims) {
     case 1:
     {
+        Display_container *container = createDisplayContainer(dims);
+        container->set_file_name(_name);
+
+        if (is_null_ptr(container))
+            return;
+
         stir::Array<1, float>* tmp = dynamic_cast<stir::Array<1, float>* >(_array.get());
         Display_container_1d *child = dynamic_cast<Display_container_1d *>(container);
 
@@ -263,45 +296,49 @@ void SavvyWindow::display_array(std::shared_ptr<stir::ArrayInterface> _array,
         //                           tmp->get_min_index());
 
         child->set_display(vtmp);
-        break;
+        append_to_mdi(container);
+        return;
     }
     case 2:
     {
+        Display_container *container = createDisplayContainer(dims);
+        container->set_file_name(_name);
+
+        if (is_null_ptr(container))
+            return;
+
         stir::Array<2, float>* tmp = dynamic_cast<stir::Array<2, float>* >(_array.get());
         Display_container_2d *child = dynamic_cast<Display_container_2d *>(container);
 
-        QVector<QVector<double> > vtmp;
-        savvy::Array2QVector(*tmp, vtmp);
+//        QVector<QVector<double> > vtmp;
+//        savvy::Array2QVector(*tmp, vtmp);
+//                child->set_display(vtmp);
 
         //        child->set_display(vtmp,
         //                           tmp->get_min_index(),
         //                           (*tmp)[0].get_min_index());
-        child->set_display(vtmp,
-                           tmp->get_min_index());
-        break;
+        child->set_display(*tmp);
+        append_to_mdi(container);
+        return;
     }
     case 3:
     {
         stir::Array<3, float>* tmp = dynamic_cast<stir::Array<3, float>* >(_array.get());
-        Display_container_3d *child = dynamic_cast<Display_container_3d *>(container);
+        Display_manager* manager = createDisplayManager();
+        manager->set_file_name(_name);
 
-        QVector<QVector<QVector<double> > > vtmp;
-        savvy::Array2QVector(*tmp, vtmp);
+        Display_container_3d * disp =
+                dynamic_cast<Display_container_3d*>(manager->get_display());
 
-        //        child->set_display(vtmp,
-        //                           tmp->get_min_index(),
-        //                           (*tmp)[0].get_min_index());
-//        child->set_display(vtmp,
-//                           tmp->get_min_index());
-        break;
+        disp->set_display(*tmp);
+
+        append_to_mdi(manager);
+        return;
     }
     default:
         //! \todo throw error
         break;
     }
-
-    append_to_mdi(container);
-
 }
 
 
@@ -620,7 +657,19 @@ void SavvyWindow::on_actionStart_GUI_tests_triggered()
 
     all_tests = test_display_3d_data();
 
+    all_tests = test_display_3d_data_alt();
+
 }
+
+int SavvyWindow::ask(QString question)
+{
+    QMessageBox msgBox;
+    msgBox.setText(question);
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    return msgBox.exec();
+}
+
 
 bool SavvyWindow::test_display_1d_data()
 {
@@ -665,9 +714,8 @@ bool SavvyWindow::test_display_2d_data()
     std::shared_ptr <stir::ArrayInterface> test2_sptr = pnl_workspace->create_array_ptr<2>(range, "test2");
     stir::Array<2, float>* test2 = dynamic_cast<stir::Array<2, float>* >(test2_sptr.get());
 
-
-    for (int i = test2->get_min_index(); i < test2->get_max_index() ; ++i)
-        for (int j = (*test2)[i].get_min_index(); j < (*test2)[i].get_max_index() ; ++j)
+    for (int i = test2->get_min_index(); i <= test2->get_max_index() ; ++i)
+        for (int j = (*test2)[i].get_min_index(); j <= (*test2)[i].get_max_index() ; ++j)
         {
             float f = sqrt(i*i + j*j);
             if( f != 0)
@@ -835,37 +883,47 @@ bool SavvyWindow::test_display_2d_data_physical_not_square()
 bool SavvyWindow::test_display_3d_data()
 {
 
-    const IndexRange<3> range(stir::Coordinate3D<int>(-60,-60, -60),stir::Coordinate3D<int>(59,59, 59));
+    const IndexRange<3> range(stir::Coordinate3D<int>(-30,-60, -60),stir::Coordinate3D<int>(29,59, 59));
     std::shared_ptr <stir::ArrayInterface> test5_sptr = pnl_workspace->create_array_ptr<3>(range, "test5");
     stir::Array<3, float>* test5 = dynamic_cast<stir::Array<3, float>* >(test5_sptr.get());
 
+    for (int i = test5->get_min_index(); i <= test5->get_max_index() ; ++i)
+        for (int j = (*test5)[i].get_min_index(); j <= (*test5)[i].get_max_index() ; ++j)
+            for (int k = (*test5)[i][j].get_min_index(); k <= (*test5)[i][j].get_max_index() ; ++k)
+            {
+                float f = sqrt(i*i + k*k + j*j);
+                if( f != 0)
+                    (*test5)[i][j][k] = sin(f) / f;
+                else
+                    (*test5)[i][j][k] = 1;
+            }
 
-//    for (int i = test2->get_min_index(); i < test2->get_max_index() ; ++i)
-//        for (int j = (*test2)[i].get_min_index(); j < (*test2)[i].get_max_index() ; ++j)
-//        {
-//            float f = sqrt(i*i + j*j);
-//            if( f != 0)
-//                (*test2)[i][j]  = sin(f) / f;
-//            else
-//                (*test2)[i][j] = 1;
-//        }
+    QString n = pnl_workspace->get_current_name() + "_indiced";
+    display_array(test5_sptr, n);
 
-//    QString n = pnl_workspace->get_current_name() + "_indiced";
-//    display_array(test2_sptr, n);
-
-//    return true;
+    return true;
 }
 
-
-int SavvyWindow::ask(QString question)
+bool SavvyWindow::test_display_3d_data_alt()
 {
-    QMessageBox msgBox;
-    msgBox.setText(question);
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::Yes);
-    return msgBox.exec();
-}
+    std::shared_ptr <stir::ArrayInterface> test5_sptr = pnl_workspace->get_current_array_ptr();
+    stir::Array<3, float>* test5 = dynamic_cast<stir::Array<3, float>* >(test5_sptr.get());
 
+    QString n = pnl_workspace->get_current_name() + "_indiced_alt";
+    QVector<QVector<QVector<double> > > vtmp;
+    Display_manager* manager = createDisplayManager();
+     manager->set_file_name(n);
+
+    savvy::Array2QVector(*test5, vtmp);
+
+    Display_container_3d * disp =
+            dynamic_cast<Display_container_3d*>(manager->get_display());
+
+    disp->set_display(vtmp);
+
+    append_to_mdi(manager);
+    return true;
+}
 
 /*
  *

@@ -154,6 +154,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/include)
 add_library(savvy_gui)
 add_library(savvy_IO)
 add_library(savvy_display)
+add_library(savvy_gui_tests)
 
 qt5_add_resources(PROJECT_RESOURCE resources.qrc)
 
@@ -161,7 +162,7 @@ include(src/CMakeLists.txt)
 
 add_executable(${PROJECT_NAME} main.cpp ${PROJECT_RESOURCE})
 
-target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::Widgets Qt5::Gui savvy_gui savvy_IO savvy_display)
+target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::Widgets Qt5::Gui savvy_gui savvy_IO savvy_display savvy_gui_tests)
 
 if (ENABLE_TESTING)
     enable_testing(true)

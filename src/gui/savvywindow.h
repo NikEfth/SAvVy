@@ -10,6 +10,7 @@
 #include "src/gui/panel_displayed_files.h"
 #include "src/gui/panel_opened_file_controls.h"
 #include "src/display/display_container.h"
+#include "src/display/display_manager.h"
 
 namespace Ui {
 class SavvyWindow;
@@ -56,6 +57,10 @@ private slots:
                              bool prepend_to_recent=false,
                              bool minimized = false);
 
+    bool append_to_mdi(Display_manager *child,
+                             bool prepend_to_recent=false,
+                             bool minimized = false);
+
     void remove_from_mdi();
     /** @}*/
 
@@ -85,6 +90,8 @@ private:
     QMdiSubWindow *findMdiChild(const QString &_id) const;
     //! Create a new Display_container with num_dims the number of dimensions
     Display_container *createDisplayContainer(int num_dims = 1);
+    //! Create a new Display_Manager
+    Display_manager *createDisplayManager(int num_dims = 3);
 
     /** @}*/
 
@@ -96,7 +103,7 @@ private:
     //! 1.
     quint16 next_window_id;
     //! The QMdiSubWindow which was previously active.
-    Display_container* previous_active;
+    DisplayInterface* previous_active;
 
     /** \addtogroup GUI
      *  @{
@@ -211,6 +218,8 @@ private:
     bool test_display_2d_data_physical_not_square();
 
     bool test_display_3d_data();
+
+    bool test_display_3d_data_alt();
 
     /** @}*/
 };

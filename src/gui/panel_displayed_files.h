@@ -7,7 +7,7 @@
 #include <memory>
 
 #include "src/display/display_container.h"
-
+#include "src/display/display_manager.h"
 #include "stir/Array.h"
 #include "stir/VectorWithOffset.h"
 
@@ -46,9 +46,11 @@ signals:
 public slots:
     //! Append a window on the  ui->listOpenedFiles
     void appendToOpenedList(Display_container* child);
+    //! Append a window on the  ui->listOpenedFiles
+    void appendToOpenedList(Display_manager* child);
 
     //! Remove item from the ui->listOpenedFiles list.
-    void removeFromOpenedList(Display_container* child);
+    void removeFromOpenedList(DisplayInterface *child);
 
 private slots:
     void on_listOpenedFiles_itemDoubleClicked(QListWidgetItem *item);

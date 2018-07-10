@@ -2,6 +2,7 @@
 #define SAVVY_H
 
 #include <QVector>
+#include <QProgressDialog>
 
 #include "stir/common.h"
 #include "stir/Array.h"
@@ -70,7 +71,6 @@ void Array2QVector(const stir::Array<1, float> & input,
 
     stir::Array<1, float>::const_full_iterator it = input.begin_all_const();
     QVector<double>::iterator ot = output.begin();
-
     for (; it != input.end_all(); ++it, ++ot)
     {
         *ot = static_cast<double>(*it);
@@ -105,7 +105,6 @@ void Array2QVector(const stir::Array<2, float> & input,
 void Array2QVector(const stir::Array<3, float> & input,
                    QVector<QVector<QVector<double> > > & output)
 {
-
     if (output.size() == 0)
     {
         output.resize(input.size());
@@ -122,7 +121,6 @@ void Array2QVector(const stir::Array<3, float> & input,
     assert(input.size() == output.size());
 
     int ii = 0, ij = 0, ik = 0;
-
     for( int i = input.get_min_index(); i <= input.get_max_index(); ++i, ++ii)
     {
         for (int j = input[i].get_min_index(); j <= input[i].get_max_index(); ++j, ++ij)

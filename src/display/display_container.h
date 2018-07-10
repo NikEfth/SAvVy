@@ -2,10 +2,10 @@
 #define DISPLAY_CONTAINER_H
 
 #include <qwt_plot.h>
-#include <qwt_plot_layout.h>
 
-//#include "common_display.h"
+#include "common_display.h"
 
+using namespace display;
 //!
 //! \brief The Display_container class
 //! \details The maximum dimention of the supported arrays is 4D. Thats the why the
@@ -20,17 +20,15 @@
 //! It the axis are enabled by default then the images are larger. Otherwise the
 //! size falls to that of the minimum canvas. This creates another one inconsistency
 //! with the size of the colormap preview widget.
-class Display_container : public QwtPlot
+class Display_container : public QwtPlot, public DisplayInterface
 {
     Q_OBJECT
 public:
     explicit Display_container(int _my_id, int _num_dim, QWidget *parent = nullptr)
-        :QwtPlot(parent), dims(_num_dim), my_id(_my_id)
+        :QwtPlot(parent), DisplayInterface(_my_id, _num_dim)
     {
         this->canvas()->setMinimumSize(150, 150);
     }
-//    //! Clone function
-//    virtual Display_container* clone() const = 0;
 
     /** \addtogroup Setters
      *  @{
@@ -40,58 +38,30 @@ public:
         fullFileName = _s;
         this->setWindowTitle(_s);
     }
-
     inline void rename(const QString& _s)
     {
         set_file_name(_s);
     }
     /** @}*/
 
-    /** \addtogroup Getters
-     *  @{
-     */
-    inline int get_num_dimensions() const
-    {
-        return dims;
-    }
-
-    inline QString get_file_name() const
-    {
-        return fullFileName;
-    }
-
-    //! \return the unique (per session) id for this window
-    inline int get_my_id() const
-    {
-        return my_id;
-    }
-    /** @}*/
-
+    void enable_axis(bool state = true);
+public slots:
     //! Update the display contents
     //! \details Try to keep this as minimal as possible
-    virtual void update_scene() = 0;
-
-    void enable_axis(bool state = true);
+    virtual void update_scene(int i = 0) = 0;
 
 signals:
     //! Signal to let the application know that this window should be
     //! removed from various places.
     void aboutToClose();
 
+    void setup_ready();
 protected:
-    //! File name and path
-    QString fullFileName;
+
     //! We hack this QEvent because upon close we emit aboutToClose()
     //! to let know the application that this window must be removed
     //! from various places.
     void closeEvent(QCloseEvent *event) override;
-
-    QwtPlotLayout* layout;
-private:
-    //! Number of dimensions of the data
-    int dims;
-    //! This number is unique within a session
-    int my_id;
 
 };
 

@@ -46,6 +46,22 @@ void Panel_displayed_files::appendToOpenedList(Display_container* child)
 
 }
 
+void Panel_displayed_files::appendToOpenedList(Display_manager* child)
+{
+
+    QListWidgetItem* tmp_itm =  new QListWidgetItem();
+
+    tmp_itm->setToolTip( QString::number(child->get_my_id()));
+    tmp_itm->setText(child->get_file_name());
+
+    tmp_itm->setFlags(tmp_itm->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+    tmp_itm->setCheckState(Qt::Unchecked);
+
+    ui->listOpenedFiles->addItem(tmp_itm);
+    ui->listOpenedFiles->setCurrentItem(tmp_itm);
+
+}
+
 void Panel_displayed_files::rename(const QString& _id, QString _new_name)
 {
     // Get sender's row number
@@ -62,7 +78,7 @@ void Panel_displayed_files::rename(const int& _id, QString _new_name)
     ui->listOpenedFiles->item(rowNum)->setText(_new_name);
 }
 
-void Panel_displayed_files::removeFromOpenedList(Display_container* child)
+void Panel_displayed_files::removeFromOpenedList(DisplayInterface* child)
 {
     // Get sender's row number
     qint16 rowNum = findQListWidgetItem(QString::number(child->get_my_id()));

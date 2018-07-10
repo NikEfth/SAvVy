@@ -130,9 +130,10 @@ void Display_container_1d::set_physical_display(const QVector<double > &_array,
     }
 
     update_scene();
+    emit setup_ready();
 }
 
-void Display_container_1d::update_scene()
+void Display_container_1d::update_scene(int i)
 {
     this->setAxisScale(QwtPlot::yLeft,
                        *std::min_element(data.constBegin(), data.constEnd()),

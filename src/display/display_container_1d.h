@@ -32,8 +32,6 @@ public:
     void set_physical_display(const QVector<double>& , int offset = 0, float _min_x = 0.f, float  _max_x= 0.f);
     /** @}*/
 
-    virtual void update_scene();
-
     //! Clear the data and x_data
     void clear();
 
@@ -43,6 +41,8 @@ public:
     //! Get value at position. The offset is taken into account
     double at(int) const;
     /** @}*/
+public slots:
+        virtual void update_scene(int i = 0);
 
 protected:
     /** \addtogroup Setters

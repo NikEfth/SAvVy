@@ -86,8 +86,9 @@
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionStart_GUI_tests"/>
     <addaction name="separator"/>
+    <addaction name="actionStart_GUI_tests"/>
+    <addaction name="actionStart_not_so_Simple_GUI_tests"/>
     <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuImage">
@@ -144,7 +145,7 @@
   <action name="actionStart_GUI_tests">
    <property name="icon">
     <iconset resource="../../resources.qrc">
-     <normaloff>:/icons/resources/gimp-pro/images/gimp-controller-linux-input.png</normaloff>:/icons/resources/gimp-pro/images/gimp-controller-linux-input.png</iconset>
+     <normaloff>:/resources/other_icons/analyze.png</normaloff>:/resources/other_icons/analyze.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Start Simple GUI tests</string>
@@ -251,6 +252,15 @@
    </property>
    <property name="text">
     <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="actionStart_not_so_Simple_GUI_tests">
+   <property name="icon">
+    <iconset resource="../../resources.qrc">
+     <normaloff>:/resources/other_icons/analyze.png</normaloff>:/resources/other_icons/analyze.png</iconset>
+   </property>
+   <property name="text">
+    <string>Start not so Simple GUI tests</string>
    </property>
   </action>
  </widget>

@@ -266,5 +266,6 @@
     </qresource>
     <qresource prefix="/">
         <file>resources/other_icons/copy-item.png</file>
+        <file>resources/other_icons/analyze.png</file>
     </qresource>
 </RCC>

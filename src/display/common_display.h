@@ -2,10 +2,42 @@
 #define COMMON_DISPLAY_H
 
 #include <qwt_color_map.h>
-#include "display_container.h"
-
 
 namespace display {
+
+class DisplayInterface
+{
+public:
+    explicit DisplayInterface(int _id, int _dims):
+        my_id(_id), dims(_dims)
+    {    }
+    /** \addtogroup Getters
+     *  @{
+     */
+    inline int get_num_dimensions() const
+    {
+        return dims;
+    }
+
+    inline QString get_file_name() const
+    {
+        return fullFileName;
+    }
+
+    //! \return the unique (per session) id for this window
+    inline int get_my_id() const
+    {
+        return my_id;
+    }
+    /** @}*/
+protected:
+    //! File name and path
+    QString fullFileName;
+    //! Number of dimensions of the data
+    int dims;
+    //! This number is unique within a session
+    int my_id;
+};
 
 //! Colormaps. Defaults at BW grayscale.
 class ColorMap: public QwtLinearColorMap
