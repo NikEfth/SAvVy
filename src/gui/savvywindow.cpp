@@ -1,7 +1,7 @@
 #include "src/include/savvy.h"
+#include "src/include/external_interface.h"
 #include "savvywindow.h"
 #include "ui_savvywindow.h"
-#include "src/IO/io_manager.h"
 #include "src/display/display_container_1d.h"
 #include "src/display/display_container_2d.h"
 #include "src/display/display_container_3d.h"
@@ -36,6 +36,11 @@ SavvyWindow::SavvyWindow(QWidget *parent) :
         if (state)
             ui->mdiArea->setViewMode( QMdiArea::ViewMode::TabbedView);
     }
+
+    if(settings.contains("AutoPlotOpenedImages"))
+        auto_plot_opened_files = settings.value("AutoPlotOpenedImages").toBool();
+    else
+        auto_plot_opened_files = true;
 
     next_window_id = 0;
 
@@ -87,7 +92,7 @@ void SavvyWindow::on_actionOpen_triggered()
             QFileDialog::getOpenFileNames(this,
                                           tr("Open File"),
                                           initial_open_path,
-                                          tr("All Files (*.*)"
+                                          tr("All Files (*.hs *.hv *.dicom *.dcm);;"
                                              "STIR Interfile Header (*.hs);;"
                                              "STIR Image Header (*.hv);;"
                                              "Dicom Images (*.dicom);;"
@@ -96,8 +101,13 @@ void SavvyWindow::on_actionOpen_triggered()
     if (fileNames.size() == 0)
         return;
 
+    bool _mute = false;
+
+    //    if (fileNames.size() > 1)
+    //        _mute = true;
+
     for (QString fileName : fileNames)
-        open_file(fileName);
+        open_file(fileName, _mute);
 }
 
 /*
@@ -110,25 +120,22 @@ void SavvyWindow::on_actionOpen_triggered()
  *
  */
 
-bool SavvyWindow::open_file(const QString& fileName)
+bool SavvyWindow::open_file(const QString& fileName, bool _mute_open)
 {
     int num_of_data = 1;
 
-    //    std::shared_ptr <stir::ArrayInterface> tmp_sptr =
-    //            pnl_workspace->open_array_ptr(fileName.toStdString());
+    std::shared_ptr <stir::ArrayInterface> tmp_sptr =
+            pnl_workspace->open_array(fileName);
 
-    //    Array<3, float>* tmp
-    //            = io_manager::open_array(fileName.toStdString(), num_of_data);
-
-    //    if(!is_null_ptr(tmp_sptr))
-    //    {
-    //        //error opening file!!
-    //    }
-
-    //    display_array(tmp_sptr, pnl_workspace->get_current_name());
-
+    if(is_null_ptr(tmp_sptr))
+    {
+        //error opening file!!
+    }
 
     prependToRecentFiles(fileName);
+
+    if(auto_plot_opened_files || !_mute_open)
+        display_array(tmp_sptr, pnl_workspace->get_current_name());
 
     return true;
 }
@@ -181,27 +188,20 @@ Display_container *SavvyWindow::createDisplayContainer(int num_dims)
     next_window_id++;
 
     if(num_dims == 1)
-        return new Display_container_1d(next_window_id-1,1, this);
+        return new Display_container_1d(next_window_id-1,num_dims, this);
     else if(num_dims == 2)
-        return new Display_container_2d(next_window_id-1, 2, this);
+        return new Display_container_2d(next_window_id-1, num_dims, this);
     else if (num_dims == 3)
-        return new Display_container_3d(next_window_id-1, 3, this);
+        return new Display_container_3d(next_window_id-1, num_dims, this);
 
-    return NULL;
+    return nullptr;
 }
 
 Display_manager *SavvyWindow::createDisplayManager(int num_dims)
 {
-    next_window_id++;
-
-    if(num_dims == 1)
-        return new Display_manager(next_window_id-1,1, this);
-    else if(num_dims == 2)
-        return new Display_manager(next_window_id-1, 2, this);
-    else if (num_dims == 3)
-        return new Display_manager(next_window_id-1, 3, this);
-
-    return NULL;
+    Display_manager *ret = new Display_manager(next_window_id-1,num_dims, this);
+        next_window_id++;
+    return ret;
 }
 
 QMdiSubWindow *SavvyWindow::findMdiChild(const QString &_id) const
@@ -310,9 +310,9 @@ void SavvyWindow::display_array(std::shared_ptr<stir::ArrayInterface> _array,
         stir::Array<2, float>* tmp = dynamic_cast<stir::Array<2, float>* >(_array.get());
         Display_container_2d *child = dynamic_cast<Display_container_2d *>(container);
 
-//        QVector<QVector<double> > vtmp;
-//        savvy::Array2QVector(*tmp, vtmp);
-//                child->set_display(vtmp);
+        //        QVector<QVector<double> > vtmp;
+        //        savvy::Array2QVector(*tmp, vtmp);
+        //                child->set_display(vtmp);
 
         //        child->set_display(vtmp,
         //                           tmp->get_min_index(),
@@ -323,21 +323,18 @@ void SavvyWindow::display_array(std::shared_ptr<stir::ArrayInterface> _array,
     }
     case 3:
     {
-        stir::Array<3, float>* tmp = dynamic_cast<stir::Array<3, float>* >(_array.get());
         Display_manager* manager = createDisplayManager();
         manager->set_file_name(_name);
 
         Display_container_3d * disp =
                 dynamic_cast<Display_container_3d*>(manager->get_display());
 
+        stir::Array<3, float>* tmp = dynamic_cast<stir::Array<3, float>* >(_array.get());
         disp->set_display(*tmp);
 
         append_to_mdi(manager);
         return;
     }
-    default:
-        //! \todo throw error
-        break;
     }
 }
 
@@ -912,7 +909,7 @@ bool SavvyWindow::test_display_3d_data_alt()
     QString n = pnl_workspace->get_current_name() + "_indiced_alt";
     QVector<QVector<QVector<double> > > vtmp;
     Display_manager* manager = createDisplayManager();
-     manager->set_file_name(n);
+    manager->set_file_name(n);
 
     savvy::Array2QVector(*test5, vtmp);
 

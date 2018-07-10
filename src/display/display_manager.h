@@ -43,6 +43,11 @@ public:
     {
         return _display;
     }
+
+    inline QString get_label(int _page, int num_pages)
+    {
+        return QString::number(_page) + " / " + QString::number(num_pages);
+    }
     /** @}*/
 signals:
     //! Signal to let the application know that this window should be
@@ -57,7 +62,9 @@ protected:
 
 private slots:
 
-    void updated_display();
+    void updated_display(int position);
+
+    void initialised_display();
 private:
     Ui::Display_manager *ui;
 

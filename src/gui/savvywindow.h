@@ -80,7 +80,7 @@ private:
     /** \addtogroup Operations
      *  @{
      */
-    bool open_file(const QString &fileName);
+    bool open_file(const QString &fileName, bool _mute_open = false);
     /** @}*/
 
     /** \addtogroup MDI
@@ -93,6 +93,7 @@ private:
     //! Create a new Display_Manager
     Display_manager *createDisplayManager(int num_dims = 3);
 
+    bool auto_plot_opened_files;
     /** @}*/
 
     //! Hold the path of the last opened file

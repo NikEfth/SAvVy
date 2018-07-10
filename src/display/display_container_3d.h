@@ -48,7 +48,7 @@ protected:
     /** @}*/
 
     //! QVector of data.
-    QVector< QVector< double > > data;
+    QVector< QVector< double > > *data;
 
     int plane_num;
 

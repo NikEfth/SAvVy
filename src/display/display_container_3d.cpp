@@ -96,10 +96,7 @@ void Display_container_3d::set_array(const QVector<QVector<QVector<double> > > &
     row_num = _array[0].size();
     row_size = _array[0][0].size();
 
-    data.resize(plane_num);
-
-    for(int i = 0; i < plane_num; ++i)
-        data[i].resize(row_size*row_num);
+    data = new QVector< QVector<double> >(plane_num, QVector<double>(row_num*row_size));
 
     min_value.resize(plane_num);
     min_value.fill(100000);
@@ -113,12 +110,16 @@ void Display_container_3d::set_array(const QVector<QVector<QVector<double> > > &
         for(int j = 0; j < row_size; ++j)
             for(int k = 0; k < row_num; ++k, ++idx)
             {
-                data[i][idx] = _array[i][j][k];
+                float val = _array[i][j][k];
+                if (val != 0.f)
+                {
+                    (*data)[i][idx] = val;
 
-                if (data[i][idx] > max_value[i])
-                    max_value[i] = data[i][idx];
-                if(data[i][idx]< min_value[i])
-                    min_value[i] = data[i][idx] ;
+                    if (val > max_value[i])
+                        max_value[i] = val;
+                    else if(val < min_value[i])
+                        min_value[i] = val;
+                }
             }
         idx = 0;
     }
@@ -130,10 +131,7 @@ void Display_container_3d::set_array(const stir::Array<3, float>& _array)
     row_num = _array[0].size();
     row_size = _array[0][0].size();
 
-    data.resize(plane_num);
-
-    for(int i = 0; i < plane_num; ++i)
-        data[i].resize(row_size*row_num);
+    data = new QVector< QVector<double> >(plane_num, QVector<double>(row_num*row_size));
 
     min_value.resize(plane_num);
     min_value.fill(100000);
@@ -147,12 +145,16 @@ void Display_container_3d::set_array(const stir::Array<3, float>& _array)
         for(int j = _array[i].get_min_index(); j <= _array[i].get_max_index(); ++j)
             for(int k = _array[i][j].get_min_index(); k <= _array[i][j].get_max_index(); ++k, ++idx)
             {
-                data[idp][idx] = _array[i][j][k];
+                float val = _array[i][j][k];
+                if (val != 0.f)
+                {
+                    (*data)[idp][idx] = static_cast<double>(val);
 
-                if (data[idp][idx] > max_value[idp])
-                    max_value[idp] = data[idp][idx];
-                if(data[idp][idx]< min_value[idp])
-                    min_value[idp] = data[idp][idx] ;
+                    if (val > max_value[idp])
+                        max_value[idp] = val;
+                    else if(val < min_value[idp])
+                        min_value[idp] = val;
+                }
             }
         idx = 0;
     }
@@ -160,10 +162,7 @@ void Display_container_3d::set_array(const stir::Array<3, float>& _array)
 
 void Display_container_3d::update_scene(int i)
 {
-    if (i >= plane_num)
-        return;
-    QVector<double> s = data[i];
-    p_raster->setValueMatrix(s, row_size);
+    p_raster->setValueMatrix((*data)[i], row_size);
 
     p_raster->setInterval( Qt::ZAxis, QwtInterval(min_value[i],  max_value[i]));
     d_spectrogram->setData(p_raster);

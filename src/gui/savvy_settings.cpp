@@ -25,6 +25,9 @@ GeneralSettings::GeneralSettings(QWidget *parent) :
         defaultsPage->setLayout(defaultsPageLayout);
 
         //
+        autoPlotOpenedFiles = new QCheckBox("Automatically plot opened files. ", defaultsPage);
+        defaultsPageLayout->addWidget(autoPlotOpenedFiles);
+
         autoContrast = new QCheckBox("Automatically optimise contrast when opening images. ", defaultsPage);
         defaultsPageLayout->addWidget(autoContrast);
 
@@ -133,6 +136,7 @@ Savvy_settings::Savvy_settings(QWidget *parent) :
     QSettings settings;
     view_setts->colorMapCombo->setCurrentIndex(settings.value("defaultColorMap").toInt());
     general_setts->autoContrast->setChecked(settings.value("AutoScaleImages").toBool());
+    general_setts->autoPlotOpenedFiles->setChecked(settings.value("AutoPlotOpenedImages").toBool());
     general_setts->defaultAxis->setChecked(settings.value("showAxisDefault").toBool());
     general_setts->defaultTabbedMode->setChecked(settings.value("defaultTabbedViewMode").toBool());
 
@@ -171,6 +175,7 @@ void Savvy_settings::on_save_settings()
     QSettings settings;
     settings.setValue("defaultColorMap", view_setts->colorMapCombo->currentIndex());
     settings.setValue("AutoScaleImages", general_setts->autoContrast->isChecked());
+    settings.setValue("AutoPlotOpenedImages", general_setts->autoPlotOpenedFiles->isChecked());
     settings.setValue("showAxisDefault", general_setts->defaultAxis->isChecked());
     settings.setValue("defaultTabbedViewMode", general_setts->defaultTabbedMode->isChecked());
 

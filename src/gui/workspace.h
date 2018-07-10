@@ -54,6 +54,8 @@ public:
     template<int T>
     std::shared_ptr<stir::ArrayInterface> create_array_ptr(const stir::IndexRange<T> &, const QString& _name);
 
+    std::shared_ptr<stir::ArrayInterface> open_array(const QString& fileName);
+
 signals:
     void double_clicked_item(QString);
     //! Signal emitted when the ui->display_array is pressed.This is connected to
@@ -89,13 +91,11 @@ private:
     //! 1.
     qint16 next_dataset_id;
     //! Create a new record in ui->listOpenedFiles with the specified name
-    void append_to_openedFiles(const QString&);
+//    void append_to_openedFiles(const QString&);
     //! Remove from listOpenedFiles the item at row _id
     void remove_from_workspace(int _id);
 
     Ui::Workspace *ui;
-
-    QVector<QString> grouped_files;
     //! All the openned files are held by this vector
     QVector< std::shared_ptr<stir::ArrayInterface> > openned_files;
 };

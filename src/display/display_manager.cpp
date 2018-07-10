@@ -28,7 +28,8 @@ Display_manager::Display_manager(int _my_id, int _num_dim, QWidget *parent) :
     ui->verticalLayout_2->addWidget(_display);
 
     connect(ui->sld_plane, &QSlider::sliderMoved, _display, &Display_container::update_scene);
-    connect(_display, &Display_container::setup_ready, this, &Display_manager::updated_display);
+    connect(ui->sld_plane, &QSlider::sliderMoved, this, &Display_manager::updated_display);
+    connect(_display, &Display_container::setup_ready, this, &Display_manager::initialised_display);
 }
 
 Display_manager::~Display_manager()
@@ -41,7 +42,14 @@ void Display_manager::closeEvent(QCloseEvent *event)
     emit aboutToClose();
 }
 
-void Display_manager::updated_display()
+void Display_manager::updated_display(int position)
 {
-    ui->sld_plane->setMaximum(_display->get_num_planes());
+    ui->lbl_plane->setText(QString::number(position) + " / " + QString::number(_display->get_num_planes()));
+}
+
+void Display_manager::initialised_display()
+{
+    ui->sld_plane->setMaximum(_display->get_num_planes()-1);
+    int val = ui->sld_plane->value();
+    ui->lbl_plane->setText(get_label(val, _display->get_num_planes()));
 }

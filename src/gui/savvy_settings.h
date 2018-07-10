@@ -20,6 +20,8 @@ class GeneralSettings : public QWidget
 public:
     explicit GeneralSettings(QWidget *parent = 0);
 
+     QCheckBox* autoPlotOpenedFiles;
+
     QCheckBox* autoContrast;
 
     QCheckBox* autoUpdates;

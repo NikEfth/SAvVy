@@ -14,10 +14,10 @@ namespace io_manager {
 //! \param file_name
 //! \return
 //!
-stir::Array<3, float>* open_array(std::string file_name, int& num_of_data)
+stir::ArrayInterface* open_array(std::string file_name)
 {
 
-    if (stir::is_interfile_signature(file_name.c_str()))
+    if (!stir::is_interfile_signature(file_name.c_str()))
     {
         return stir::read_interfile_image(file_name.c_str());
     }

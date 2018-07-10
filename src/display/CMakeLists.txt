@@ -8,6 +8,8 @@ target_sources(savvy_display
     "${CMAKE_CURRENT_LIST_DIR}/display_manager.ui"
     "${CMAKE_CURRENT_LIST_DIR}/display_container_1d.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/display_container_1d.h"
+    "${CMAKE_CURRENT_LIST_DIR}/display_container_raster.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/display_container_raster.h"
     "${CMAKE_CURRENT_LIST_DIR}/display_container_2d.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/display_container_2d.h"
     "${CMAKE_CURRENT_LIST_DIR}/display_container_3d.cpp"

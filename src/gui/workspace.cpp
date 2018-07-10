@@ -1,6 +1,10 @@
 #include "workspace.h"
 #include "ui_workspace.h"
 
+#include "src/IO/io_manager.h"
+
+#include "stir/is_null_ptr.h"
+
 Workspace::Workspace(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Workspace),
@@ -43,19 +47,19 @@ void Workspace::append_to_workspace(std::shared_ptr<stir::ArrayInterface> child,
     updateGUI();
 }
 
-void Workspace::append_to_openedFiles(const QString& _id)
-{
-    QListWidgetItem* tmp_itm =  new QListWidgetItem();
+//void Workspace::append_to_openedFiles(const QString& _id)
+//{
+//    QListWidgetItem* tmp_itm =  new QListWidgetItem();
 
-    tmp_itm->setText(_id);
-    tmp_itm->setFlags(tmp_itm->flags() | Qt::ItemIsUserCheckable  | Qt::ItemIsEditable);
-    tmp_itm->setCheckState(Qt::Unchecked);
+//    tmp_itm->setText(_id);
+//    tmp_itm->setFlags(tmp_itm->flags() | Qt::ItemIsUserCheckable  | Qt::ItemIsEditable);
+//    tmp_itm->setCheckState(Qt::Unchecked);
 
-    ui->listOpenedFiles->addItem(tmp_itm);
-    ui->listOpenedFiles->setCurrentItem(tmp_itm);
+//    ui->listOpenedFiles->addItem(tmp_itm);
+//    ui->listOpenedFiles->setCurrentItem(tmp_itm);
 
-    updateGUI();
-}
+//    updateGUI();
+//}
 
 void Workspace::remove_from_workspace(int _id)
 {
@@ -106,34 +110,77 @@ void Workspace::highlightChecked(QListWidgetItem *item)
         ui->listOpenedFiles->blockSignals(true);
         item->setBackgroundColor(QColor("#ffffb2"));
         ui->listOpenedFiles->blockSignals(false);
-
-        grouped_files.append(item->toolTip());
     }
     else
     {
         ui->listOpenedFiles->blockSignals(true);
         item->setBackgroundColor(QColor("#ffffff"));
         ui->listOpenedFiles->blockSignals(false);
-
-        grouped_files.removeAll(item->toolTip());
     }
-    ui->lbl_num_groupped->setText(QString::number(grouped_files.size()));
+    //    ui->lbl_num_groupped->setText(QString::number(grouped_files.size()));
 }
 
 bool Workspace::has_grouped_items() const
 {
-    return grouped_files.size()>0 ? true: false;
+    for (qint16 i = 0; i <  ui->listOpenedFiles->count(); ++i)
+        if ( ui->listOpenedFiles->item(i)->checkState() == Qt::Checked)
+            return true;
+    return false;
 }
 
 QVector<QString> Workspace::get_groupped() const
 {
-    return grouped_files;
+    //    return grouped_files;
 }
 
+std::shared_ptr <stir::ArrayInterface> Workspace::open_array(const QString& fileName)
+{
+
+    stir::ArrayInterface* input = io_manager::open_array(fileName.toStdString());
+
+    if(stir::is_null_ptr(input))
+        return nullptr;
+
+    std::shared_ptr<stir::ArrayInterface> wtmp;
+    int dims = input->get_num_dimensions();
+
+    switch (dims) {
+    case 1:
+    {
+        stir::Array<1,float>* tmp = dynamic_cast<stir::Array<1,float>* >(input);
+        wtmp.reset( new stir::Array<1,float>( *tmp ));
+    }
+        break;
+    case 2:
+    {
+        stir::Array<2,float>* tmp = dynamic_cast<stir::Array<2,float>* >(input);
+        wtmp.reset(new stir::Array<2,float>( *tmp ));
+    }
+        break;
+    case 3:
+    {
+        stir::Array<3,float>* tmp = dynamic_cast<stir::Array<3,float>* >(input);
+        wtmp.reset( new stir::Array<3,float>( *tmp ));
+    }
+        break;
+    }
+
+    append_to_workspace(wtmp,fileName);
+    updateGUI();
+    return wtmp;
+}
 
 void Workspace::on_display_array_pressed()
 {
-    emit display_current( openned_files[ui->listOpenedFiles->currentRow()],
+    if (has_grouped_items())
+    {
+        for (qint16 i = 0; i <  ui->listOpenedFiles->count(); ++i)
+            if ( ui->listOpenedFiles->item(i)->checkState() == Qt::Checked)
+                emit display_current( openned_files[i],
+                                      get_array_name(i) );
+    }
+    else
+        emit display_current( openned_files[ui->listOpenedFiles->currentRow()],
             get_array_name(ui->listOpenedFiles->currentRow()) );
 }
 
@@ -144,26 +191,26 @@ void Workspace::on_duplicate_array_clicked()
 
     int current_row  = ui->listOpenedFiles->currentRow();
     int dims = openned_files.at(current_row)->get_num_dimensions();
+    std::shared_ptr<stir::ArrayInterface> wtmp;
 
-    if (dims == 1)
+    switch (dims) {
+    case 1:
     {
-        stir::Array<1,float>* tmp = dynamic_cast<stir::Array<1,float>* >(openned_files[current_row].get());
-
-        std::shared_ptr<stir::ArrayInterface> wtmp(
-                new stir::Array<1,float>( *tmp ));
-
-        append_to_workspace(wtmp, "copyOf_" + ui->listOpenedFiles->item(current_row)->text() );
-
+        wtmp.reset( new stir::Array<1,float>( *dynamic_cast<stir::Array<1,float>* >(openned_files[current_row].get()) ));
     }
-    else if (dims == 2)
+        break;
+    case 2:
     {
-        stir::Array<2,float>* tmp = dynamic_cast<stir::Array<2,float>* >(openned_files[current_row].get());
-
-        std::shared_ptr<stir::ArrayInterface> wtmp(
-                new stir::Array<2,float>( *tmp ));
-
-        append_to_workspace(wtmp, "copyOf_" + ui->listOpenedFiles->item(current_row)->text() );
+        wtmp.reset( new stir::Array<2,float>( *dynamic_cast<stir::Array<2,float>* >(openned_files[current_row].get()) ));
+    }
+        break;
+    case 3:
+    {
+        wtmp.reset( new stir::Array<3,float>( *dynamic_cast<stir::Array<3,float>* >(openned_files[current_row].get()) ));
+    }
+        break;
     }
 
+    append_to_workspace(wtmp, "copyOf_" + ui->listOpenedFiles->item(current_row)->text() );
     updateGUI();
 }

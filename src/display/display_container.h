@@ -44,11 +44,12 @@ public:
     }
     /** @}*/
 
-    void enable_axis(bool state = true);
 public slots:
     //! Update the display contents
     //! \details Try to keep this as minimal as possible
     virtual void update_scene(int i = 0) = 0;
+
+    void enable_axis(bool state = true);
 
 signals:
     //! Signal to let the application know that this window should be

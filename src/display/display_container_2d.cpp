@@ -77,12 +77,16 @@ void Display_container_2d::set_array(const QVector<QVector<double> > &_array)
     for(int i = 0; i < row_num; ++i)
         for(int j = 0; j < row_size; ++j, ++idx)
         {
-            data[idx] = _array[i][j];
+            float val =  _array[i][j];
+            if (val != 0.f)
+            {
+            data[idx] = val;
 
-            if (data[idx] > max_value)
-                max_value = data[idx] ;
-            if(data[idx] < min_value)
-                min_value = data[idx] ;
+            if (val > max_value)
+                max_value = val ;
+            else if(val< min_value)
+                min_value = val ;
+            }
         }
 }
 
@@ -100,12 +104,16 @@ void Display_container_2d::set_array(const stir::Array<2,float> &_array)
     for(int i = _array.get_min_index(); i <= _array.get_max_index(); ++i)
         for(int j = _array[i].get_min_index(); j <= _array[i].get_max_index(); ++j, ++idx)
         {
-            data[idx] = _array[i][j];
+            float val = _array[i][j];
+            if (val != 0.f)
+            {
+            data[idx] = val ;
 
-            if (data[idx] > max_value)
-                max_value = data[idx] ;
-            if(data[idx] < min_value)
-                min_value = data[idx] ;
+            if (val> max_value)
+                max_value = val ;
+            else if(val < min_value)
+                min_value = val;
+            }
         }
 }
 
@@ -208,12 +216,9 @@ void Display_container_2d::set_axis(int _offset_h, int _offset_v,
 void Display_container_2d::update_scene(int i)
 {
     p_raster->setValueMatrix(data, row_size);
-
     p_raster->setInterval( Qt::ZAxis, QwtInterval(min_value,  max_value));
     d_spectrogram->setData(p_raster);
     replot();
-    //    d_rescaler->rescale();
-    this->adjustSize();
 }
 
 void Display_container_2d::clear()
