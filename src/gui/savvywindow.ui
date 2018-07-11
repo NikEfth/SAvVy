@@ -114,6 +114,8 @@
     <property name="title">
      <string>Pl&amp;ugins</string>
     </property>
+    <addaction name="separator"/>
+    <addaction name="actionAbout_Plugins"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -260,7 +262,16 @@
      <normaloff>:/resources/other_icons/analyze.png</normaloff>:/resources/other_icons/analyze.png</iconset>
    </property>
    <property name="text">
-    <string>Start not so Simple GUI tests</string>
+    <string>Start &amp;not so Simple GUI tests</string>
+   </property>
+  </action>
+  <action name="actionAbout_Plugins">
+   <property name="icon">
+    <iconset resource="../../resources.qrc">
+     <normaloff>:/icons/resources/gimp-pro/images/gimp-plugin.png</normaloff>:/icons/resources/gimp-pro/images/gimp-plugin.png</iconset>
+   </property>
+   <property name="text">
+    <string>About Plugins</string>
    </property>
   </action>
  </widget>

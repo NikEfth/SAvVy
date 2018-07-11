@@ -5,6 +5,8 @@
 
 #include <QSettings>
 
+#include "stir/Array.h"
+
 Display_container_1d::Display_container_1d(int _my_id, int dims, QWidget *parent) :
     Display_container(_my_id, dims, parent)
 {
@@ -21,57 +23,43 @@ Display_container_1d::Display_container_1d(int _my_id, int dims, QWidget *parent
 
     if(settings.contains("showAxisDefault"))
     {
-//        bool state = settings.value("showAxisDefault").toBool();
-//        this->enableAxis(QwtPlot::xBottom, state);
-//        this->enableAxis(QwtPlot::yLeft, state);
+        //        bool state = settings.value("showAxisDefault").toBool();
+        //        this->enableAxis(QwtPlot::xBottom, state);
+        //        this->enableAxis(QwtPlot::yLeft, state);
     }
 
     inc_x = 1.;
 }
 
-//Display_container_1d* Display_container_1d::clone() const
-//{
-//    return new Display_container_1d(*this);
-//}
-
-double Display_container_1d::at(int val) const
+void Display_container_1d::set_array(QVector<double>* _array)
 {
-    return data.at(val + abs(data_offset));
+    *data = * _array;
 }
 
-void Display_container_1d::set_array(QVector<double>* _array,
-                                     int offset)
+void Display_container_1d::set_array(const QVector<double> &_array)
 {
-    data = * _array;
-    data_offset = offset;
-    x_data.resize(data.size());
+    data = new QVector<double>(_array.size());
+    *data = _array;
+}
 
+void Display_container_1d::set_array( stir::Array<1, float>* _in)
+{
+    data = new QVector<double>(_in->size());
+
+    int idx = 0;
+    for (int i = _in->get_min_index(); i <= _in->get_max_index(); ++i, ++idx)
+        (*data)[idx] = static_cast<double>( (*_in)[i]);
+
+     data_offset = _in->get_min_index();
+}
+
+void Display_container_1d::set_display(QVector<double>* _array)
+{
+    set_array(_array);
+
+    x_data.resize(data->size());
     QVector<double>::iterator it = x_data.begin();
-    double acc = min_x;
-    *it = acc; ++it;
-
-    for (; it != x_data.end(); ++it)
-    {
-        acc += inc_x;
-        *it = acc;
-    }
-}
-
-void Display_container_1d::set_array(const QVector<double> &_array,
-                                     int offset)
-{
-    data = _array;
-    data_offset = offset;
-}
-
-void Display_container_1d::set_display(QVector<double>* _array,
-                                       int offset)
-{
-    set_array(_array, offset);
-
-    x_data.resize(data.size());
-    QVector<double>::iterator it = x_data.begin();
-    double acc = offset;
+    double acc = 0;
     *it = acc; ++it;
 
     for (; it != x_data.end(); ++it)
@@ -83,14 +71,37 @@ void Display_container_1d::set_display(QVector<double>* _array,
     update_scene();
 }
 
-void Display_container_1d::set_display(const QVector<double> &_array,
-                                       int offset)
+void Display_container_1d::set_display(const QVector<double> &_array)
 {
-    set_array(_array, offset);
+    set_array(_array);
 
-    x_data.resize(data.size());
+    x_data.resize(data->size());
     QVector<double>::iterator it = x_data.begin();
-    double acc = offset;
+    double acc = 0;
+    *it = acc; ++it;
+
+    for (; it != x_data.end(); ++it)
+    {
+        acc += inc_x;
+        *it = acc;
+    }
+
+    update_scene();
+}
+
+void Display_container_1d::set_display(void* _in)
+{
+    stir::Array<1, float>* tmp =
+            static_cast<stir::Array<1, float>* >(_in);
+
+    if(stir::is_null_ptr(_in))
+        return;
+
+    set_array(tmp);
+
+    x_data.resize(data->size());
+    QVector<double>::iterator it = x_data.begin();
+    double acc = tmp->get_min_index();
     *it = acc; ++it;
 
     for (; it != x_data.end(); ++it)
@@ -105,7 +116,6 @@ void Display_container_1d::set_display(const QVector<double> &_array,
 void Display_container_1d::set_sizes(
         float _min_x, float  _max_x)
 {
-
     min_x = _min_x;
     max_x = _max_x;
 }
@@ -116,9 +126,9 @@ void Display_container_1d::set_physical_display(const QVector<double > &_array,
 {
     set_sizes(_min_x, _max_x);
     inc_x =  (fabs(max_x) + fabs(min_x)) / _array.size();
-    set_array(_array, offset);
+    set_array(_array);
 
-    x_data.resize(data.size());
+    x_data.resize(data->size());
     QVector<double>::iterator it = x_data.begin();
     double acc = min_x + inc_x/2.0;
     *it = acc; ++it;
@@ -136,17 +146,17 @@ void Display_container_1d::set_physical_display(const QVector<double > &_array,
 void Display_container_1d::update_scene(int i)
 {
     this->setAxisScale(QwtPlot::yLeft,
-                       *std::min_element(data.constBegin(), data.constEnd()),
-                       *std::max_element(data.constBegin(), data.constEnd()));
+                       *std::min_element(data->constBegin(), data->constEnd()),
+                       *std::max_element(data->constBegin(), data->constEnd()));
 
-    curve->setSamples(x_data, data);
+    curve->setSamples(x_data, *data);
     curve->attach(this);
     this->replot();
 }
 
 void Display_container_1d::clear()
 {
-    data.clear();
+    data->clear();
     x_data.clear();
     data_offset = 0;
 }

@@ -11,25 +11,32 @@ Display_manager::Display_manager(int _my_id, int _num_dim, QWidget *parent) :
 {
     ui->setupUi(this);
 
-//    switch (dims) {
-//    case 1:
-//        _display = new Display_container_1d(my_id,1, this);
-//        break;
-//    case 2:
-//        _display = new Display_container_2d(my_id, 2, this);
-//        break;
-//    case 3:
+    switch (dims) {
+    case 1:
+    {
+        //! \todo error
+    }
+        break;
+    case 2:
+    {
+        _display = new Display_container_2d(my_id, 2, this);
+        ui->sld_plane->setHidden(true);
+        ui->lbl_plane->setHidden(true);
+    }
+        break;
+    case 3:
+    {
         _display = new Display_container_3d(my_id, 3, this);
-//        break;
-//    default:
-//        break;
-//    }
+        connect(ui->sld_plane, &QSlider::sliderMoved, _display, &Display_container::update_scene);
+        connect(ui->sld_plane, &QSlider::sliderMoved, this, &Display_manager::updated_display);
+        connect(_display, &Display_container::setup_ready, this, &Display_manager::initialised_display);
+    }
+        break;
+    default:
+        break;
+    }
 
     ui->verticalLayout_2->addWidget(_display);
-
-    connect(ui->sld_plane, &QSlider::sliderMoved, _display, &Display_container::update_scene);
-    connect(ui->sld_plane, &QSlider::sliderMoved, this, &Display_manager::updated_display);
-    connect(_display, &Display_container::setup_ready, this, &Display_manager::initialised_display);
 }
 
 Display_manager::~Display_manager()

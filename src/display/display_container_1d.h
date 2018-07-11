@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include "display_container.h"
+#include "stir/Array.h"
 
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
@@ -23,9 +24,11 @@ public:
      *  @{
      */
     //! Set the data array, initialise x_data and update() display, by pointer
-    void set_display(QVector<double> * , int _offset = 0 );
+    void set_display(QVector<double> *);
     //! Set the data array, initialise x_data and update() display, by reference
-    void set_display(const QVector<double>& , int _offset = 0 );
+    void set_display(const QVector<double>&);
+    //!
+    void set_display(void*_in);
     //! Set the physical dimentions of the x axis
     void set_sizes(float _min_x = 0.f, float  _min_y = 0.f);
     //! Set the the array to display and calibrate the x axis to the physical dimensions.
@@ -35,12 +38,6 @@ public:
     //! Clear the data and x_data
     void clear();
 
-    /** \addtogroup Getters
-     *  @{
-     */
-    //! Get value at position. The offset is taken into account
-    double at(int) const;
-    /** @}*/
 public slots:
         virtual void update_scene(int i = 0);
 
@@ -49,14 +46,16 @@ protected:
      *  @{
      */
     //! Set the data array and initialise x_data by pointer
-    void set_array(QVector<double>* , int _offset = 0);
+    void set_array(QVector<double>*);
     //! Set the data array and initialise x_data by reference
-    void set_array(const QVector<double>&, int _offset = 0 );
+    void set_array(const QVector<double>&);
+
+    void set_array( stir::Array<1, float>* _in);
     /** @}*/
 
 private:
     //! QVector of y data
-    QVector<double> data;
+    QVector<double>* data;
     //! QVector of x data
     QVector<double> x_data;
     //! Offset of the x axis

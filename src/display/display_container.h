@@ -4,6 +4,8 @@
 #include <qwt_plot.h>
 
 #include "common_display.h"
+#include "stir/Array.h"
+#include "stir/is_null_ptr.h"
 
 using namespace display;
 //!
@@ -33,6 +35,8 @@ public:
     /** \addtogroup Setters
      *  @{
      */
+    virtual void set_display(void*) = 0;
+
     inline void set_file_name(QString _s)
     {
         fullFileName = _s;

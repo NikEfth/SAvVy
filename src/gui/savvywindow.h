@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QDockWidget>
 #include <QMdiSubWindow>
+#include <QDir>
+#include <QActionGroup>
 
 // GUI elements
 #include "src/gui/workspace.h"
@@ -11,6 +13,7 @@
 #include "src/gui/panel_opened_file_controls.h"
 #include "src/display/display_container.h"
 #include "src/display/display_manager.h"
+#include "src/include/external_interface.h"
 
 namespace Ui {
 class SavvyWindow;
@@ -54,14 +57,18 @@ private slots:
      */
     //! Append a new window in the ui->mdiArea
     bool append_to_mdi(Display_container *child,
-                             bool prepend_to_recent=false,
-                             bool minimized = false);
+                       bool prepend_to_recent=false,
+                       bool minimized = false);
 
     bool append_to_mdi(Display_manager *child,
-                             bool prepend_to_recent=false,
-                             bool minimized = false);
+                       bool prepend_to_recent=false,
+                       bool minimized = false);
 
     void remove_from_mdi();
+
+    void on_actionDuplicate_triggered();
+
+    void on_set_colormap(int _cm);
     /** @}*/
 
     /** \addtogroup GUI
@@ -73,7 +80,8 @@ private slots:
 
     void on_actionRename_triggered();
     /** @}*/
-    void on_actionDuplicate_triggered();
+
+    void on_actionAbout_Plugins_triggered();
 
 private:
 
@@ -170,6 +178,21 @@ private:
     QAction *tileVerticalAct;
 
     QAction *tileHorizontalAct;
+    /** @}*/
+
+    /** \addtogroup Testing
+     *  @{
+     */
+    QDir pluginsDir;
+
+    QStringList pluginFileNames;
+
+    void loadPlugins();
+
+    void populateMenus(QObject *plugin);
+
+    void addToMenu(ExternalInterface *plugin, const QString text,
+                   QMenu *menu);
     /** @}*/
 
     /** \addtogroup Testing

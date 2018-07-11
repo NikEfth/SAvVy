@@ -20,6 +20,13 @@ public:
 
     void show_panel(int dim=0);
 
+signals:
+    void colormap_changed(int);
+
+    void show_axis(bool);
+
+    void show_cursor(bool);
+
 private:
     Ui::Panel_opened_file_controls *ui;
 

@@ -15,6 +15,13 @@ Panel_opened_file_controls::Panel_opened_file_controls(QWidget *parent) :
 
     ui->verticalLayout_2->addWidget(controls_1d);
     ui->verticalLayout_2->addWidget(controls_2d);
+
+    connect(controls_2d, &Controls_display_2d::colormap_changed,
+            this, &Panel_opened_file_controls::colormap_changed);
+    connect(controls_2d, &Controls_display_2d::show_axis,
+            this, &Panel_opened_file_controls::show_axis);
+    connect(controls_2d, &Controls_display_2d::show_cursor,
+            this, &Panel_opened_file_controls::show_cursor);
 }
 
 Panel_opened_file_controls::~Panel_opened_file_controls()
@@ -36,7 +43,7 @@ void Panel_opened_file_controls::show_panel(int dim)
         controls_2d->setHidden(false);
         break;
     case 3:
-
+        controls_2d->setHidden(false);
         break;
     default:
         break;

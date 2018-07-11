@@ -4,15 +4,8 @@
 #include <QWidget>
 
 #include <memory>
-
-#include "display_container.h"
+#include "display_container_raster.h"
 #include "common_display.h"
-
-#include <qwt_plot_spectrogram.h>
-#include <qwt_matrix_raster_data.h>
-#include <qwt_plot_rescaler.h>
-
-#include "stir/Array.h"
 
 //!
 //! \brief The definition of Display_container_2d class
@@ -22,7 +15,7 @@
 //! arrays other from the first. I implemented it this way, so it can be used
 //! as a parent class for the Display_container_3d.
 
-class Display_container_2d : public Display_container
+class Display_container_2d : public Display_container_raster
 {
     Q_OBJECT
 public:
@@ -32,14 +25,16 @@ public:
      *  @{
      */
     //! Set the data array and update() display, by pointer
-    void set_display(QVector<double> * , int _row_size = 0, int _offset_h = 0, int _offset_v = 0);
+    void set_display(QVector<double> * , int _row_size = 0);
     //! Set the data array and update() display, by reference
-    void set_display(const QVector<double>& , int _row_size = 0 , int _offset_h = 0, int _offset_v = 0);
+    void set_display(const QVector<double>& , int _row_size = 0);
     //! Set the data array from a 2D array and update() display, by reference.
     //! This is the fastest option with QVector
-    void set_display(const QVector<QVector<double> >& , int _offset_h = 0, int _offset_v = 0);
+    void set_display(const QVector<QVector<double> >&);
 
     void set_display(const stir::Array<2, float>& );
+    //!
+    virtual void set_display(void*_in);
     //! Set physical sizes of the data
     void set_sizes(int _offset_h = 0, int _offset_v = 0,
                    float _h_spacing = 1.f, float _v_spacing = 1.f,
@@ -51,7 +46,7 @@ public:
                               float _origin_x = 0.f, float  _origin_y = 0.f);
     //! Set the axis. As a weird convention X axis is the
     //! vertical axis and Y the horizontal.
-    void set_axis(int _offset_h, int _offset_v,
+    void set_axis(int _offset_h = 0, int _offset_v = 0,
                   float _h_spacing = 1, float _v_spacing = 1);
     /** @}*/
 
@@ -70,9 +65,6 @@ public:
 
     inline int get_max_index_v()
     {return offset_v + row_num; }
-
-    double at(int row, int col);
-
     /** @}*/
 
     void clear();
@@ -98,39 +90,12 @@ protected:
     void set_array(const QVector<QVector<double> > &_array);
 
     void set_array(const stir::Array<2,float> &_array);
+
+    void set_array(stir::Array<2, float> *_array);
     /** @}*/
 
     //! QVector of data.
-    QVector< double > data;
-
-    int row_size;
-
-    int row_num;
-
-    int offset_h;
-
-    int offset_v;
-    //! Pixel spacing, Horizontal, this will follow the convension in the header
-    float h_spacing;
-    //! Pixel spacing, Vertical, this will follow the convensions in the header
-    float v_spacing;
-
-    float origin_x;
-
-    float  origin_y;
-
-    double min_value;
-
-    double max_value;
-
-    QwtPlotSpectrogram *d_spectrogram;
-
-    QwtMatrixRasterData *p_raster;
-
-    QwtPlotRescaler *d_rescaler;
-    //! Current ColorMap
-    display::ColorMap *myColorMap;
-
+    QVector< double >* data;
 };
 
 #endif // DISPLAY_CONTAINER_H

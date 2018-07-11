@@ -17,6 +17,13 @@ public:
     explicit Controls_display_2d(QWidget *parent = 0);
     ~Controls_display_2d();
 
+signals:
+    void colormap_changed(int);
+
+    void show_axis(bool);
+
+    void show_cursor(bool);
+
 private:
     Ui::Controls_display_2d *ui;
 };

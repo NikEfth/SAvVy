@@ -2,7 +2,7 @@
 #define DISPLAY_MANAGER_H
 
 #include <QWidget>
-#include "display_container_3d.h"
+#include "display_container_raster.h"
 #include "common_display.h"
 
 using namespace display;
@@ -19,17 +19,6 @@ public:
     explicit Display_manager(int _my_id, int _num_dim, QWidget *parent = 0);
     ~Display_manager();
 
-    inline QString get_file_name() const
-    {
-        return fullFileName;
-    }
-
-    //! \return the unique (per session) id for this window
-    inline int get_my_id() const
-    {
-        return my_id;
-    }
-
     /** \addtogroup Setters
      *  @{
      */
@@ -39,6 +28,13 @@ public:
         this->setWindowTitle(_s);
     }
 
+    //!
+    inline void set_display(void*_in)
+    { _display->set_display(_in);}
+    //!
+    inline void set_color_map(int i)
+    { _display->set_color_map(i);}
+    /** @}*/
     inline Display_container* get_display()
     {
         return _display;
@@ -48,7 +44,7 @@ public:
     {
         return QString::number(_page) + " / " + QString::number(num_pages);
     }
-    /** @}*/
+
 signals:
     //! Signal to let the application know that this window should be
     //! removed from various places.
@@ -68,7 +64,7 @@ private slots:
 private:
     Ui::Display_manager *ui;
 
-    Display_container_3d* _display;
+    Display_container_raster* _display;
 };
 
 #endif // DISPLAY_MANAGER_H

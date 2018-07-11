@@ -1,10 +1,11 @@
 #include "src/include/savvy.h"
-#include "src/include/external_interface.h"
 #include "savvywindow.h"
 #include "ui_savvywindow.h"
 #include "src/display/display_container_1d.h"
 #include "src/display/display_container_2d.h"
 #include "src/display/display_container_3d.h"
+#include "src/display/display_manager.h"
+#include "pluginsdialog.h"
 #include "savvy_settings.h"
 #include "aboutdialog.h"
 
@@ -17,6 +18,7 @@
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QPluginLoader>
 
 USING_NAMESPACE_STIR
 
@@ -45,6 +47,8 @@ SavvyWindow::SavvyWindow(QWidget *parent) :
     next_window_id = 0;
 
     create_interface();
+
+    loadPlugins();
 
     // This connection will update the window on every interaction
     // It is the main "refresh all" interface function
@@ -199,8 +203,8 @@ Display_container *SavvyWindow::createDisplayContainer(int num_dims)
 
 Display_manager *SavvyWindow::createDisplayManager(int num_dims)
 {
-    Display_manager *ret = new Display_manager(next_window_id-1,num_dims, this);
-        next_window_id++;
+    Display_manager *ret = new Display_manager(next_window_id,num_dims, this);
+    next_window_id++;
     return ret;
 }
 
@@ -286,51 +290,32 @@ void SavvyWindow::display_array(std::shared_ptr<stir::ArrayInterface> _array,
             return;
 
         stir::Array<1, float>* tmp = dynamic_cast<stir::Array<1, float>* >(_array.get());
-        Display_container_1d *child = dynamic_cast<Display_container_1d *>(container);
 
-        QVector<double> vtmp;
-
-        savvy::Array2QVector(*tmp, vtmp);
-        // With offset
-        //        child->set_display(vtmp,
-        //                           tmp->get_min_index());
-
-        child->set_display(vtmp);
+        container->set_display(tmp);
         append_to_mdi(container);
         return;
     }
     case 2:
     {
-        Display_container *container = createDisplayContainer(dims);
-        container->set_file_name(_name);
+        Display_manager* manager = createDisplayManager(dims);
+        manager->set_file_name(_name);
 
-        if (is_null_ptr(container))
+        if (is_null_ptr(manager))
             return;
 
         stir::Array<2, float>* tmp = dynamic_cast<stir::Array<2, float>* >(_array.get());
-        Display_container_2d *child = dynamic_cast<Display_container_2d *>(container);
 
-        //        QVector<QVector<double> > vtmp;
-        //        savvy::Array2QVector(*tmp, vtmp);
-        //                child->set_display(vtmp);
-
-        //        child->set_display(vtmp,
-        //                           tmp->get_min_index(),
-        //                           (*tmp)[0].get_min_index());
-        child->set_display(*tmp);
-        append_to_mdi(container);
+        manager->set_display(tmp);
+        append_to_mdi(manager);
         return;
     }
     case 3:
     {
-        Display_manager* manager = createDisplayManager();
+        Display_manager* manager = createDisplayManager(dims);
         manager->set_file_name(_name);
 
-        Display_container_3d * disp =
-                dynamic_cast<Display_container_3d*>(manager->get_display());
-
         stir::Array<3, float>* tmp = dynamic_cast<stir::Array<3, float>* >(_array.get());
-        disp->set_display(*tmp);
+        manager->set_display(tmp);
 
         append_to_mdi(manager);
         return;
@@ -348,6 +333,17 @@ void SavvyWindow::on_actionDuplicate_triggered()
     //    active->rename(result);
 
     //    pnl_opened_files->rename(active->get_my_id(), result);
+}
+
+void SavvyWindow::on_set_colormap(int _cm)
+{
+    Display_manager* active =
+            static_cast<Display_manager *>(ui->mdiArea->activeSubWindow()->widget());
+    if(!stir::is_null_ptr(active))
+    {
+        active->set_color_map( _cm);
+        return;
+    }
 }
 
 /*
@@ -398,6 +394,8 @@ void SavvyWindow::create_docks()
 
     dc_opened_file_controls = new QDockWidget("Controls", this);
     pnl_opened_file_controls = new Panel_opened_file_controls(this);
+    connect(pnl_opened_file_controls, &Panel_opened_file_controls::colormap_changed,
+            this, &SavvyWindow::on_set_colormap);
     dc_opened_file_controls->setWidget(pnl_opened_file_controls);
 
     this->addDockWidget(Qt::DockWidgetArea::TopDockWidgetArea, dc_contrast);
@@ -805,7 +803,10 @@ bool SavvyWindow::test_display_2d_data_alt_not_square()
 
     for (int i = test3->get_min_index(); i <= test3->get_max_index() ; ++i)
         for (int j = (*test3)[i].get_min_index(); j <= (*test3)[i].get_max_index() ; ++j)
-            (*test3)[i][j] = j;
+        {
+            float f = sqrt(i*i + j*j);
+            (*test3)[i][j] = f;
+        }
 
     int num_row = test3->size();
     int size_row = (*test3)[0].size();
@@ -826,8 +827,7 @@ bool SavvyWindow::test_display_2d_data_alt_not_square()
     if (is_null_ptr(child))
         return false;
 
-    child->set_display(svtest3, size_row,
-                       (*test3)[0].get_min_index(), (*test3).get_min_index());
+    child->set_display(svtest3, size_row);
 
     append_to_mdi(child);
 
@@ -850,7 +850,7 @@ bool SavvyWindow::test_display_2d_data_physical_not_square()
     for (int i = test4->get_min_index(); i <= test4->get_max_index() ; ++i)
         for (int j = (*test4)[i].get_min_index(); j <= (*test4)[i].get_max_index() ; ++j)
         {
-            float f = i;
+            float f = sqrt(i*i + j*j);
             (*test4)[i][j] = f;
         }
 
@@ -931,4 +931,66 @@ void SavvyWindow::on_actionAbout_triggered()
 {
     AboutDialog* about = new AboutDialog(this);
     about->exec();
+}
+
+void SavvyWindow::on_actionAbout_Plugins_triggered()
+{
+    QSettings settings;
+    if(settings.contains("PluginsPath"))
+        pluginsDir.setPath(settings.value("PluginsPath").toString());
+
+    PlugInsDialog dialog(pluginsDir.path(), pluginFileNames, this);
+    dialog.exec();
+}
+
+void SavvyWindow::loadPlugins()
+{
+    foreach (QObject *plugin, QPluginLoader::staticInstances())
+        populateMenus(plugin);
+
+    QSettings settings;
+    if(settings.contains("PluginsPath"))
+        pluginsDir = settings.value("PluginsPath").toString();
+    else
+        pluginsDir = QDir(qApp->applicationDirPath());
+
+#if defined(Q_OS_WIN)
+    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+        pluginsDir.cdUp();
+#elif defined(Q_OS_MAC)
+    if (pluginsDir.dirName() == "MacOS") {
+        pluginsDir.cdUp();
+        pluginsDir.cdUp();
+        pluginsDir.cdUp();
+    }
+#endif
+    //    pluginsDir.cd("plugins");
+
+    foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+        QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
+        QObject *plugin = loader.instance();
+        if (plugin) {
+            populateMenus(plugin);
+            pluginFileNames += fileName;
+        }
+    }
+
+    //    brushMenu->setEnabled(!brushActionGroup->actions().isEmpty());
+    //    shapesMenu->setEnabled(!shapesMenu->actions().isEmpty());
+    //    filterMenu->setEnabled(!filterMenu->actions().isEmpty());
+}
+
+void SavvyWindow::populateMenus(QObject *plugin)
+{
+    ExternalInterface *iProc = qobject_cast<ExternalInterface *>(plugin);
+    if (iProc)
+        addToMenu(iProc, iProc->get_name(), ui->menuPlugins);
+}
+
+void SavvyWindow::addToMenu(ExternalInterface *plugin, const QString text,
+                            QMenu *menu)
+{
+    QAction *action = new QAction(text, plugin);
+            connect(action, SIGNAL(triggered()), plugin, SLOT(exec()));
+    menu->addAction(action);
 }

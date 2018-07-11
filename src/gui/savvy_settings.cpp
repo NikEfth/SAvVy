@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QSettings>
+#include <QHBoxLayout>
 
 #include <cmath>
 
@@ -21,7 +22,7 @@ GeneralSettings::GeneralSettings(QWidget *parent) :
     {
         QWidget* defaultsPage = new QWidget(this);
         QVBoxLayout* defaultsPageLayout = new QVBoxLayout(defaultsPage);
-        defaultsPageLayout->setContentsMargins(1,1,1,1);
+        //        defaultsPageLayout->setContentsMargins(1,1,1,1);
         defaultsPage->setLayout(defaultsPageLayout);
 
         //
@@ -36,6 +37,14 @@ GeneralSettings::GeneralSettings(QWidget *parent) :
 
         defaultTabbedMode = new QCheckBox("Use Tabbed view mode by default ", defaultsPage);
         defaultsPageLayout->addWidget(defaultTabbedMode);
+
+        QHBoxLayout* hLayout = new QHBoxLayout(defaultsPage);
+        pluginsPath = new QLineEdit(this);
+        QLabel * lbl_pluginsPath = new QLabel("Plugins path: ");
+        hLayout->addWidget(lbl_pluginsPath);
+        hLayout->addWidget(pluginsPath);
+        defaultsPageLayout->addItem(hLayout);
+
 
         defaultsPageLayout->addStretch();
         mainTab->addTab(defaultsPage,"Defaults");
@@ -136,6 +145,7 @@ Savvy_settings::Savvy_settings(QWidget *parent) :
     QSettings settings;
     view_setts->colorMapCombo->setCurrentIndex(settings.value("defaultColorMap").toInt());
     general_setts->autoContrast->setChecked(settings.value("AutoScaleImages").toBool());
+    general_setts->pluginsPath->setText(settings.value("PluginsPath").toString());
     general_setts->autoPlotOpenedFiles->setChecked(settings.value("AutoPlotOpenedImages").toBool());
     general_setts->defaultAxis->setChecked(settings.value("showAxisDefault").toBool());
     general_setts->defaultTabbedMode->setChecked(settings.value("defaultTabbedViewMode").toBool());
@@ -175,6 +185,7 @@ void Savvy_settings::on_save_settings()
     QSettings settings;
     settings.setValue("defaultColorMap", view_setts->colorMapCombo->currentIndex());
     settings.setValue("AutoScaleImages", general_setts->autoContrast->isChecked());
+    settings.setValue("PluginsPath", general_setts->pluginsPath->text());
     settings.setValue("AutoPlotOpenedImages", general_setts->autoPlotOpenedFiles->isChecked());
     settings.setValue("showAxisDefault", general_setts->defaultAxis->isChecked());
     settings.setValue("defaultTabbedViewMode", general_setts->defaultTabbedMode->isChecked());
