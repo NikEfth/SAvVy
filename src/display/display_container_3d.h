@@ -25,7 +25,7 @@ public:
     //!
     void set_display(const stir::Array<3, float>& _array);
     //!
-    virtual void set_display(void*_in);
+    virtual bool set_display(void*_in);
     //!
     void set_axis(int _offset_h = 0, int _offset_v = 0, int _offset_d = 0,
                   float _h_spacing= 1, float _v_spacing = 1, float _d_spacing =1 );

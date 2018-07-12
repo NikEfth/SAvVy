@@ -51,9 +51,33 @@ void Display_container_2d::set_array(const QVector<QVector<double> > &_array)
                 (*data)[idx] = val;
 
                 if (val >  (*max_value)[0] )
-                     (*max_value)[0]  = val ;
+                    (*max_value)[0]  = val ;
                 else if(val<  (*min_value)[0])
-                     (*min_value)[0] = val ;
+                    (*min_value)[0] = val ;
+            }
+        }
+}
+
+void Display_container_2d::set_array(QVector<QVector<double> > *_array)
+{
+    row_num = _array->size();
+    row_size = _array[0].size();
+
+    data = new QVector< double >(row_num*row_size, 0.0);
+
+    int idx = 0;
+    for(int i = 0; i < row_num; ++i)
+        for(int j = 0; j < row_size; ++j, ++idx)
+        {
+            float val =  (*_array)[i][j];
+            if (val != 0.f)
+            {
+                (*data)[idx] = val;
+
+                if (val >  (*max_value)[0] )
+                    (*max_value)[0]  = val ;
+                else if(val<  (*min_value)[0])
+                    (*min_value)[0] = val ;
             }
         }
 }
@@ -77,7 +101,7 @@ void Display_container_2d::set_array(const stir::Array<2,float> &_array)
                 if (val> (*max_value)[0] )
                     (*max_value)[0]  = val ;
                 else if(val <  (*min_value)[0])
-                     (*min_value)[0] = val;
+                    (*min_value)[0] = val;
             }
         }
 }
@@ -101,7 +125,7 @@ void Display_container_2d::set_array(stir::Array<2,float> *_array)
                 if (val> (*max_value)[0] )
                     (*max_value)[0]  = val ;
                 else if(val <  (*min_value)[0])
-                     (*min_value)[0] = val;
+                    (*min_value)[0] = val;
             }
         }
 }
@@ -140,18 +164,16 @@ void Display_container_2d::set_display(const stir::Array<2, float>& _array)
     emit setup_ready();
 }
 
-void Display_container_2d::set_display(void* _in)
+bool Display_container_2d::set_display(void* _in)
 {
     stir::Array<2, float>* tmp =
-            static_cast<stir::Array<2, float>* >(_in);
-
-    if(stir::is_null_ptr(tmp))
-        return;
-
+            reinterpret_cast<stir::Array<2, float>* >(_in);
     set_array(tmp);
     set_axis(tmp->get_min_index(), tmp[0].get_min_index());
     update_scene();
     emit setup_ready();
+
+    return true;
 }
 
 void Display_container_2d::set_sizes(

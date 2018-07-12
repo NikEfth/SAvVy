@@ -13,9 +13,9 @@ class Display_container_raster : public Display_container
 public:
     explicit Display_container_raster(int _my_id, int dims, QWidget *parent = nullptr);
 
-    inline int get_num_planes() { return plane_num;}
+    virtual int get_num_data() { return plane_num; }
 
-    inline void set_color_map(int i)
+    virtual void set_color_map(int i)
     {
         if(!stir::is_null_ptr(myColorMap))
         {

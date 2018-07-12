@@ -89,13 +89,13 @@ void Display_container_1d::set_display(const QVector<double> &_array)
     update_scene();
 }
 
-void Display_container_1d::set_display(void* _in)
+bool Display_container_1d::set_display(void* _in)
 {
     stir::Array<1, float>* tmp =
             static_cast<stir::Array<1, float>* >(_in);
 
     if(stir::is_null_ptr(_in))
-        return;
+        return false;
 
     set_array(tmp);
 
@@ -111,6 +111,8 @@ void Display_container_1d::set_display(void* _in)
     }
 
     update_scene();
+
+    return true;
 }
 
 void Display_container_1d::set_sizes(

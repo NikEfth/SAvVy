@@ -34,7 +34,7 @@ public:
 
     void set_display(const stir::Array<2, float>& );
     //!
-    virtual void set_display(void*_in);
+    virtual bool set_display(void*_in);
     //! Set physical sizes of the data
     void set_sizes(int _offset_h = 0, int _offset_v = 0,
                    float _h_spacing = 1.f, float _v_spacing = 1.f,
@@ -88,6 +88,8 @@ protected:
     //! Set 2D data. This function will perform the transformation to 1D
     //! Fastest option
     void set_array(const QVector<QVector<double> > &_array);
+
+    void set_array(QVector<QVector<double> > *_array);
 
     void set_array(const stir::Array<2,float> &_array);
 

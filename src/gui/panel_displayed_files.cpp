@@ -32,17 +32,17 @@ void Panel_displayed_files::set_active(int _id)
 
 void Panel_displayed_files::appendToOpenedList(Display_container* child)
 {
+    //! \todo Display_container cannot be used for display outside of a wrapper
+//    QListWidgetItem* tmp_itm =  new QListWidgetItem();
 
-    QListWidgetItem* tmp_itm =  new QListWidgetItem();
+//    tmp_itm->setToolTip( QString::number(child->get_my_id()));
+//    tmp_itm->setText(child->get_file_name());
 
-    tmp_itm->setToolTip( QString::number(child->get_my_id()));
-    tmp_itm->setText(child->get_file_name());
+//    tmp_itm->setFlags(tmp_itm->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+//    tmp_itm->setCheckState(Qt::Unchecked);
 
-    tmp_itm->setFlags(tmp_itm->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
-    tmp_itm->setCheckState(Qt::Unchecked);
-
-    ui->listOpenedFiles->addItem(tmp_itm);
-    ui->listOpenedFiles->setCurrentItem(tmp_itm);
+//    ui->listOpenedFiles->addItem(tmp_itm);
+//    ui->listOpenedFiles->setCurrentItem(tmp_itm);
 
 }
 

@@ -2,7 +2,7 @@
 #define DISPLAY_MANAGER_H
 
 #include <QWidget>
-#include "display_container_raster.h"
+#include "display_container.h"
 #include "common_display.h"
 
 using namespace display;
@@ -11,7 +11,7 @@ namespace Ui {
 class Display_manager;
 }
 
-class Display_manager : public QWidget, public DisplayInterface
+class Display_manager : public DisplayInterface
 {
     Q_OBJECT
 
@@ -29,11 +29,16 @@ public:
     }
 
     //!
-    inline void set_display(void*_in)
-    { _display->set_display(_in);}
+    virtual void set_display(void*_in)
+    {
+        _display->set_display(_in);
+    }
+
     //!
-    inline void set_color_map(int i)
-    { _display->set_color_map(i);}
+    virtual void set_color_map(int i)
+    {
+        _display->set_color_map(i);
+    }
     /** @}*/
     inline Display_container* get_display()
     {
@@ -64,7 +69,7 @@ private slots:
 private:
     Ui::Display_manager *ui;
 
-    Display_container_raster* _display;
+    Display_container* _display;
 };
 
 #endif // DISPLAY_MANAGER_H

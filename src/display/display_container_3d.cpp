@@ -60,18 +60,20 @@ void Display_container_3d::set_display(const stir::Array<3, float>& _array)
     emit setup_ready();
 }
 
-void Display_container_3d::set_display(void* _in)
+bool Display_container_3d::set_display(void* _in)
 {
     stir::Array<3, float>* tmp =
             static_cast<stir::Array<3, float>* >(_in);
 
     if(stir::is_null_ptr(tmp))
-        return;
+        return false;
 
     set_array(tmp);
     set_axis(tmp->get_min_index(), (*tmp)[0].get_min_index(), (*tmp)[0][0].get_min_index());
     update_scene();
     emit setup_ready();
+
+    return true;
 }
 
 void Display_container_3d::set_array(const QVector<QVector<QVector<double> > > &_array)

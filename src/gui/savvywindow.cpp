@@ -212,7 +212,7 @@ QMdiSubWindow *SavvyWindow::findMdiChild(const QString &_id) const
 {
 
     for(QMdiSubWindow *window: ui->mdiArea->subWindowList()) {
-        Display_container *mdiChild = qobject_cast<Display_container *>(window->widget());
+        DisplayInterface *mdiChild = qobject_cast<DisplayInterface *>(window->widget());
         if (QString::number(mdiChild->get_my_id()) == _id)
             return window;
     }
@@ -224,18 +224,18 @@ bool SavvyWindow::append_to_mdi(Display_container *child,
                                 bool prepend_to_recent,
                                 bool minimized)
 {
-    QObject::connect(child, &Display_container::aboutToClose, this, &SavvyWindow::remove_from_mdi);
+    //    QObject::connect(child, &Display_container::aboutToClose, this, &SavvyWindow::remove_from_mdi);
 
-    ui->mdiArea->addSubWindow(child);
-    ui->mdiArea->setFocusPolicy(Qt::StrongFocus);
-    pnl_displayed_files->appendToOpenedList(child);
+    //    ui->mdiArea->addSubWindow(child);
+    //    ui->mdiArea->setFocusPolicy(Qt::StrongFocus);
+    //    pnl_displayed_files->appendToOpenedList(child);
 
-    if (!minimized)
-        child->show();
-    else
-        child->showMinimized();
+    //    if (!minimized)
+    //        child->show();
+    //    else
+    //        child->showMinimized();
 
-    return true;
+    //    return true;
 }
 
 bool SavvyWindow::append_to_mdi(Display_manager *child,
@@ -283,16 +283,17 @@ void SavvyWindow::display_array(std::shared_ptr<stir::ArrayInterface> _array,
     switch (dims) {
     case 1:
     {
-        Display_container *container = createDisplayContainer(dims);
-        container->set_file_name(_name);
+        //! \todo Display_container cannot be used for display outside of a wrapper
+        //        Display_container *container = createDisplayContainer(dims);
+        //        container->set_file_name(_name);
 
-        if (is_null_ptr(container))
-            return;
+        //        if (is_null_ptr(container))
+        //            return;
 
-        stir::Array<1, float>* tmp = dynamic_cast<stir::Array<1, float>* >(_array.get());
+        //        stir::Array<1, float>* tmp = dynamic_cast<stir::Array<1, float>* >(_array.get());
 
-        container->set_display(tmp);
-        append_to_mdi(container);
+        //        container->set_display(tmp);
+        //        append_to_mdi(container);
         return;
     }
     case 2:
@@ -303,8 +304,9 @@ void SavvyWindow::display_array(std::shared_ptr<stir::ArrayInterface> _array,
         if (is_null_ptr(manager))
             return;
 
-        stir::Array<2, float>* tmp = dynamic_cast<stir::Array<2, float>* >(_array.get());
+//        stir::Array<2, float>* tmp = dynamic_cast<stir::Array<2, float>* >(_array.get());
 
+        QVector < double> * tmp = new QVector<double>(199);
         manager->set_display(tmp);
         append_to_mdi(manager);
         return;
@@ -732,26 +734,26 @@ bool SavvyWindow::test_display_2d_data_alt()
     QString n = pnl_workspace->get_current_name() + "_no_offset";
     stir::Array<2, float>* test2 = dynamic_cast<stir::Array<2, float>* >(test2_sptr.get());
 
-    int size = test2->size();
-    QVector<QVector<double> > vtest2(size);
+    display_array(test2_sptr, n);
 
-    for (int i = 0; i < size; ++i)
-        vtest2[i].resize(size);
+//        int size = test2->size();
+//        QVector<QVector<double> > vtest2(size);
 
-    savvy::Array2QVector(*test2, vtest2);
+//        for (int i = 0; i < size; ++i)
+//            vtest2[i].resize(size);
 
-    QVector<double> svtest2;
-    savvy::serialize_QVector(vtest2, svtest2);
+//        savvy::Array2QVector(*test2, vtest2);
 
-    Display_container_2d *child = dynamic_cast<Display_container_2d *>(createDisplayContainer(2));
-    child->set_file_name(n);
+//        //! \todo Display_container cannot be used for display outside of a wrapper
+//        Display_manager *child = createDisplayManager(2);
+//        child->set_file_name(n);
 
-    if (is_null_ptr(child))
-        return false;
+//        if (is_null_ptr(child))
+//            return false;
 
-    child->set_display(svtest2, size);
+//        child->set_display(&vtest2);
 
-    append_to_mdi(child);
+//        append_to_mdi(child);
 
     return true;
 }
@@ -763,26 +765,28 @@ bool SavvyWindow::test_display_2d_data_physical()
     QString n = pnl_workspace->get_current_name() + "_physical";
     stir::Array<2, float>* test2 = dynamic_cast<stir::Array<2, float>* >(test2_sptr.get());
 
+    display_array(test2_sptr, n);
 
-    int size = test2->size();
-    QVector<QVector<double> > vtest2(size);
+    //    int size = test2->size();
+    //    QVector<QVector<double> > vtest2(size);
 
-    for (int i = 0; i < size; ++i)
-        vtest2[i].resize(size);
+    //    for (int i = 0; i < size; ++i)
+    //        vtest2[i].resize(size);
 
-    savvy::Array2QVector(*test2, vtest2);
+    //    savvy::Array2QVector(*test2, vtest2);
 
-    Display_container_2d *child = dynamic_cast<Display_container_2d *>(createDisplayContainer(2));
-    child->set_file_name(n);
+    //! \todo Display_container cannot be used for display outside of a wrapper
+    //    Display_container_2d *child = dynamic_cast<Display_container_2d *>(createDisplayContainer(2));
+    //    child->set_file_name(n);
 
-    if (is_null_ptr(child))
-        return false;
+    //    if (is_null_ptr(child))
+    //        return false;
 
-    child->set_physical_display(vtest2,
-                                (*test2)[0].get_min_index(), (*test2).get_min_index(),
-            0.5, 0.5);
+    //    child->set_physical_display(vtest2,
+    //                                (*test2)[0].get_min_index(), (*test2).get_min_index(),
+    //            0.5, 0.5);
 
-    append_to_mdi(child);
+    //    append_to_mdi(child);
 
     return true;
 }
@@ -808,28 +812,31 @@ bool SavvyWindow::test_display_2d_data_alt_not_square()
             (*test3)[i][j] = f;
         }
 
-    int num_row = test3->size();
-    int size_row = (*test3)[0].size();
-    QVector<QVector<double> > vtest3(num_row);
-
-    for (int i = 0; i < num_row; ++i)
-        vtest3[i].resize(size_row);
-
-    savvy::Array2QVector(*test3, vtest3);
-
-    QVector<double> svtest3;
-    savvy::serialize_QVector(vtest3, svtest3);
-
-    Display_container_2d *child = dynamic_cast<Display_container_2d *>(createDisplayContainer(2));
     QString n = pnl_workspace->get_current_name() + "_vertical";
-    child->set_file_name(n);
+    display_array(test3_sptr, n);
+    //    int num_row = test3->size();
+    //    int size_row = (*test3)[0].size();
+    //    QVector<QVector<double> > vtest3(num_row);
 
-    if (is_null_ptr(child))
-        return false;
+    //    for (int i = 0; i < num_row; ++i)
+    //        vtest3[i].resize(size_row);
 
-    child->set_display(svtest3, size_row);
+    //    savvy::Array2QVector(*test3, vtest3);
 
-    append_to_mdi(child);
+    //    QVector<double> svtest3;
+    //    savvy::serialize_QVector(vtest3, svtest3);
+
+    //! \todo Display_container cannot be used for display outside of a wrapper
+    //    Display_container_2d *child = dynamic_cast<Display_container_2d *>(createDisplayContainer(2));
+
+    //    child->set_file_name(n);
+
+    //    if (is_null_ptr(child))
+    //        return false;
+
+    //    child->set_display(svtest3, size_row);
+
+    //    append_to_mdi(child);
 
     return true;
 }
@@ -853,26 +860,27 @@ bool SavvyWindow::test_display_2d_data_physical_not_square()
             float f = sqrt(i*i + j*j);
             (*test4)[i][j] = f;
         }
-
-    QVector<QVector<double> > vtest4(test4->size());
-
-    for (int i = 0; i < test4->size(); ++i)
-        vtest4[i].resize((*test4)[0].size());
-
-    savvy::Array2QVector(*test4, vtest4);
-
-    Display_container_2d *child = dynamic_cast<Display_container_2d *>(createDisplayContainer(2));
     QString n = pnl_workspace->get_current_name() + "_horizontal";
-    child->set_file_name(n);
+    display_array(test4_sptr, n);
+    //    QVector<QVector<double> > vtest4(test4->size());
 
-    if (is_null_ptr(child))
-        return false;
+    //    for (int i = 0; i < test4->size(); ++i)
+    //        vtest4[i].resize((*test4)[0].size());
 
-    child->set_physical_display(vtest4,
-                                (*test4)[0].get_min_index(), (*test4).get_min_index(),
-            0.5, 0.5);
+    //    savvy::Array2QVector(*test4, vtest4);
+    //! \todo Display_container cannot be used for display outside of a wrapper
+    //    Display_container_2d *child = dynamic_cast<Display_container_2d *>(createDisplayContainer(2));
+    //    QString n = pnl_workspace->get_current_name() + "_horizontal";
+    //    child->set_file_name(n);
 
-    append_to_mdi(child);
+    //    if (is_null_ptr(child))
+    //        return false;
+
+    //    child->set_physical_display(vtest4,
+    //                                (*test4)[0].get_min_index(), (*test4).get_min_index(),
+    //            0.5, 0.5);
+
+    //    append_to_mdi(child);
 
     return true;
 }
@@ -991,6 +999,6 @@ void SavvyWindow::addToMenu(ExternalInterface *plugin, const QString text,
                             QMenu *menu)
 {
     QAction *action = new QAction(text, plugin);
-            connect(action, SIGNAL(triggered()), plugin, SLOT(exec()));
+    connect(action, SIGNAL(triggered()), plugin, SLOT(exec()));
     menu->addAction(action);
 }

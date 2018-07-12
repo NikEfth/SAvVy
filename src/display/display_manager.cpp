@@ -6,7 +6,7 @@
 #include "display_container_3d.h"
 
 Display_manager::Display_manager(int _my_id, int _num_dim, QWidget *parent) :
-    QWidget(parent), DisplayInterface(_my_id, _num_dim),
+    DisplayInterface(_my_id, _num_dim, parent),
     ui(new Ui::Display_manager)
 {
     ui->setupUi(this);
@@ -14,7 +14,9 @@ Display_manager::Display_manager(int _my_id, int _num_dim, QWidget *parent) :
     switch (dims) {
     case 1:
     {
-        //! \todo error
+         _display = new Display_container_1d(my_id, 1, this);
+        ui->sld_plane->setHidden(true);
+        ui->lbl_plane->setHidden(true);
     }
         break;
     case 2:
@@ -28,7 +30,7 @@ Display_manager::Display_manager(int _my_id, int _num_dim, QWidget *parent) :
     {
         _display = new Display_container_3d(my_id, 3, this);
         connect(ui->sld_plane, &QSlider::sliderMoved, _display, &Display_container::update_scene);
-        connect(ui->sld_plane, &QSlider::sliderMoved, this, &Display_manager::updated_display);
+//        connect(ui->sld_plane, &QSlider::sliderMoved, this, &Display_manager::updated_display);
         connect(_display, &Display_container::setup_ready, this, &Display_manager::initialised_display);
     }
         break;
@@ -51,12 +53,12 @@ void Display_manager::closeEvent(QCloseEvent *event)
 
 void Display_manager::updated_display(int position)
 {
-    ui->lbl_plane->setText(QString::number(position) + " / " + QString::number(_display->get_num_planes()));
+    ui->lbl_plane->setText(QString::number(position) + " / " + QString::number(_display->get_num_data()));
 }
 
 void Display_manager::initialised_display()
 {
-    ui->sld_plane->setMaximum(_display->get_num_planes()-1);
+    ui->sld_plane->setMaximum(_display->get_num_data()-1);
     int val = ui->sld_plane->value();
-    ui->lbl_plane->setText(get_label(val, _display->get_num_planes()));
+    ui->lbl_plane->setText(get_label(val, _display->get_num_data()));
 }

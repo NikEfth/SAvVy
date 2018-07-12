@@ -2,14 +2,16 @@
 #define COMMON_DISPLAY_H
 
 #include <qwt_color_map.h>
+#include <QWidget>
 
 namespace display {
 
-class DisplayInterface
+class DisplayInterface : public QWidget
 {
+    Q_OBJECT
 public:
-    explicit DisplayInterface(int _id, int _dims):
-        my_id(_id), dims(_dims)
+    explicit DisplayInterface(int _id, int _dims, QWidget *parent = nullptr)
+        : QWidget(parent), my_id(_id), dims(_dims)
     {    }
     /** \addtogroup Getters
      *  @{
@@ -23,6 +25,8 @@ public:
     {
         return fullFileName;
     }
+
+    virtual void set_display(void*_in) = 0;
 
     //! \return the unique (per session) id for this window
     inline int get_my_id() const

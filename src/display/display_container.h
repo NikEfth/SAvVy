@@ -2,6 +2,9 @@
 #define DISPLAY_CONTAINER_H
 
 #include <qwt_plot.h>
+#include <qwt_plot_canvas.h>
+#include <qwt_plot_marker.h>
+#include <qwt_symbol.h>
 
 #include "common_display.h"
 #include "stir/Array.h"
@@ -22,12 +25,12 @@ using namespace display;
 //! It the axis are enabled by default then the images are larger. Otherwise the
 //! size falls to that of the minimum canvas. This creates another one inconsistency
 //! with the size of the colormap preview widget.
-class Display_container : public QwtPlot, public DisplayInterface
+class Display_container : public QwtPlot
 {
     Q_OBJECT
 public:
     explicit Display_container(int _my_id, int _num_dim, QWidget *parent = nullptr)
-        :QwtPlot(parent), DisplayInterface(_my_id, _num_dim)
+        :QwtPlot(parent)
     {
         this->canvas()->setMinimumSize(150, 150);
     }
@@ -35,18 +38,20 @@ public:
     /** \addtogroup Setters
      *  @{
      */
-    virtual void set_display(void*) = 0;
+    virtual bool set_display(void*) = 0;
 
-    inline void set_file_name(QString _s)
+    virtual void set_color_map(int i)
     {
-        fullFileName = _s;
-        this->setWindowTitle(_s);
+        //! \todo Set colormap could be usefull for 1D arrays, too.
     }
-    inline void rename(const QString& _s)
-    {
-        set_file_name(_s);
-    }
+
     /** @}*/
+
+    virtual int get_num_data()
+    {
+        //! \todo Set colormap could be usefull for 1D arrays, too.
+        return 0;
+    }
 
 public slots:
     //! Update the display contents
