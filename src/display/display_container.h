@@ -9,6 +9,7 @@
 #include "common_display.h"
 #include "stir/Array.h"
 #include "stir/is_null_ptr.h"
+#include "savvy.h"
 
 using namespace display;
 //!
@@ -29,8 +30,8 @@ class Display_container : public QwtPlot
 {
     Q_OBJECT
 public:
-    explicit Display_container(int _my_id, int _num_dim, QWidget *parent = nullptr)
-        :QwtPlot(parent)
+    explicit Display_container(int _num_dim, QWidget *parent = nullptr)
+        :QwtPlot(parent), num_dim(_num_dim)
     {
         this->canvas()->setMinimumSize(150, 150);
     }
@@ -38,7 +39,26 @@ public:
     /** \addtogroup Setters
      *  @{
      */
-    virtual bool set_display(void*) = 0;
+    //!
+    virtual void set_display(const QVector<double> & _x_array,
+                             const QVector<double> & _y_array)
+    {
+        //!\todo It can be used for Scatter plottings
+    }
+    //! Set the data array, initialise x_data and update() display, by reference
+    virtual void set_display(const QVector<double>&, int row_size) = 0;
+    //! Set the data array, initialise x_data and update() display, by pointer
+    virtual void set_display(const QVector< QVector<double> >&) = 0;
+    //! Set the data array, initialise x_data and update() display, by reference
+    virtual void set_display(const QVector<QVector< QVector<double> > >&) = 0;
+    //! Set the data array, initialise x_data and update() display, by reference
+    virtual void set_display(const stir::Array<1, float>&, int row_size) = 0;
+    //! Set the data array, initialise x_data and update() display, by pointer
+    virtual void set_display(const  stir::Array<2, float>&) = 0;
+    //! Set the data array, initialise x_data and update() display, by reference
+    virtual void set_display(const  stir::Array<3, float>&) = 0;
+
+    virtual void set_display(void*) = 0;
 
     virtual void set_color_map(int i)
     {
@@ -47,11 +67,17 @@ public:
 
     /** @}*/
 
-    virtual int get_num_data()
+    virtual int get_num_data() const
     {
-        //! \todo Set colormap could be usefull for 1D arrays, too.
-        return 0;
+        return data_num;
     }
+
+    inline int get_num_dimensions() const
+    {
+        return num_dim;
+    }
+
+    virtual ~Display_container();
 
 public slots:
     //! Update the display contents
@@ -66,12 +92,22 @@ signals:
     void aboutToClose();
 
     void setup_ready();
-protected:
 
+protected:
     //! We hack this QEvent because upon close we emit aboutToClose()
     //! to let know the application that this window must be removed
     //! from various places.
     void closeEvent(QCloseEvent *event) override;
+
+    QVector< double >* min_value = NULL;
+
+    QVector< double >* max_value = NULL;
+
+    int num_dim;
+
+    int data_num;
+
+    int row_size;
 
 };
 

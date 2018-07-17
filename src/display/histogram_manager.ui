@@ -6,14 +6,26 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>502</width>
-    <height>410</height>
+    <width>518</width>
+    <height>416</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="leftMargin">
+    <number>2</number>
+   </property>
+   <property name="topMargin">
+    <number>2</number>
+   </property>
+   <property name="rightMargin">
+    <number>2</number>
+   </property>
+   <property name="bottomMargin">
+    <number>2</number>
+   </property>
    <item>
     <widget class="QFrame" name="_display">
      <property name="minimumSize">
@@ -28,7 +40,20 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3"/>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="leftMargin">
+       <number>2</number>
+      </property>
+      <property name="topMargin">
+       <number>2</number>
+      </property>
+      <property name="rightMargin">
+       <number>2</number>
+      </property>
+      <property name="bottomMargin">
+       <number>2</number>
+      </property>
+     </layout>
     </widget>
    </item>
    <item>
@@ -46,6 +71,9 @@
       </item>
       <item>
        <widget class="QSpinBox" name="spinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="minimum">
          <number>1</number>
         </property>
@@ -63,6 +91,9 @@
       </item>
       <item>
        <widget class="QDoubleSpinBox" name="doubleSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="suffix">
          <string>%</string>
         </property>

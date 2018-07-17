@@ -11,9 +11,7 @@ class Display_container_raster : public Display_container
 {
     Q_OBJECT
 public:
-    explicit Display_container_raster(int _my_id, int dims, QWidget *parent = nullptr);
-
-    virtual int get_num_data() { return plane_num; }
+    explicit Display_container_raster(int dims, QWidget *parent = nullptr);
 
     virtual void set_color_map(int i)
     {
@@ -24,10 +22,8 @@ public:
             replot();
         }
     }
-signals:
 
-public slots:
-
+    virtual ~Display_container_raster();
 protected:
     QwtPlotSpectrogram *d_spectrogram = NULL;
 
@@ -36,10 +32,6 @@ protected:
     QwtPlotRescaler *d_rescaler = NULL;
     //! Current ColorMap
     display::ColorMap *myColorMap = NULL;
-
-    int plane_num;
-
-    int row_size;
 
     int row_num;
 
@@ -57,13 +49,9 @@ protected:
 
     float origin_x;
 
-    float  origin_y;
+    float origin_y;
 
     float origin_z;
-
-    QVector< double >* min_value = NULL;
-
-    QVector< double >* max_value = NULL;
 
 };
 

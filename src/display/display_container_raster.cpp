@@ -2,8 +2,8 @@
 
 #include <QSettings>
 
-Display_container_raster::Display_container_raster(int _my_id,  int dims, QWidget *parent)
-    : Display_container(_my_id, dims,parent)
+Display_container_raster::Display_container_raster(int dims, QWidget *parent)
+    : Display_container(dims,parent)
 {
     QSettings settings;
 
@@ -32,4 +32,10 @@ Display_container_raster::Display_container_raster(int _my_id,  int dims, QWidge
     p_raster = new QwtMatrixRasterData();
 
     d_spectrogram->attach(this);
+}
+
+
+Display_container_raster::~Display_container_raster()
+{
+    delete d_spectrogram;
 }

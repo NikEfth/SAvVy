@@ -103,7 +103,7 @@ ViewSettings::ViewSettings(QWidget *parent) :
                 vtest1[i][j] = sqrt(i*i + j*j);
         }
 
-        preview = new Display_container_2d(0, 2, visualisationGroup);
+        preview = new Display_container_2d(2, visualisationGroup);
         preview->set_display(vtest1);
         preview->enable_axis(false);
         visualisationGroupLayout->addWidget(preview,1,1);

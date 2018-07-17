@@ -96,8 +96,6 @@ private:
      */
     //! Find and \return a pointer to the QMdiSubWindow with the _id
     QMdiSubWindow *findMdiChild(const QString &_id) const;
-    //! Create a new Display_container with num_dims the number of dimensions
-    Display_container *createDisplayContainer(int num_dims = 1);
     //! Create a new Display_Manager
     Display_manager *createDisplayManager(int num_dims = 3);
 
@@ -193,6 +191,8 @@ private:
 
     void addToMenu(ExternalInterface *plugin, const QString text,
                    QMenu *menu);
+
+    QVector<QAction *> loaded_plugins;
     /** @}*/
 
     /** \addtogroup Testing
@@ -200,50 +200,86 @@ private:
      */
     //! Ask a question to the user
     int ask(QString);
-    //! This function will create a sinc plot. The plot will have 121 points with
-    //! offset -60. The x axis is on indeces.
-    //! - This test function will write the test array in Workspace
-    bool test_display_1d_data();
-    //! Similar to test_display_1d_data() but the array has 121 points, with
-    //! sampling distance 0.5 (mm) therefore the boundaties are [-30,30).
-    //! The x axis is float representing a physical sampling.
-    //! - The array data are drawn from Workspace.
-    bool test_display_1d_data_physical();
-    //! Creates a 2D sinc plot in a matrix [200, 200], from (-100, -100) to (99, 99).
-    //! This is the simplest case of 2D plotting handled by the application.
-    //! - In this case a stir::Array<2> is created and the values are passed in a
-    //! 1D QVector, from savvy::Array2QVector(const stir::Array<2, float> & input,
-    //! QVector<QVector<double> > & output) and the 2D matrix is input to the
-    //! Display_container_2d.
-    //! - The result should look like a sereis of concetric circles with gradially
-    //! reduced intensity. The circles should be centered around point (0,0).
-    //! - The serialisation is done in the Display_container_2d. This approch should have
-    //! a small speed advnatage as, in the same time the search for mininum and
-    //! maximum value is performed.
-    bool test_display_2d_data();
-    //! This test function is similar to the test_display_2d_data(). The same
-    //! simulation function, is used. The differences are
-    //! # zero offset is used, therefore point (0,0) should be at the lower bottem
-    //! corner
-    //! # The savvy::serialize_QVector is called before the display function, therefore
-    //! the 1D array is the input to Display_container_2d::set_display().
-    bool test_display_2d_data_alt();
-    //! A test for displaying non square matrices. This test is similar to
-    //! test_display_2d_data_alt() but the size of the x axis is smaller than the size of
-    //! y axis. The dipslayed gradient should move from left to right.
-    //! The serialisation is performed calling the savvy::serialize_QVector()
-    bool test_display_2d_data_alt_not_square();
-    //! Similar to test_display_2d_data() but the physical sampling is every 0.5 (mm)
-    //! therefore the size of the image boundaries are (-50, -50) to (49,49) mm . The
-    //! serialisation is performed by calling savvy::serialize_QVector()
-    bool test_display_2d_data_physical();
-    //! Tests the display with physical sizes and non square form. In this case the
-    //! Y axis is shorter and the gradient should move from bottom to top.
-    bool test_display_2d_data_physical_not_square();
+    //! This function will create a sinc function and store it in Workspace.
+    //! The plot will have 121 points with offset -60. The x axis is on indeces.
+    //! The name of the dataset is "test1".
+    bool create_test_1d_data();
+    //! Creates a diagonal line segment from (-60, 0) to (60, 120)
+    //! The name of the dataset is "test1l".
+    bool create_test_1d_data_lin();
+    //! Create a stir::Array<2, float> and store it in Workspace
+    //! The name of the dataset is "test2".
+    bool create_test_2d_data();
+    //! Creates a stir::Array<2, float> with a saw function and store it in Workspace.
+    //! The name of the dataset is "test2l".
+    bool create_test_2d_data_lin();
+    //! Create a stir::Array<3, float> and store it in Workspace
+    //! The name of the dataset is "test3"
+    bool create_test_3d_data();
+    //! The name of the dataset it "test3l"
+    bool create_test_3d_data_lin();
 
-    bool test_display_3d_data();
+    //! Test the display of a stir::Array<1, float> in a 1D Display_container_1d
+    bool test_display_array_1d();
 
-    bool test_display_3d_data_alt();
+    bool test_display_array_1d_points();
+    //! Test the display of a stir::Array<2, float> in a 1D Display_container_1d
+    bool test_display_array_2d_in_1d_container();
+    //! Test the display of a stir::Array<3, float> in a 1D Display_container_1d
+    bool test_display_array_3d_in_1d_container();
+
+    bool test_display_array_2d();
+
+    bool test_display_array_1d_in_2d_container();
+
+    bool test_display_array_3d_in_2d_container();
+
+     bool test_display_array_3d();
+
+    //    //! This function will create a sinc plot. The plot will have 121 points with
+    //    //! offset -60. The x axis is on indeces.
+    //    //! - This test function will write the test array in Workspace
+    //    bool test_display_1d_data();
+    //    //! Similar to test_display_1d_data() but the array has 121 points, with
+    //    //! sampling distance 0.5 (mm) therefore the boundaties are [-30,30).
+    //    //! The x axis is float representing a physical sampling.
+    //    //! - The array data are drawn from Workspace.
+    //    bool test_display_1d_data_physical();
+    //    //! Creates a 2D sinc plot in a matrix [200, 200], from (-100, -100) to (99, 99).
+    //    //! This is the simplest case of 2D plotting handled by the application.
+    //    //! - In this case a stir::Array<2> is created and the values are passed in a
+    //    //! 1D QVector, from savvy::Array2QVector(const stir::Array<2, float> & input,
+    //    //! QVector<QVector<double> > & output) and the 2D matrix is input to the
+    //    //! Display_container_2d.
+    //    //! - The result should look like a sereis of concetric circles with gradially
+    //    //! reduced intensity. The circles should be centered around point (0,0).
+    //    //! - The serialisation is done in the Display_container_2d. This approch should have
+    //    //! a small speed advnatage as, in the same time the search for mininum and
+    //    //! maximum value is performed.
+    //    bool test_display_2d_data();
+    //    //! This test function is similar to the test_display_2d_data(). The same
+    //    //! simulation function, is used. The differences are
+    //    //! # zero offset is used, therefore point (0,0) should be at the lower bottem
+    //    //! corner
+    //    //! # The savvy::serialize_QVector is called before the display function, therefore
+    //    //! the 1D array is the input to Display_container_2d::set_display().
+    //    bool test_display_2d_data_alt();
+    //    //! A test for displaying non square matrices. This test is similar to
+    //    //! test_display_2d_data_alt() but the size of the x axis is smaller than the size of
+    //    //! y axis. The dipslayed gradient should move from left to right.
+    //    //! The serialisation is performed calling the savvy::serialize_QVector()
+    //    bool test_display_2d_data_alt_not_square();
+    //    //! Similar to test_display_2d_data() but the physical sampling is every 0.5 (mm)
+    //    //! therefore the size of the image boundaries are (-50, -50) to (49,49) mm . The
+    //    //! serialisation is performed by calling savvy::serialize_QVector()
+    //    bool test_display_2d_data_physical();
+    //    //! Tests the display with physical sizes and non square form. In this case the
+    //    //! Y axis is shorter and the gradient should move from bottom to top.
+    //    bool test_display_2d_data_physical_not_square();
+
+    //    bool test_display_3d_data();
+
+    //    bool test_display_3d_data_alt();
 
     /** @}*/
 };

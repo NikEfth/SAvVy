@@ -17,6 +17,9 @@ class Display_manager : public DisplayInterface
 
 public:
     explicit Display_manager(int _my_id, int _num_dim, QWidget *parent = 0);
+
+    explicit Display_manager(int _my_id, stir::ArrayInterface* __display, QWidget *parent = 0);
+
     ~Display_manager();
 
     /** \addtogroup Setters
@@ -31,10 +34,12 @@ public:
     //!
     virtual void set_display(void*_in)
     {
-        _display->set_display(_in);
+        //        _display->set_display(_in);
     }
 
-    //!
+    void set_no_controls(bool _f);
+
+    //! Set the Colormap of choise
     virtual void set_color_map(int i)
     {
         _display->set_color_map(i);

@@ -11,8 +11,13 @@ class DisplayInterface : public QWidget
     Q_OBJECT
 public:
     explicit DisplayInterface(int _id, int _dims, QWidget *parent = nullptr)
-        : QWidget(parent), my_id(_id), dims(_dims)
+        : QWidget(parent),
+          my_id(_id),
+          dims(_dims)
     {    }
+
+    ~DisplayInterface() {}
+
     /** \addtogroup Getters
      *  @{
      */
@@ -26,15 +31,19 @@ public:
         return fullFileName;
     }
 
-    virtual void set_display(void*_in) = 0;
-
     //! \return the unique (per session) id for this window
     inline int get_my_id() const
     {
         return my_id;
     }
     /** @}*/
+
+    virtual void set_display(void*_in) = 0;
+
+    virtual void  set_no_controls(bool) = 0;
+
 protected:
+
     //! File name and path
     QString fullFileName;
     //! Number of dimensions of the data
@@ -66,8 +75,9 @@ public:
     }
 
     ~ColorMap()
-    { }
+    {
 
+    }
     //! Get the list with all the available options
     static QStringList getColormapList()
     {
@@ -75,7 +85,6 @@ public:
         ret<<"BW"<<"WB"<<"Viridis" <<"Extended Black Body"<<"QWT"<<"Jet";
         return ret;
     }
-
     //! Set the active ColorMap by name
     void setColormap(QString name)
     {
@@ -103,7 +112,6 @@ public:
             break;
         }
     }
-
     //! Set the active ColorMap by index
     void setColormap(int index)
     {
@@ -131,7 +139,6 @@ public:
             break;
         }
     }
-
     //! Set Black - White grayscale
     inline void set_BW()
     {
@@ -139,7 +146,6 @@ public:
         peak = Qt::yellow;
         setColorInterval(Qt::black, Qt::white);
     }
-
     //! Set White - Black grayscale
     inline void set_WB()
     {
@@ -147,7 +153,6 @@ public:
         peak = Qt::black;
         setColorInterval(Qt::white, Qt::black);
     }
-
     //! Set Jet, popular by old Matlab
     inline void set_JET()
     {
@@ -158,7 +163,6 @@ public:
         addColorStop( 0.5, Qt::green );
         addColorStop( 0.75, Qt::yellow );
     }
-
     //! Set QWT default ColorMap
     inline void set_qwt()
     {
@@ -169,7 +173,6 @@ public:
         addColorStop( 0.6, Qt::green );
         addColorStop( 0.95, Qt::yellow );
     }
-
     //! Set Viridis ColorMap
     inline void set_Viridis()
     {
@@ -189,7 +192,6 @@ public:
         peak = _data[Nstops-1];
         setColorInterval(_data[0], _data[Nstops-1]);
     }
-
     //! Set Extended Black Body ColorMap
     inline void set_EBB()
     {
@@ -209,23 +211,16 @@ public:
         peak = _data[Nstops-1];
         setColorInterval(_data[0], _data[Nstops-1]);
     }
-
     //! Returns the first Color of the ColorMap
     inline QColor get_background() const
     { return background; }
-
     //! Returns the last Color of the ColorMap
     inline QColor get_peak_color() const
     { return peak; }
 
 private:
-    //! Number of color stops \todo Adjustable
-    int Nstops;
-    QColor background, peak;
 
     QColor _data[256];
-
-    QStringList my_list;
     //! Vidiris array. I could find the functions.
     quint8 _viridis_data[256][3] = {
         68, 1,  84,
@@ -741,6 +736,13 @@ private:
         5,252,240,
         5,253,245,
         5,254,250};
+
+    QColor background;
+    QColor peak;
+
+    QStringList my_list;
+    //! Number of color stops \todo Adjustable
+    int Nstops;
 };
 
 }

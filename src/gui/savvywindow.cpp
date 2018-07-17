@@ -58,6 +58,8 @@ SavvyWindow::SavvyWindow(QWidget *parent) :
 
 SavvyWindow::~SavvyWindow()
 {
+    for (int i = 0 ; i < loaded_plugins.size(); ++i)
+        ui->menuPlugins->removeAction(loaded_plugins[i]);
     delete ui;
 }
 
@@ -187,20 +189,6 @@ void SavvyWindow::focus_sub_window(QString _id)
     }
 }
 
-Display_container *SavvyWindow::createDisplayContainer(int num_dims)
-{
-    next_window_id++;
-
-    if(num_dims == 1)
-        return new Display_container_1d(next_window_id-1,num_dims, this);
-    else if(num_dims == 2)
-        return new Display_container_2d(next_window_id-1, num_dims, this);
-    else if (num_dims == 3)
-        return new Display_container_3d(next_window_id-1, num_dims, this);
-
-    return nullptr;
-}
-
 Display_manager *SavvyWindow::createDisplayManager(int num_dims)
 {
     Display_manager *ret = new Display_manager(next_window_id,num_dims, this);
@@ -283,43 +271,39 @@ void SavvyWindow::display_array(std::shared_ptr<stir::ArrayInterface> _array,
     switch (dims) {
     case 1:
     {
-        //! \todo Display_container cannot be used for display outside of a wrapper
-        //        Display_container *container = createDisplayContainer(dims);
-        //        container->set_file_name(_name);
+        Display_manager * disp =  new Display_manager(next_window_id, _array.get(), this);
+        disp->set_file_name(_name);
+        ++next_window_id;
 
-        //        if (is_null_ptr(container))
-        //            return;
+        if (is_null_ptr(disp))
+            return;
 
-        //        stir::Array<1, float>* tmp = dynamic_cast<stir::Array<1, float>* >(_array.get());
-
-        //        container->set_display(tmp);
-        //        append_to_mdi(container);
+        append_to_mdi(disp);
         return;
     }
     case 2:
     {
-        Display_manager* manager = createDisplayManager(dims);
-        manager->set_file_name(_name);
+        Display_manager* disp = new Display_manager(next_window_id, _array.get(), this);
+        disp->set_file_name(_name);
+        ++next_window_id;
 
-        if (is_null_ptr(manager))
+        if (is_null_ptr(disp))
             return;
 
-//        stir::Array<2, float>* tmp = dynamic_cast<stir::Array<2, float>* >(_array.get());
-
-        QVector < double> * tmp = new QVector<double>(199);
-        manager->set_display(tmp);
-        append_to_mdi(manager);
+        append_to_mdi(disp);
         return;
     }
     case 3:
     {
-        Display_manager* manager = createDisplayManager(dims);
-        manager->set_file_name(_name);
+        Display_manager* disp = new Display_manager(next_window_id, _array.get(), this);
+        disp->set_file_name(_name);
+        ++next_window_id;
 
-        stir::Array<3, float>* tmp = dynamic_cast<stir::Array<3, float>* >(_array.get());
-        manager->set_display(tmp);
+        if (is_null_ptr(disp))
+            return;
 
-        append_to_mdi(manager);
+        append_to_mdi(disp);
+
         return;
     }
     }
@@ -624,37 +608,68 @@ void SavvyWindow::on_actionStart_GUI_tests_triggered()
 {
     bool all_tests = true;
 
-    all_tests = test_display_1d_data();
+    all_tests = create_test_1d_data();
 
-    //all_tests = ask(QString("Is this the output of a sinc function? "));
+    all_tests = create_test_1d_data_lin();
 
-    all_tests = test_display_1d_data_physical();
+    all_tests = create_test_2d_data();
 
-    //all_tests = ask(QString("Has the range of x axis reduced half? "));
+    all_tests = create_test_2d_data_lin();
 
-    all_tests = test_display_2d_data();
+    all_tests = create_test_3d_data();
 
-    //all_tests = ask(QString("Does the image look like a ripple? "));
+    all_tests = create_test_3d_data_lin();
 
-    all_tests = test_display_2d_data_alt();
 
-    //all_tests = ask(QString("Was this the same as the previous? "));
+    all_tests = test_display_array_1d();
 
-    all_tests = test_display_2d_data_physical();
+    all_tests = test_display_array_1d_points();
 
-    //all_tests = ask(QString("Has the range of the image reduced half? "));
+    all_tests = test_display_array_2d_in_1d_container();
 
-    all_tests = test_display_2d_data_alt_not_square();
+    all_tests = test_display_array_3d_in_1d_container();
 
-    //all_tests = ask(QString("Was this the same as the previous? "));
 
-    all_tests = test_display_2d_data_physical_not_square();
+    all_tests = test_display_array_2d();
 
-    //all_tests = ask(QString("Has the range of the image reduced half? "));
+    all_tests = test_display_array_1d_in_2d_container();
 
-    all_tests = test_display_3d_data();
+    all_tests = test_display_array_3d_in_2d_container();
 
-    all_tests = test_display_3d_data_alt();
+
+    all_tests = test_display_array_3d();
+
+    //    all_tests = test_display_array_3d_in_1d_container();
+
+    //    all_tests = test_display_array_1d_in_2d_container();
+
+    //     all_tests = test_display_array_1d_in_3d_container();
+
+    //    //all_tests = ask(QString("Has the range of x axis reduced half? "));
+
+
+
+    //    //all_tests = ask(QString("Does the image look like a ripple? "));
+
+    //    all_tests = test_display_2d_data_alt();
+
+    //    //all_tests = ask(QString("Was this the same as the previous? "));
+
+    //    all_tests = test_display_2d_data_physical();
+
+    //    //all_tests = ask(QString("Has the range of the image reduced half? "));
+
+    //    all_tests = test_display_2d_data_alt_not_square();
+
+    //    //all_tests = ask(QString("Was this the same as the previous? "));
+
+    //    all_tests = test_display_2d_data_physical_not_square();
+
+    //    //all_tests = ask(QString("Has the range of the image reduced half? "));
+
+    //    all_tests = test_display_3d_data();
+
+    //    all_tests = test_display_3d_data_alt();
 
 }
 
@@ -668,7 +683,7 @@ int SavvyWindow::ask(QString question)
 }
 
 
-bool SavvyWindow::test_display_1d_data()
+bool SavvyWindow::create_test_1d_data()
 {
 
     const IndexRange<1> range(-60,60);
@@ -686,25 +701,26 @@ bool SavvyWindow::test_display_1d_data()
             test1->at(i) = 1;
     }
 
-    QString n = pnl_workspace->get_current_name() + "_indiced";
-
-    display_array(test1_sptr, n);
-
     return true;
 }
 
-bool SavvyWindow::test_display_1d_data_physical()
+bool SavvyWindow::create_test_1d_data_lin()
 {
 
-    std::shared_ptr <stir::ArrayInterface> test1_sptr = pnl_workspace->get_array_ptr(0);
-    QString n = pnl_workspace->get_current_name() + "_physical";
+    const IndexRange<1> range(-60,60);
+    std::shared_ptr <stir::ArrayInterface> test1_sptr = pnl_workspace->create_array_ptr<1>(range, "test1l");
+    stir::Array<1, float>* test1 = dynamic_cast<stir::Array<1, float>* >(test1_sptr.get());
 
-    display_array(test1_sptr, n);
+    float x = 0.f;
+    for (int i = test1->get_min_index(); i <= test1->get_max_index() ; ++i, x += 1.f)
+    {
+        test1->at(i) = x;
+    }
 
     return true;
 }
 
-bool SavvyWindow::test_display_2d_data()
+bool SavvyWindow::create_test_2d_data()
 {
 
     const IndexRange<2> range(stir::Coordinate2D<int>(-60,-60),stir::Coordinate2D<int>(59,59));
@@ -721,175 +737,35 @@ bool SavvyWindow::test_display_2d_data()
                 (*test2)[i][j] = 1;
         }
 
-    QString n = pnl_workspace->get_current_name() + "_indiced";
-    display_array(test2_sptr, n);
-
     return true;
 }
 
-bool SavvyWindow::test_display_2d_data_alt()
+bool SavvyWindow::create_test_2d_data_lin()
 {
 
-    std::shared_ptr <stir::ArrayInterface> test2_sptr = pnl_workspace->get_current_array_ptr();
-    QString n = pnl_workspace->get_current_name() + "_no_offset";
+    const IndexRange<2> range(stir::Coordinate2D<int>(-60,-60),stir::Coordinate2D<int>(59,59));
+    std::shared_ptr <stir::ArrayInterface> test2_sptr = pnl_workspace->create_array_ptr<2>(range, "test2l");
     stir::Array<2, float>* test2 = dynamic_cast<stir::Array<2, float>* >(test2_sptr.get());
 
-    display_array(test2_sptr, n);
-
-//        int size = test2->size();
-//        QVector<QVector<double> > vtest2(size);
-
-//        for (int i = 0; i < size; ++i)
-//            vtest2[i].resize(size);
-
-//        savvy::Array2QVector(*test2, vtest2);
-
-//        //! \todo Display_container cannot be used for display outside of a wrapper
-//        Display_manager *child = createDisplayManager(2);
-//        child->set_file_name(n);
-
-//        if (is_null_ptr(child))
-//            return false;
-
-//        child->set_display(&vtest2);
-
-//        append_to_mdi(child);
-
-    return true;
-}
-
-bool SavvyWindow::test_display_2d_data_physical()
-{
-
-    std::shared_ptr <stir::ArrayInterface> test2_sptr = pnl_workspace->get_current_array_ptr();
-    QString n = pnl_workspace->get_current_name() + "_physical";
-    stir::Array<2, float>* test2 = dynamic_cast<stir::Array<2, float>* >(test2_sptr.get());
-
-    display_array(test2_sptr, n);
-
-    //    int size = test2->size();
-    //    QVector<QVector<double> > vtest2(size);
-
-    //    for (int i = 0; i < size; ++i)
-    //        vtest2[i].resize(size);
-
-    //    savvy::Array2QVector(*test2, vtest2);
-
-    //! \todo Display_container cannot be used for display outside of a wrapper
-    //    Display_container_2d *child = dynamic_cast<Display_container_2d *>(createDisplayContainer(2));
-    //    child->set_file_name(n);
-
-    //    if (is_null_ptr(child))
-    //        return false;
-
-    //    child->set_physical_display(vtest2,
-    //                                (*test2)[0].get_min_index(), (*test2).get_min_index(),
-    //            0.5, 0.5);
-
-    //    append_to_mdi(child);
-
-    return true;
-}
-
-bool SavvyWindow::test_display_2d_data_alt_not_square()
-{
-
-    int row_size = 60;
-    int row_num = 120;
-
-    int start_x= -row_size/2;
-    int start_y = -row_num/2;
-    const IndexRange<2> range(stir::Coordinate2D<int>(start_x, start_y),
-                              stir::Coordinate2D<int>( start_x+row_size, start_y + row_num));
-
-    std::shared_ptr <stir::ArrayInterface> test3_sptr = pnl_workspace->create_array_ptr<2>(range, "test3");
-    stir::Array<2, float>* test3 = dynamic_cast<stir::Array<2, float>* >(test3_sptr.get());
-
-    for (int i = test3->get_min_index(); i <= test3->get_max_index() ; ++i)
-        for (int j = (*test3)[i].get_min_index(); j <= (*test3)[i].get_max_index() ; ++j)
+    float x  = 0.f;
+    float y  = 1.f;
+    for (int i = test2->get_min_index(); i <= test2->get_max_index() ; ++i, y +=1.f)
+    {
+        for (int j = (*test2)[i].get_min_index(); j <= (*test2)[i].get_max_index() ; ++j, x += 1.f)
         {
-            float f = sqrt(i*i + j*j);
-            (*test3)[i][j] = f;
+            (*test2)[i][j]  = x*y;
         }
-
-    QString n = pnl_workspace->get_current_name() + "_vertical";
-    display_array(test3_sptr, n);
-    //    int num_row = test3->size();
-    //    int size_row = (*test3)[0].size();
-    //    QVector<QVector<double> > vtest3(num_row);
-
-    //    for (int i = 0; i < num_row; ++i)
-    //        vtest3[i].resize(size_row);
-
-    //    savvy::Array2QVector(*test3, vtest3);
-
-    //    QVector<double> svtest3;
-    //    savvy::serialize_QVector(vtest3, svtest3);
-
-    //! \todo Display_container cannot be used for display outside of a wrapper
-    //    Display_container_2d *child = dynamic_cast<Display_container_2d *>(createDisplayContainer(2));
-
-    //    child->set_file_name(n);
-
-    //    if (is_null_ptr(child))
-    //        return false;
-
-    //    child->set_display(svtest3, size_row);
-
-    //    append_to_mdi(child);
+        x = 0.f;
+    }
 
     return true;
 }
 
-bool SavvyWindow::test_display_2d_data_physical_not_square()
-{
-    int row_size = 120;
-    int row_num = 60;
-
-    int start_x= -row_size/2;
-    int start_y = -row_num/2;
-
-    const IndexRange<2> range(stir::Coordinate2D<int>(start_x, start_y),
-                              stir::Coordinate2D<int>( start_x+row_size, start_y + row_num));
-    std::shared_ptr <stir::ArrayInterface> test4_sptr = pnl_workspace->create_array_ptr<2>(range, "test4");
-    stir::Array<2, float>* test4 = dynamic_cast<stir::Array<2, float>* >(test4_sptr.get());
-
-    for (int i = test4->get_min_index(); i <= test4->get_max_index() ; ++i)
-        for (int j = (*test4)[i].get_min_index(); j <= (*test4)[i].get_max_index() ; ++j)
-        {
-            float f = sqrt(i*i + j*j);
-            (*test4)[i][j] = f;
-        }
-    QString n = pnl_workspace->get_current_name() + "_horizontal";
-    display_array(test4_sptr, n);
-    //    QVector<QVector<double> > vtest4(test4->size());
-
-    //    for (int i = 0; i < test4->size(); ++i)
-    //        vtest4[i].resize((*test4)[0].size());
-
-    //    savvy::Array2QVector(*test4, vtest4);
-    //! \todo Display_container cannot be used for display outside of a wrapper
-    //    Display_container_2d *child = dynamic_cast<Display_container_2d *>(createDisplayContainer(2));
-    //    QString n = pnl_workspace->get_current_name() + "_horizontal";
-    //    child->set_file_name(n);
-
-    //    if (is_null_ptr(child))
-    //        return false;
-
-    //    child->set_physical_display(vtest4,
-    //                                (*test4)[0].get_min_index(), (*test4).get_min_index(),
-    //            0.5, 0.5);
-
-    //    append_to_mdi(child);
-
-    return true;
-}
-
-bool SavvyWindow::test_display_3d_data()
+bool SavvyWindow::create_test_3d_data()
 {
 
     const IndexRange<3> range(stir::Coordinate3D<int>(-30,-60, -60),stir::Coordinate3D<int>(29,59, 59));
-    std::shared_ptr <stir::ArrayInterface> test5_sptr = pnl_workspace->create_array_ptr<3>(range, "test5");
+    std::shared_ptr <stir::ArrayInterface> test5_sptr = pnl_workspace->create_array_ptr<3>(range, "test3");
     stir::Array<3, float>* test5 = dynamic_cast<stir::Array<3, float>* >(test5_sptr.get());
 
     for (int i = test5->get_min_index(); i <= test5->get_max_index() ; ++i)
@@ -903,32 +779,380 @@ bool SavvyWindow::test_display_3d_data()
                     (*test5)[i][j][k] = 1;
             }
 
-    QString n = pnl_workspace->get_current_name() + "_indiced";
-    display_array(test5_sptr, n);
-
     return true;
 }
 
-bool SavvyWindow::test_display_3d_data_alt()
+bool SavvyWindow::create_test_3d_data_lin()
 {
-    std::shared_ptr <stir::ArrayInterface> test5_sptr = pnl_workspace->get_current_array_ptr();
+
+    const IndexRange<3> range(stir::Coordinate3D<int>(-30,-60, -60),stir::Coordinate3D<int>(29,59, 59));
+    std::shared_ptr <stir::ArrayInterface> test5_sptr = pnl_workspace->create_array_ptr<3>(range, "test3l");
     stir::Array<3, float>* test5 = dynamic_cast<stir::Array<3, float>* >(test5_sptr.get());
 
-    QString n = pnl_workspace->get_current_name() + "_indiced_alt";
-    QVector<QVector<QVector<double> > > vtmp;
-    Display_manager* manager = createDisplayManager();
-    manager->set_file_name(n);
+    float x  = 0.f;
+    float y  = 1.f;
+    float z  = 1.f;
+    for (int i = test5->get_min_index(); i <= test5->get_max_index() ; ++i, z +=1.f)
+    {
+        for (int j = (*test5)[i].get_min_index(); j <= (*test5)[i].get_max_index() ; ++j, y +=1.f)
+        {
+            for (int k = (*test5)[i][j].get_min_index(); k <= (*test5)[i][j].get_max_index() ; ++k, x += 1.f)
+            {
+                (*test5)[i][j][k] = x * y *z;
+            }
+            x = 0.f;
+        }
+        y = 1.f;
+    }
 
-    savvy::Array2QVector(*test5, vtmp);
-
-    Display_container_3d * disp =
-            dynamic_cast<Display_container_3d*>(manager->get_display());
-
-    disp->set_display(vtmp);
-
-    append_to_mdi(manager);
     return true;
 }
+
+bool SavvyWindow::test_display_array_1d()
+{
+
+    std::shared_ptr <stir::ArrayInterface> test1_sptr = pnl_workspace->get_array_ptr("test1l");
+    QString _name = pnl_workspace->get_array_name(1) + "_array_1d";
+
+    display_array(test1_sptr, _name);
+
+    return true;
+}
+
+bool SavvyWindow::test_display_array_1d_points()
+{
+
+    std::shared_ptr <stir::ArrayInterface> test_sptr = pnl_workspace->get_array_ptr("test1");
+    QString _name = pnl_workspace->get_array_name(1) + "_array_1d_points";
+
+    stir::Array<1, float> * tmp = dynamic_cast<stir::Array<1, float> * >(test_sptr.get());
+
+    Display_manager *disp = new Display_manager(next_window_id, 1, this);
+    ++next_window_id;
+    disp->set_file_name(_name);
+
+    QVector<double> y_values;
+    QVector <double> x_values;
+
+    savvy::decompose_Array1D_to_QVectors_XY(*tmp, x_values, y_values);
+    if (is_null_ptr(disp))
+        return false;
+    disp->get_display()->set_display(x_values, y_values);
+
+    append_to_mdi(disp);
+
+    return true;
+}
+
+bool SavvyWindow::test_display_array_2d_in_1d_container()
+{
+
+    std::shared_ptr <stir::ArrayInterface> test2_sptr = pnl_workspace->get_array_ptr("test2l");
+    QString _name = pnl_workspace->get_array_name(3)+ "_array_2d_in_1d";
+
+    stir::Array<2, float> * tmp = dynamic_cast<stir::Array<2, float> * >(test2_sptr.get());
+
+    Display_manager * disp =  new Display_manager(next_window_id, 1, this);
+    disp->set_file_name(_name);
+    ++next_window_id;
+
+    if (is_null_ptr(disp))
+        return false;
+
+    disp->get_display()->set_display(*tmp);
+    append_to_mdi(disp);
+
+    return true;
+}
+
+bool SavvyWindow::test_display_array_3d_in_1d_container()
+{
+
+    std::shared_ptr <stir::ArrayInterface> test2_sptr = pnl_workspace->get_array_ptr("test3l");
+    QString _name = pnl_workspace->get_array_name(5) + "_array_3d_in_1d";
+
+    stir::Array<3, float> * tmp = dynamic_cast<stir::Array<3, float> * >(test2_sptr.get());
+
+    Display_manager * disp =  new Display_manager(next_window_id, 1, this);
+    disp->set_file_name(_name);
+    ++next_window_id;
+
+    if (is_null_ptr(disp))
+        return false;
+
+    disp->get_display()->set_display(*tmp);
+    append_to_mdi(disp);
+
+    return true;
+}
+
+bool SavvyWindow::test_display_array_2d()
+{
+
+    std::shared_ptr <stir::ArrayInterface> test_sptr = pnl_workspace->get_array_ptr("test2");
+    QString _name = pnl_workspace->get_array_name(3) + "_array_2d";
+
+    display_array(test_sptr, _name);
+
+    return true;
+}
+
+bool SavvyWindow::test_display_array_1d_in_2d_container()
+{
+
+    std::shared_ptr <stir::ArrayInterface> test_sptr = pnl_workspace->get_array_ptr("test1");
+    QString _name = pnl_workspace->get_array_name(1)+ "_array_2d_in_1d";
+
+    stir::Array<1, float> * tmp = dynamic_cast<stir::Array<1, float> * >(test_sptr.get());
+
+    Display_manager * disp =  new Display_manager(next_window_id, 2, this);
+    disp->set_file_name(_name);
+    ++next_window_id;
+
+    if (is_null_ptr(disp))
+        return false;
+
+    disp->get_display()->set_display(*tmp, tmp->size());
+    append_to_mdi(disp);
+
+    return true;
+}
+//!\todo
+bool SavvyWindow::test_display_array_3d_in_2d_container()
+{
+
+    //    std::shared_ptr <stir::ArrayInterface> test_sptr = pnl_workspace->get_array_ptr(4);
+    //    QString _name = pnl_workspace->get_array_name(4)+ "_array_3d_in_2d";
+
+    //    stir::Array<3, float> * tmp = dynamic_cast<stir::Array<3, float> * >(test_sptr.get());
+
+    //    Display_manager * disp =  new Display_manager(next_window_id, 2, this);
+    //    disp->set_file_name(_name);
+    //    ++next_window_id;
+
+    //    if (is_null_ptr(disp))
+    //        return false;
+
+    //    disp->get_display()->set_display(*tmp);
+    //    append_to_mdi(disp);
+
+    //    return true;
+}
+
+bool SavvyWindow::test_display_array_3d()
+{
+
+    std::shared_ptr <stir::ArrayInterface> test_sptr = pnl_workspace->get_array_ptr(4);
+    QString _name = pnl_workspace->get_array_name(4) + "_array_3d";
+
+    display_array(test_sptr, _name);
+
+    return true;
+}
+
+
+//bool SavvyWindow::test_display_2d_data_alt()
+//{
+
+//    std::shared_ptr <stir::ArrayInterface> test2_sptr = pnl_workspace->get_current_array_ptr();
+//    QString n = pnl_workspace->get_current_name() + "_no_offset";
+//    stir::Array<2, float>* test2 = dynamic_cast<stir::Array<2, float>* >(test2_sptr.get());
+
+//    display_array(test2_sptr, n);
+
+////        int size = test2->size();
+////        QVector<QVector<double> > vtest2(size);
+
+////        for (int i = 0; i < size; ++i)
+////            vtest2[i].resize(size);
+
+////        savvy::Array2QVector(*test2, vtest2);
+
+////        //! \todo Display_container cannot be used for display outside of a wrapper
+////        Display_manager *child = createDisplayManager(2);
+////        child->set_file_name(n);
+
+////        if (is_null_ptr(child))
+////            return false;
+
+////        child->set_display(&vtest2);
+
+////        append_to_mdi(child);
+
+//    return true;
+//}
+
+//bool SavvyWindow::test_display_2d_data_physical()
+//{
+
+//    std::shared_ptr <stir::ArrayInterface> test2_sptr = pnl_workspace->get_current_array_ptr();
+//    QString n = pnl_workspace->get_current_name() + "_physical";
+//    stir::Array<2, float>* test2 = dynamic_cast<stir::Array<2, float>* >(test2_sptr.get());
+
+//    display_array(test2_sptr, n);
+
+//    //    int size = test2->size();
+//    //    QVector<QVector<double> > vtest2(size);
+
+//    //    for (int i = 0; i < size; ++i)
+//    //        vtest2[i].resize(size);
+
+//    //    savvy::Array2QVector(*test2, vtest2);
+
+//    //! \todo Display_container cannot be used for display outside of a wrapper
+//    //    Display_container_2d *child = dynamic_cast<Display_container_2d *>(createDisplayContainer(2));
+//    //    child->set_file_name(n);
+
+//    //    if (is_null_ptr(child))
+//    //        return false;
+
+//    //    child->set_physical_display(vtest2,
+//    //                                (*test2)[0].get_min_index(), (*test2).get_min_index(),
+//    //            0.5, 0.5);
+
+//    //    append_to_mdi(child);
+
+//    return true;
+//}
+
+//bool SavvyWindow::test_display_2d_data_alt_not_square()
+//{
+
+//    int row_size = 60;
+//    int row_num = 120;
+
+//    int start_x= -row_size/2;
+//    int start_y = -row_num/2;
+//    const IndexRange<2> range(stir::Coordinate2D<int>(start_x, start_y),
+//                              stir::Coordinate2D<int>( start_x+row_size, start_y + row_num));
+
+//    std::shared_ptr <stir::ArrayInterface> test3_sptr = pnl_workspace->create_array_ptr<2>(range, "test3");
+//    stir::Array<2, float>* test3 = dynamic_cast<stir::Array<2, float>* >(test3_sptr.get());
+
+//    for (int i = test3->get_min_index(); i <= test3->get_max_index() ; ++i)
+//        for (int j = (*test3)[i].get_min_index(); j <= (*test3)[i].get_max_index() ; ++j)
+//        {
+//            float f = sqrt(i*i + j*j);
+//            (*test3)[i][j] = f;
+//        }
+
+//    QString n = pnl_workspace->get_current_name() + "_vertical";
+//    display_array(test3_sptr, n);
+//    //    int num_row = test3->size();
+//    //    int size_row = (*test3)[0].size();
+//    //    QVector<QVector<double> > vtest3(num_row);
+
+//    //    for (int i = 0; i < num_row; ++i)
+//    //        vtest3[i].resize(size_row);
+
+//    //    savvy::Array2QVector(*test3, vtest3);
+
+//    //    QVector<double> svtest3;
+////       savvy::serialize_QVector(vtest3, svtest3);
+
+//    //! \todo Display_container cannot be used for display outside of a wrapper
+//    //    Display_container_2d *child = dynamic_cast<Display_container_2d *>(createDisplayContainer(2));
+
+//    //    child->set_file_name(n);
+
+//    //    if (is_null_ptr(child))
+//    //        return false;
+
+//    //    child->set_display(svtest3, size_row);
+
+//    //    append_to_mdi(child);
+
+//    return true;
+//}
+
+//bool SavvyWindow::test_display_2d_data_physical_not_square()
+//{
+//    int row_size = 120;
+//    int row_num = 60;
+
+//    int start_x= -row_size/2;
+//    int start_y = -row_num/2;
+
+//    const IndexRange<2> range(stir::Coordinate2D<int>(start_x, start_y),
+//                              stir::Coordinate2D<int>( start_x+row_size, start_y + row_num));
+//    std::shared_ptr <stir::ArrayInterface> test4_sptr = pnl_workspace->create_array_ptr<2>(range, "test4");
+//    stir::Array<2, float>* test4 = dynamic_cast<stir::Array<2, float>* >(test4_sptr.get());
+
+//    for (int i = test4->get_min_index(); i <= test4->get_max_index() ; ++i)
+//        for (int j = (*test4)[i].get_min_index(); j <= (*test4)[i].get_max_index() ; ++j)
+//        {
+//            float f = sqrt(i*i + j*j);
+//            (*test4)[i][j] = f;
+//        }
+//    QString n = pnl_workspace->get_current_name() + "_horizontal";
+//    display_array(test4_sptr, n);
+//    //    QVector<QVector<double> > vtest4(test4->size());
+
+//    //    for (int i = 0; i < test4->size(); ++i)
+//    //        vtest4[i].resize((*test4)[0].size());
+
+//    //    savvy::Array2QVector(*test4, vtest4);
+//    //! \todo Display_container cannot be used for display outside of a wrapper
+//    //    Display_container_2d *child = dynamic_cast<Display_container_2d *>(createDisplayContainer(2));
+//    //    QString n = pnl_workspace->get_current_name() + "_horizontal";
+//    //    child->set_file_name(n);
+
+//    //    if (is_null_ptr(child))
+//    //        return false;
+
+//    //    child->set_physical_display(vtest4,
+//    //                                (*test4)[0].get_min_index(), (*test4).get_min_index(),
+//    //            0.5, 0.5);
+
+//    //    append_to_mdi(child);
+
+//    return true;
+//}
+
+//bool SavvyWindow::test_display_3d_data()
+//{
+
+//    const IndexRange<3> range(stir::Coordinate3D<int>(-30,-60, -60),stir::Coordinate3D<int>(29,59, 59));
+//    std::shared_ptr <stir::ArrayInterface> test5_sptr = pnl_workspace->create_array_ptr<3>(range, "test5");
+//    stir::Array<3, float>* test5 = dynamic_cast<stir::Array<3, float>* >(test5_sptr.get());
+
+//    for (int i = test5->get_min_index(); i <= test5->get_max_index() ; ++i)
+//        for (int j = (*test5)[i].get_min_index(); j <= (*test5)[i].get_max_index() ; ++j)
+//            for (int k = (*test5)[i][j].get_min_index(); k <= (*test5)[i][j].get_max_index() ; ++k)
+//            {
+//                float f = sqrt(i*i + k*k + j*j);
+//                if( f != 0)
+//                    (*test5)[i][j][k] = sin(f) / f;
+//                else
+//                    (*test5)[i][j][k] = 1;
+//            }
+
+//    QString n = pnl_workspace->get_current_name() + "_indiced";
+//    display_array(test5_sptr, n);
+
+//    return true;
+//}
+
+//bool SavvyWindow::test_display_3d_data_alt()
+//{
+////    std::shared_ptr <stir::ArrayInterface> test5_sptr = pnl_workspace->get_current_array_ptr();
+////    stir::Array<3, float>* test5 = dynamic_cast<stir::Array<3, float>* >(test5_sptr.get());
+
+////    QString n = pnl_workspace->get_current_name() + "_indiced_alt";
+////    QVector<QVector<QVector<double> > > vtmp;
+////    Display_manager* manager = createDisplayManager();
+////    manager->set_file_name(n);
+
+////    savvy::Array2QVector(*test5, vtmp);
+
+////    Display_container_3d * disp =
+////            dynamic_cast<Display_container_3d*>(manager->get_display());
+
+////    disp->set_display(vtmp);
+
+////    append_to_mdi(manager);
+////    return true;
+//}
 
 /*
  *
@@ -972,7 +1196,6 @@ void SavvyWindow::loadPlugins()
         pluginsDir.cdUp();
     }
 #endif
-    //    pluginsDir.cd("plugins");
 
     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
@@ -998,7 +1221,10 @@ void SavvyWindow::populateMenus(QObject *plugin)
 void SavvyWindow::addToMenu(ExternalInterface *plugin, const QString text,
                             QMenu *menu)
 {
+
     QAction *action = new QAction(text, plugin);
-    connect(action, SIGNAL(triggered()), plugin, SLOT(exec()));
+    loaded_plugins.append(action);
+
+    connect(loaded_plugins.back(), SIGNAL(triggered()), plugin, SLOT(exec()));
     menu->addAction(action);
 }

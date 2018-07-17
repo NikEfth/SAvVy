@@ -1,148 +1,62 @@
 #include "display_container_2d.h"
 
-Display_container_2d::Display_container_2d(int _my_id,  int dims, QWidget *parent) :
-    Display_container_raster(_my_id, dims,parent)
+Display_container_2d::Display_container_2d(int dims, QWidget *parent) :
+    Display_container_raster(dims,parent)
 {
-    min_value = new QVector<double>(1,100000);
-    max_value = new QVector<double>(1,0);
-
-    plane_num = 1;
-    offset_d = 0;
-    d_spacing = 1.f;
-    origin_z = 0;
+    initialise();
 }
 
-void Display_container_2d::set_array(QVector<double>* _array,
-                                     int _row_size)
+Display_container_2d::Display_container_2d(const QVector<double>& _in, int row_size, int dims, QWidget *parent):
+    Display_container_raster(dims, parent)
 {
-    *data = *_array;
-    row_size = _row_size;
-    row_num = data->size() / row_size;
-    (*max_value)[0] = *std::max_element(data->begin(),data->end());
-    (*min_value)[0] = *std::min_element(data->begin(), data->end());
+    initialise();
+    set_display(_in, row_size);
 }
 
-void Display_container_2d::set_array(const QVector<double> &_array,
-                                     int _row_size)
+Display_container_2d::Display_container_2d(const QVector< QVector<double> >& _in, int dims, QWidget *parent):
+    Display_container_raster(dims, parent)
 {
-    row_size = _row_size;
-    row_num = _array.size() / row_size;
-
-    data = new QVector< double >(row_num*_row_size, 0.0);
-    *data = _array;
-    (*max_value)[0] = *std::max_element(data->begin(), data->end());
-    (*min_value)[0] = *std::min_element(data->begin(), data->end());
+    initialise();
+    set_display(_in);
 }
 
-void Display_container_2d::set_array(const QVector<QVector<double> > &_array)
+Display_container_2d::Display_container_2d(const QVector<QVector< QVector<double> > >& _in, int dims, QWidget *parent):
+    Display_container_raster(dims, parent)
 {
-    row_num = _array.size();
-    row_size = _array[0].size();
-
-    data = new QVector< double >(row_num*row_size, 0.0);
-
-    int idx = 0;
-    for(int i = 0; i < row_num; ++i)
-        for(int j = 0; j < row_size; ++j, ++idx)
-        {
-            float val =  _array[i][j];
-            if (val != 0.f)
-            {
-                (*data)[idx] = val;
-
-                if (val >  (*max_value)[0] )
-                    (*max_value)[0]  = val ;
-                else if(val<  (*min_value)[0])
-                    (*min_value)[0] = val ;
-            }
-        }
+    initialise();
+    set_display(_in);
 }
 
-void Display_container_2d::set_array(QVector<QVector<double> > *_array)
+Display_container_2d::Display_container_2d(const stir::Array<1, float>& _in, int row_size, int dims, QWidget *parent):
+    Display_container_raster(dims, parent)
 {
-    row_num = _array->size();
-    row_size = _array[0].size();
-
-    data = new QVector< double >(row_num*row_size, 0.0);
-
-    int idx = 0;
-    for(int i = 0; i < row_num; ++i)
-        for(int j = 0; j < row_size; ++j, ++idx)
-        {
-            float val =  (*_array)[i][j];
-            if (val != 0.f)
-            {
-                (*data)[idx] = val;
-
-                if (val >  (*max_value)[0] )
-                    (*max_value)[0]  = val ;
-                else if(val<  (*min_value)[0])
-                    (*min_value)[0] = val ;
-            }
-        }
+    initialise();
+    set_display(_in, row_size);
 }
 
-void Display_container_2d::set_array(const stir::Array<2,float> &_array)
+Display_container_2d::Display_container_2d(const  stir::Array<2, float>& _in, int dims, QWidget *parent):
+    Display_container_raster(dims, parent)
 {
-    row_num = _array.size();
-    row_size = _array[0].size();
-
-    data = new QVector< double >(row_num*row_size, 0.0);
-
-    int idx = 0;
-    for(int i = _array.get_min_index(); i <= _array.get_max_index(); ++i)
-        for(int j = _array[i].get_min_index(); j <= _array[i].get_max_index(); ++j, ++idx)
-        {
-            float val = _array[i][j];
-            if (val != 0.f)
-            {
-                (*data)[idx] = val ;
-
-                if (val> (*max_value)[0] )
-                    (*max_value)[0]  = val ;
-                else if(val <  (*min_value)[0])
-                    (*min_value)[0] = val;
-            }
-        }
+    initialise();
+    set_display(_in);
 }
 
-void Display_container_2d::set_array(stir::Array<2,float> *_array)
+Display_container_2d::Display_container_2d(const  stir::Array<3, float>& _in, int dims, QWidget *parent):
+    Display_container_raster(dims, parent)
 {
-    row_num = _array->size();
-    row_size = (*_array)[0].size();
-
-    data = new QVector< double >(row_num*row_size, 0.0);
-
-    int idx = 0;
-    for(int i = _array->get_min_index(); i <= _array->get_max_index(); ++i)
-        for(int j =  (*_array)[i].get_min_index(); j <=  (*_array)[i].get_max_index(); ++j, ++idx)
-        {
-            float val = (*_array)[i][j];
-            if (val != 0.f)
-            {
-                (*data)[idx] = static_cast<double>(val) ;
-
-                if (val> (*max_value)[0] )
-                    (*max_value)[0]  = val ;
-                else if(val <  (*min_value)[0])
-                    (*min_value)[0] = val;
-            }
-        }
-}
-
-void Display_container_2d::set_display(QVector<double>* _array,
-                                       int _row_size)
-{
-    set_array(_array, _row_size);
-    set_axis();
-    update_scene();
-    emit setup_ready();
+    initialise();
+    set_display(_in);
 }
 
 void Display_container_2d::set_display(const QVector<double> &_array,
                                        int _row_size)
 {
-    set_array(_array, _row_size);
+    row_size = _row_size;
+    row_num = _array.size() / row_size;
+
+    data = new QVector< double >(_array.size(), 0.0);
+    savvy::copy_QVector(_array, *data,(*min_value)[0] ,(*max_value)[0] );
+
     set_axis();
     update_scene();
     emit setup_ready();
@@ -150,30 +64,85 @@ void Display_container_2d::set_display(const QVector<double> &_array,
 
 void Display_container_2d::set_display(const QVector<QVector<double> > &_array)
 {
-    set_array(_array);
+    row_size = _array[0].size();
+    row_num = _array.size();
+
+    data = new QVector< double >(_array.size(), 0.0);
+    savvy::serialize_QVector(_array, *data, (*min_value)[0] ,(*max_value)[0] );
+
     set_axis();
+    update_scene();
+    emit setup_ready();
+}
+
+void Display_container_2d::set_display(const QVector<QVector<QVector<double> > > &_array)
+{
+    row_size = _array[0].size();
+    row_num = _array.size();
+
+    data = new QVector< double >(_array.size(), 0.0);
+    savvy::serialize_QVector(_array, *data, (*min_value)[0] ,(*max_value)[0]);
+
+    set_axis();
+    update_scene();
+    emit setup_ready();
+}
+
+void Display_container_2d::set_display(const stir::Array<1, float>& _array, int _row_size)
+{
+    row_size = _row_size;
+    row_num = _array.size() / row_size;
+
+    data = new QVector< double >(row_num* row_size, 0.0);
+    savvy::Array1D_QVector1D(_array, *data, (*min_value)[0] ,(*max_value)[0]);
+    set_axis(_array.get_min_index());
     update_scene();
     emit setup_ready();
 }
 
 void Display_container_2d::set_display(const stir::Array<2, float>& _array)
 {
-    set_array(_array);
+    row_num = _array.size();
+    row_size = _array[0].size();
+
+    data = new QVector< double >(row_num* row_size, 0.0);
+    savvy::Array2D_QVector1D(_array, *data, (*min_value)[0],  (*max_value)[0]);
     set_axis(_array.get_min_index(), _array[0].get_min_index());
     update_scene();
     emit setup_ready();
 }
 
-bool Display_container_2d::set_display(void* _in)
+//!\todo
+void Display_container_2d::set_display(const stir::Array<3, float>& _array)
 {
-    stir::Array<2, float>* tmp =
-            reinterpret_cast<stir::Array<2, float>* >(_in);
-    set_array(tmp);
-    set_axis(tmp->get_min_index(), tmp[0].get_min_index());
-    update_scene();
-    emit setup_ready();
+//    data_num =_array.size();
 
-    return true;
+//    row_size = static_cast<float>(data_num) / 2.f + 0.5f ;//_array[0][0].size() * data_num;
+//    row_num = data_num / row_size; // dat _array[0].size();
+
+//    QVector< QVector< double > > *tmp_data = new QVector< QVector< double > >(row_num, QVector< double >(row_size, 0.0));
+
+//    savvy::Array3D_QVector2D(_array, *tmp_data,  (*min_value)[0],  (*max_value)[0]);
+
+
+//    data = new QVector< double >(row_num* row_size, 0.0);
+
+//    savvy::Array3D_QVector1D(_array, *data,  (*min_value)[0],  (*max_value)[0]);
+//    set_axis(_array.get_min_index(), _array[0].get_min_index());
+//    update_scene();
+//    emit setup_ready();
+}
+
+void Display_container_2d::set_display(void* _in)
+{
+    //    stir::Array<2, float>* tmp =
+    //            reinterpret_cast<stir::Array<2, float>* >(_in);
+    //    set_array(tmp);
+    //    set_axis(tmp->get_min_index(), tmp[0].get_min_index());
+    //    update_scene();
+    //    emit setup_ready();
+
+    //    return true;
 }
 
 void Display_container_2d::set_sizes(
@@ -187,16 +156,6 @@ void Display_container_2d::set_sizes(
     origin_x = _origin_x;
     origin_y = _origin_y;
 
-}
-
-void Display_container_2d::set_physical_display(const QVector<QVector<double> > &_array,
-                                                int _offset_h, int _offset_v,
-                                                float _h_spacing, float _v_spacing,
-                                                float _origin_x, float  _origin_y)
-{
-    set_array(_array);
-    set_sizes(_offset_h, _offset_v, _h_spacing, _v_spacing, _origin_x,  _origin_y);
-    update_scene();
 }
 
 void Display_container_2d::set_axis(int _offset_h, int _offset_v,
@@ -264,4 +223,20 @@ void Display_container_2d::set_color_map(int index)
     //    setCanvasBackground(QBrush(myColorMap->get_background()));
 
     replot();
+}
+
+void Display_container_2d::initialise()
+{
+    min_value = new QVector<double>(1,100000);
+    max_value = new QVector<double>(1,0);
+
+    data_num = 1;
+    offset_d = 0;
+    d_spacing = 1.f;
+    origin_z = 0;
+}
+
+Display_container_2d::~Display_container_2d()
+{
+    delete data;
 }

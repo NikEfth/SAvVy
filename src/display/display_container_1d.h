@@ -17,47 +17,60 @@ class Display_container_1d : public Display_container
 {
     Q_OBJECT
 public:
-    explicit Display_container_1d(int, int dims = 1, QWidget *parent = nullptr);
+    explicit Display_container_1d(int dims = 1, QWidget *parent = nullptr);
 
-//    virtual Display_container_1d* clone() const;
+    explicit Display_container_1d(const QVector<double>& x_data, const QVector<double> & y_data, int dims = 1, QWidget *parent = nullptr);
+
+    explicit Display_container_1d(const QVector<double>&, int row_size, int dims = 1, QWidget *parent = nullptr);
+
+    explicit Display_container_1d(const QVector< QVector<double> >&, int dims = 1, QWidget *parent = nullptr);
+
+    explicit Display_container_1d(const QVector<QVector< QVector<double> > >&, int dims = 1, QWidget *parent = nullptr);
+
+    explicit Display_container_1d(const stir::Array<1, float>&, int row_size, int dims = 1, QWidget *parent = nullptr);
+
+    explicit Display_container_1d(const  stir::Array<2, float>&, int dims = 1, QWidget *parent = nullptr);
+
+    explicit Display_container_1d(const  stir::Array<3, float>&, int dims = 1, QWidget *parent = nullptr);
+
+    //    virtual Display_container_1d* clone() const;
     /** \addtogroup Setters
      *  @{
      */
-    //! Set the data array, initialise x_data and update() display, by pointer
-    void set_display(QVector<double> *);
+    virtual void set_display(const QVector<double> & _x_array,
+                     const QVector<double> & _y_array);
     //! Set the data array, initialise x_data and update() display, by reference
-    void set_display(const QVector<double>&);
+    virtual void set_display(const QVector<double>&, int row_size);
+    //! Set the data array, initialise x_data and update() display, by pointer
+    virtual void set_display(const QVector< QVector<double> >&);
+    //! Set th data array, initialise x_data and update() display, by reference
+    virtual void set_display(const QVector<QVector< QVector<double> > >&);
+    //! Set the data array, initialise x_data and update() display, by reference
+    virtual void set_display(const stir::Array<1, float>&, int _row_size);
+    //! Set the data array, initialise x_data and update() display, by pointer
+    virtual void set_display(const  stir::Array<2, float>&);
+    //! Set the data array, initialise x_data and update() display, by reference
+    virtual void set_display(const  stir::Array<3, float>&);
     //!
-    bool set_display(void*_in);
+    virtual void set_display(void*_in);
     //! Set the physical dimentions of the x axis
     void set_sizes(float _min_x = 0.f, float  _min_y = 0.f);
-    //! Set the the array to display and calibrate the x axis to the physical dimensions.
-    void set_physical_display(const QVector<double>& , int offset = 0, float _min_x = 0.f, float  _max_x= 0.f);
+
     /** @}*/
 
+
+    virtual ~Display_container_1d();
     //! Clear the data and x_data
     void clear();
 
 public slots:
-        virtual void update_scene(int i = 0);
-
-protected:
-    /** \addtogroup Setters
-     *  @{
-     */
-    //! Set the data array and initialise x_data by pointer
-    void set_array(QVector<double>*);
-    //! Set the data array and initialise x_data by reference
-    void set_array(const QVector<double>&);
-
-    void set_array( stir::Array<1, float>* _in);
-    /** @}*/
+    virtual void update_scene(int i = 0);
 
 private:
     //! QVector of y data
     QVector<double>* data;
     //! QVector of x data
-    QVector<double> x_data;
+    QVector<double>* x_data;
     //! Offset of the x axis
     int data_offset;
     //! The minimum x value in physical dimensions
@@ -68,6 +81,10 @@ private:
     double inc_x;
 
     QwtPlotCurve* curve;
+
+    void calculate_x_axis();
+
+    void initialise();
 
 };
 

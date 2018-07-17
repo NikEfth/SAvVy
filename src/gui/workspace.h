@@ -46,6 +46,8 @@ public:
     //! Get a pointer to an array with index _i
     std::shared_ptr<stir::ArrayInterface> get_array_ptr(int _i);
 
+    std::shared_ptr<stir::ArrayInterface> get_array_ptr(const QString& _s);
+
     std::shared_ptr<stir::ArrayInterface> get_current_array_ptr();
     /** @}*/
 

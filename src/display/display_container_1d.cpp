@@ -7,8 +7,64 @@
 
 #include "stir/Array.h"
 
-Display_container_1d::Display_container_1d(int _my_id, int dims, QWidget *parent) :
-    Display_container(_my_id, dims, parent)
+Display_container_1d::Display_container_1d(int dims, QWidget *parent) :
+    Display_container(dims, parent)
+{
+    initialise();
+}
+
+Display_container_1d::Display_container_1d(const QVector<double>& x_data,
+                                           const QVector<double> & y_data, int dims, QWidget *parent) :
+    Display_container(dims, parent)
+{
+    initialise();
+    set_display(x_data, y_data);
+}
+
+Display_container_1d::Display_container_1d(const QVector<double>& _in, int row_size, int dims, QWidget *parent):
+    Display_container(dims, parent)
+{
+    initialise();
+    set_display(_in, row_size);
+}
+
+Display_container_1d::Display_container_1d(const QVector< QVector<double> >& _in, int dims, QWidget *parent):
+    Display_container(dims, parent)
+{
+    initialise();
+    set_display(_in);
+}
+
+Display_container_1d::Display_container_1d(const QVector<QVector< QVector<double> > >& _in, int dims, QWidget *parent):
+    Display_container(dims, parent)
+{
+    initialise();
+    set_display(_in);
+}
+
+Display_container_1d::Display_container_1d(const stir::Array<1, float>& _in, int row_size, int dims, QWidget *parent):
+    Display_container(dims, parent)
+{
+    initialise();
+    set_display(_in, row_size);
+}
+
+Display_container_1d::Display_container_1d(const  stir::Array<2, float>& _in, int dims, QWidget *parent):
+    Display_container(dims, parent)
+{
+    initialise();
+    set_display(_in);
+}
+
+Display_container_1d::Display_container_1d(const  stir::Array<3, float>& _in, int dims, QWidget *parent):
+    Display_container(dims, parent)
+{
+    initialise();
+    set_display(_in);
+}
+
+
+void Display_container_1d::initialise()
 {
     QSettings settings;
 
@@ -28,91 +84,96 @@ Display_container_1d::Display_container_1d(int _my_id, int dims, QWidget *parent
         //        this->enableAxis(QwtPlot::yLeft, state);
     }
 
+    min_value = new QVector<double>(1,100000);
+    max_value = new QVector<double>(1,0);
     inc_x = 1.;
 }
 
-void Display_container_1d::set_array(QVector<double>* _array)
+void Display_container_1d::set_display(const QVector<double> & _x_array,
+                                       const QVector<double> & _y_array)
 {
-    *data = * _array;
-}
+    data = new QVector<double>(_y_array.size(), 0.0);
+    savvy::copy_QVector<double>(_y_array, *data, (*min_value)[0], (*max_value)[0]);
 
-void Display_container_1d::set_array(const QVector<double> &_array)
-{
-    data = new QVector<double>(_array.size());
-    *data = _array;
-}
-
-void Display_container_1d::set_array( stir::Array<1, float>* _in)
-{
-    data = new QVector<double>(_in->size());
-
-    int idx = 0;
-    for (int i = _in->get_min_index(); i <= _in->get_max_index(); ++i, ++idx)
-        (*data)[idx] = static_cast<double>( (*_in)[i]);
-
-     data_offset = _in->get_min_index();
-}
-
-void Display_container_1d::set_display(QVector<double>* _array)
-{
-    set_array(_array);
-
-    x_data.resize(data->size());
-    QVector<double>::iterator it = x_data.begin();
-    double acc = 0;
-    *it = acc; ++it;
-
-    for (; it != x_data.end(); ++it)
-    {
-        acc += inc_x;
-        *it = acc;
-    }
+    x_data = new QVector<double>(_x_array.size(), 0.0);
+    savvy::copy_QVector<double>(_x_array, *x_data, (*min_value)[0], (*max_value)[0]);
 
     update_scene();
 }
 
-void Display_container_1d::set_display(const QVector<double> &_array)
+void Display_container_1d::set_display(const QVector<double> & _array, int row_size)
 {
-    set_array(_array);
-
-    x_data.resize(data->size());
-    QVector<double>::iterator it = x_data.begin();
-    double acc = 0;
-    *it = acc; ++it;
-
-    for (; it != x_data.end(); ++it)
-    {
-        acc += inc_x;
-        *it = acc;
-    }
-
+    data = new QVector<double>(_array.size(), 0.0);
+    savvy::copy_QVector<double>(_array, *data, (*min_value)[0], (*max_value)[0]);
+    calculate_x_axis();
     update_scene();
 }
 
-bool Display_container_1d::set_display(void* _in)
+void Display_container_1d::set_display(const QVector<QVector<double> >&  _array)
 {
-    stir::Array<1, float>* tmp =
-            static_cast<stir::Array<1, float>* >(_in);
-
-    if(stir::is_null_ptr(_in))
-        return false;
-
-    set_array(tmp);
-
-    x_data.resize(data->size());
-    QVector<double>::iterator it = x_data.begin();
-    double acc = tmp->get_min_index();
-    *it = acc; ++it;
-
-    for (; it != x_data.end(); ++it)
-    {
-        acc += inc_x;
-        *it = acc;
-    }
-
+    data = new QVector<double>(_array.size(), 0.0);
+    savvy::serialize_QVector<double>(_array, *data, (*min_value)[0], (*max_value)[0]);
+    calculate_x_axis();
     update_scene();
+}
 
-    return true;
+void Display_container_1d::set_display(const QVector<QVector<QVector<double> > >&  _array)
+{
+    //    data = new QVector<double>(_array.size(), 0.0);
+    //    savvy::serialize_QVector<double>(_array, *data, *min_value, *max_value);
+    //    calculate_x_axis();
+    //    update_scene();
+}
+
+void Display_container_1d::set_display(const stir::Array<1, float>& _array, int _row_size)
+{
+    data = new QVector<double>(_array.size(), 0.0);
+    savvy::Array1D_QVector1D(_array, *data, (*min_value)[0], (*max_value)[0]);
+    data_offset = _array.get_min_index();
+    calculate_x_axis();
+    update_scene();
+}
+
+void Display_container_1d::set_display(const  stir::Array<2, float>& _array)
+{
+    data = new QVector<double>(_array.size()* _array[0].size(), 0.0);
+    savvy::Array2D_QVector1D(_array, *data, (*min_value)[0], (*max_value)[0]);
+    calculate_x_axis();
+    update_scene();
+}
+
+void Display_container_1d::set_display(const  stir::Array<3, float>& _array)
+{
+    data = new QVector<double>(_array.size()* _array[0].size() * _array[0][0].size(), 0.0);
+    savvy::Array3D_QVector1D(_array, *data, (*min_value)[0], (*max_value)[0]);
+    calculate_x_axis();
+    update_scene();
+}
+
+void Display_container_1d::set_display(void* _in)
+{
+    //    stir::Array<1, float>* tmp =
+    //            static_cast<stir::Array<1, float>* >(_in);
+
+    //    if(stir::is_null_ptr(_in))
+    //        return false;
+
+    //    set_array(tmp);
+
+    //    x_data.resize(data->size());
+    //    QVector<double>::iterator it = x_data.begin();
+    //    double acc = tmp->get_min_index();
+    //    *it = acc; ++it;
+
+    //    for (; it != x_data.end(); ++it)
+    //    {
+    //        acc += inc_x;
+    //        *it = acc;
+    //    }
+
+    //    update_scene();
+
+    //    return true;
 }
 
 void Display_container_1d::set_sizes(
@@ -122,28 +183,6 @@ void Display_container_1d::set_sizes(
     max_x = _max_x;
 }
 
-void Display_container_1d::set_physical_display(const QVector<double > &_array,
-                                                int offset,
-                                                float _min_x, float  _max_x)
-{
-    set_sizes(_min_x, _max_x);
-    inc_x =  (fabs(max_x) + fabs(min_x)) / _array.size();
-    set_array(_array);
-
-    x_data.resize(data->size());
-    QVector<double>::iterator it = x_data.begin();
-    double acc = min_x + inc_x/2.0;
-    *it = acc; ++it;
-
-    for (; it != x_data.end(); ++it)
-    {
-        acc += inc_x;
-        *it = acc;
-    }
-
-    update_scene();
-    emit setup_ready();
-}
 
 void Display_container_1d::update_scene(int i)
 {
@@ -151,7 +190,7 @@ void Display_container_1d::update_scene(int i)
                        *std::min_element(data->constBegin(), data->constEnd()),
                        *std::max_element(data->constBegin(), data->constEnd()));
 
-    curve->setSamples(x_data, *data);
+    curve->setSamples(*x_data, *data);
     curve->attach(this);
     this->replot();
 }
@@ -159,6 +198,26 @@ void Display_container_1d::update_scene(int i)
 void Display_container_1d::clear()
 {
     data->clear();
-    x_data.clear();
+    x_data->clear();
     data_offset = 0;
+}
+
+Display_container_1d::~Display_container_1d()
+{
+    delete x_data;
+    delete data;
+}
+
+void Display_container_1d::calculate_x_axis()
+{
+    x_data = new QVector<double>(data->size(), 0.0);
+    QVector<double>::iterator it = x_data->begin();
+    double acc = data_offset;
+    *it = acc; ++it;
+
+    for (; it != x_data->end(); ++it)
+    {
+        acc += inc_x;
+        *it = acc;
+    }
 }

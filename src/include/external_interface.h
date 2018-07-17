@@ -7,6 +7,10 @@
 class ExternalInterface : public QDialog
 {
 public:
+    explicit ExternalInterface(QWidget *parent = 0) :
+        QDialog(parent)
+    {}
+
     virtual ~ExternalInterface() {}
 
     virtual void load_from_workspace() = 0;

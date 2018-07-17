@@ -86,6 +86,18 @@ Workspace::get_array_ptr(int _i)
 }
 
 std::shared_ptr<stir::ArrayInterface>
+Workspace::get_array_ptr(const QString& _s)
+{
+    for (int i = 0; i < ui->listOpenedFiles->count(); ++i)
+    {
+        if (ui->listOpenedFiles->item(i)->text() == _s)
+            return openned_files[i];
+    }
+
+    return nullptr;
+}
+
+std::shared_ptr<stir::ArrayInterface>
 Workspace::get_current_array_ptr()
 {
     return get_array_ptr(ui->listOpenedFiles->currentRow());
