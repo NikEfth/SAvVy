@@ -47,7 +47,7 @@ Display_manager::Display_manager(int _my_id, stir::ArrayInterface *__display, QW
     case 1:
     {
         stir::Array<1, float>* tmp = dynamic_cast<stir::Array<1, float>* >(__display);
-        _display = new Display_container_1d(*tmp,  tmp->size(), 1, this);
+        _display = new Display_container_1d(*tmp, static_cast<int>(tmp->size()), 1, this);
         set_no_controls(true);
     }
         break;

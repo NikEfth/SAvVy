@@ -39,9 +39,9 @@ public:
     //! Set the data array, initialise x_data and update() display, by reference
     void set_display(const QVector<QVector< QVector<double> > >&);
     //! Set the data array, initialise x_data and update() display, by reference
-    void set_display(const stir::Array<1, float>&, int row_size) {}
+	void set_display(const stir::Array<1, float>&, int row_size);
     //! Set the data array, initialise x_data and update() display, by pointer
-    void set_display(const  stir::Array<2, float>&) {}
+	void set_display(const  stir::Array<2, float>&);
     //! Set the data array, initialise x_data and update() display, by reference
     void set_display(const  stir::Array<3, float>&);
     //!

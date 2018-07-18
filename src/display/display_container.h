@@ -40,11 +40,8 @@ public:
      *  @{
      */
     //!
-    virtual void set_display(const QVector<double> & _x_array,
-                             const QVector<double> & _y_array)
-    {
-        //!\todo It can be used for Scatter plottings
-    }
+	virtual void set_display(const QVector<double> & _x_array,
+		const QVector<double> & _y_array);
     //! Set the data array, initialise x_data and update() display, by reference
     virtual void set_display(const QVector<double>&, int row_size) = 0;
     //! Set the data array, initialise x_data and update() display, by pointer
@@ -60,17 +57,11 @@ public:
 
     virtual void set_display(void*) = 0;
 
-    virtual void set_color_map(int i)
-    {
-        //! \todo Set colormap could be usefull for 1D arrays, too.
-    }
+	virtual void set_color_map(int i);
 
     /** @}*/
 
-    virtual int get_num_data() const
-    {
-        return data_num;
-    }
+	virtual int get_num_data() const;
 
     inline int get_num_dimensions() const
     {

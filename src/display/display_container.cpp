@@ -16,3 +16,19 @@ Display_container::~Display_container()
     delete min_value;
     delete max_value;
 }
+
+int Display_container::get_num_data() const
+{
+	return data_num;
+}
+
+void Display_container::set_color_map(int i)
+{
+	//! \todo Set colormap could be usefull for 1D arrays, too.
+}
+
+void Display_container::set_display(const QVector<double> & _x_array,
+	const QVector<double> & _y_array)
+{
+	//!\todo It can be used for Scatter plottings
+}

@@ -223,7 +223,7 @@ bool SavvyWindow::append_to_mdi(Display_container *child,
     //    else
     //        child->showMinimized();
 
-    //    return true;
+        return true;
 }
 
 bool SavvyWindow::append_to_mdi(Display_manager *child,
@@ -912,7 +912,7 @@ bool SavvyWindow::test_display_array_1d_in_2d_container()
     if (is_null_ptr(disp))
         return false;
 
-    disp->get_display()->set_display(*tmp, tmp->size());
+    disp->get_display()->set_display(*tmp, static_cast<int>(tmp->size()));
     append_to_mdi(disp);
 
     return true;
@@ -936,7 +936,7 @@ bool SavvyWindow::test_display_array_3d_in_2d_container()
     //    disp->get_display()->set_display(*tmp);
     //    append_to_mdi(disp);
 
-    //    return true;
+        return true;
 }
 
 bool SavvyWindow::test_display_array_3d()

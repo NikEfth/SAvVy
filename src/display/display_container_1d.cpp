@@ -127,7 +127,7 @@ void Display_container_1d::set_display(const QVector<QVector<QVector<double> > >
 
 void Display_container_1d::set_display(const stir::Array<1, float>& _array, int _row_size)
 {
-    data = new QVector<double>(_array.size(), 0.0);
+    data = new QVector<double>(static_cast<int>(_array.size()), 0.0);
     savvy::Array1D_QVector1D(_array, *data, (*min_value)[0], (*max_value)[0]);
     data_offset = _array.get_min_index();
     calculate_x_axis();

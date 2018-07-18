@@ -5,7 +5,7 @@ Display_container_bar::Display_container_bar(int dims, QWidget *parent) :
     Display_container(dims, parent)
 {
     numBins= 32;
-    cutOff = 0.4;
+    cutOff = 0.4f;
 
     initialisePlotArea();
     initialiseHistogram();

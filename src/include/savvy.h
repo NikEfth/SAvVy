@@ -202,10 +202,10 @@ static void decompose_Array1D_to_QVectors_XY(const stir::Array<1, float> & input
 {
 
     if (input.size() > x_values.size())
-        x_values.resize(input.size());
+        x_values.resize(static_cast<int>(input.size()));
 
     if(input.size() > y_values.size())
-        y_values.resize(input.size());
+        y_values.resize(static_cast<int>(input.size()));
 
     QVector<double>::iterator xot = x_values.begin();
     QVector<double>::iterator yot = y_values.begin();
@@ -325,10 +325,10 @@ static void Array2D_QVector2D(const stir::Array<2, float> & input,
 
     if (output.size() == 0)
     {
-        output.resize(input.size());
+        output.resize(static_cast<int>(input.size()));
 
         for (int i = 0; i < input.size(); ++i)
-            output[i].resize(input[0].size());
+            output[i].resize(static_cast<int>(input[0].size()));
     }
 
     assert(input.size() == output.size());
@@ -349,14 +349,14 @@ static void Array3D_QVector3D(const stir::Array<3, float> & input,
 {
     if (output.size() == 0)
     {
-        output.resize(input.size());
+        output.resize(static_cast<int>(input.size()));
 
         for (int i = 0; i < input.size(); ++i)
         {
-            output[i].resize(input[0].size());
+            output[i].resize(static_cast<int>(input[0].size()));
 
             for (int j = 0; j < input[0][0].size(); ++j)
-                output[i][j].resize(input[0][0].size());
+                output[i][j].resize(static_cast<int>(input[0][0].size()));
         }
     }
 

@@ -27,9 +27,6 @@ link_directories(${Qwt_LIBRARIES_DIR})
 if(UNIX OR APPLE)
     find_library (GSL_LIBRARY
         NAMES gsl IMPORTED)
-endif()
-
-if(UNIX OR APPLE)
     find_library (GSL_BLAS_LIBRARY
         NAMES gslcblas IMPORTED)
 endif()
@@ -38,6 +35,10 @@ endif()
 if(WIN32)
     find_library (GSL_LIBRARY
         NAMES gsl_ddl gsl_ddl_d IMPORTED)
+
+set(GSL_INCLUDE_DIR "default value" CACHE FILEPATH "description")
+include_directories(${GSL_INCLUDE_DIR})
+	add_definitions(-D QWT_DLL)
 endif()
     
 #target_include_directories(savvy_gui PUBLIC "${SAVVY_INCLUDE_DIR}")

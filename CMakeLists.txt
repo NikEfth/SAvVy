@@ -38,10 +38,10 @@ option_with_print(BUILD_SHARED_LIBS "Build internally built libraries as shared,
 option_with_default(CMAKE_BUILD_TYPE "Build type (Release or Debug)" Debug)
 option_with_default(CMAKE_INSTALL_LIBDIR "Directory to which libraries installed" lib)
 
-if(UNIX)
+#if(UNIX)
     # Find the Qt components
     find_package(Qt5 COMPONENTS Core Gui Widgets Test REQUIRED)
-endif()
+#endif()
 
 # gcc specific stuff
 if (CMAKE_COMPILER_IS_GNUCC)

@@ -83,6 +83,7 @@ Workspace::get_array_ptr(int _i)
 {
     if (_i < openned_files.size())
         return openned_files[_i];
+	return nullptr;
 }
 
 std::shared_ptr<stir::ArrayInterface>
@@ -107,6 +108,7 @@ QString Workspace::get_array_name(int _i)
 {
     if (_i < ui->listOpenedFiles->count())
         return ui->listOpenedFiles->item(_i)->text();
+	return QString("");
 }
 
 QString Workspace::get_current_name()
@@ -140,9 +142,11 @@ bool Workspace::has_grouped_items() const
     return false;
 }
 
-QVector<QString> Workspace::get_groupped() const
+QStringList Workspace::get_groupped() const
 {
+	QStringList ret; 
     //    return grouped_files;
+	return ret; 
 }
 
 std::shared_ptr <stir::ArrayInterface> Workspace::open_array(const QString& fileName)

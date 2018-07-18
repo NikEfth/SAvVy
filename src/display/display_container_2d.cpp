@@ -91,7 +91,7 @@ void Display_container_2d::set_display(const QVector<QVector<QVector<double> > >
 void Display_container_2d::set_display(const stir::Array<1, float>& _array, int _row_size)
 {
     row_size = _row_size;
-    row_num = _array.size() / row_size;
+    row_num = static_cast<int>(_array.size()) / row_size;
 
     data = new QVector< double >(row_num* row_size, 0.0);
     savvy::Array1D_QVector1D(_array, *data, (*min_value)[0] ,(*max_value)[0]);
@@ -102,8 +102,8 @@ void Display_container_2d::set_display(const stir::Array<1, float>& _array, int 
 
 void Display_container_2d::set_display(const stir::Array<2, float>& _array)
 {
-    row_num = _array.size();
-    row_size = _array[0].size();
+	row_num = static_cast<int>(_array.size());
+    row_size = static_cast<int>(_array[0].size());
 
     data = new QVector< double >(row_num* row_size, 0.0);
     savvy::Array2D_QVector1D(_array, *data, (*min_value)[0],  (*max_value)[0]);

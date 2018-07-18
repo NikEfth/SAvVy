@@ -86,7 +86,7 @@ public:
         return ret;
     }
     //! Set the active ColorMap by name
-    void setColormap(QString name)
+    inline void setColormap(QString name)
     {
         switch (my_list.indexOf(name)) {
         case 0:
@@ -113,7 +113,7 @@ public:
         }
     }
     //! Set the active ColorMap by index
-    void setColormap(int index)
+    inline void setColormap(int index)
     {
         switch (index) {
         case 0:

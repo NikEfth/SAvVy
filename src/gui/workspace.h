@@ -38,7 +38,7 @@ public:
      *  @{
      */
     //! Get the list of groupped files
-    QVector<QString> get_groupped() const ;
+    QStringList get_groupped() const ;
     //! Get the name of the current seleted item at ui->listOpenedFiles
     QString get_current_name();
     //! Get the name of  the name of the item at ui->listOpenedFiles on row _i

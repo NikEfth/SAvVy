@@ -134,9 +134,9 @@ void Display_container_3d::set_display(const QVector<QVector<QVector<double> > >
 
 void Display_container_3d::set_display(const stir::Array<3, float>& _array)
 {
-    data_num = _array.size();
-    row_num  = _array[0].size();
-    row_size   = _array[0][0].size();
+    data_num = static_cast<int>(_array.size());
+    row_num  = static_cast<int>(_array[0].size());
+    row_size   = static_cast<int>(_array[0][0].size());
 
     data = new QVector< QVector< double > >(data_num,
                                             QVector< double >(row_num * row_size, 0.0));
@@ -264,6 +264,15 @@ void Display_container_3d::set_display(void* _in)
 //    }
 //}
 
+void Display_container_3d::set_display(const stir::Array<1, float>& a, int row_size) 
+{
+
+}
+
+void Display_container_3d::set_display(const  stir::Array<2, float>& a)
+{
+
+}
 
 void Display_container_3d::update_scene(int i)
 {
