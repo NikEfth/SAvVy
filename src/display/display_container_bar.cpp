@@ -205,8 +205,23 @@ void Display_container_bar::set_display(QFile &_inFile)
     update_scene();
 }
 
-void append_curve(const QVector<double> & x_values,
+void Display_container_bar::append_curve(const QVector<double> & x_values,
                   const QVector< double>& y_values, const QString & name)
 {
     //       Display_container_1d* tmp =  new Display_container_1d(1, this);
 }
+
+void Display_container_bar::set_display(const QVector< QVector<double> >&)
+{}
+
+void Display_container_bar::set_display(const QVector<QVector< QVector<double> > >&)
+{}
+
+void Display_container_bar::set_display(const stir::Array<1, float>&, int row_size)
+{}
+
+void Display_container_bar::set_display(const  stir::Array<2, float>&)
+{}
+
+void Display_container_bar::set_display(const  stir::Array<3, float>&)
+{}

@@ -30,11 +30,7 @@ class Display_container : public QwtPlot
 {
     Q_OBJECT
 public:
-    explicit Display_container(int _num_dim, QWidget *parent = nullptr)
-        :QwtPlot(parent), num_dim(_num_dim)
-    {
-        this->canvas()->setMinimumSize(150, 150);
-    }
+	explicit Display_container(int _num_dim, QWidget *parent = nullptr);
 
     /** \addtogroup Setters
      *  @{

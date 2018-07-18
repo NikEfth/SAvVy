@@ -39,15 +39,15 @@ public:
     //! Set the data array, initialise x_data and update() display, by reference
     void set_display(const QVector<double>& , int _row_size);
     //! Set the data array, initialise x_data and update() display, by pointer
-    void set_display(const QVector< QVector<double> >&){}
+	void set_display(const QVector< QVector<double> >&);
     //! Set the data array, initialise x_data and update() display, by reference
-    void set_display(const QVector<QVector< QVector<double> > >&){}
+	void set_display(const QVector<QVector< QVector<double> > >&);
     //! Set the data array, initialise x_data and update() display, by reference
-    void set_display(const stir::Array<1, float>&, int row_size){}
+	void set_display(const stir::Array<1, float>&, int row_size);
     //! Set the data array, initialise x_data and update() display, by pointer
-    void set_display(const  stir::Array<2, float>&){}
+	void set_display(const  stir::Array<2, float>&);
     //! Set the data array, initialise x_data and update() display, by reference
-    void set_display(const  stir::Array<3, float>&) {}
+	void set_display(const  stir::Array<3, float>&);
 
     void append_curve(const QVector<double> & x_values,
                       const QVector< double>& y_values, const QString & name);

@@ -1,5 +1,11 @@
 #include "display_container.h"
 
+Display_container::Display_container(int _num_dim, QWidget *parent)
+	:QwtPlot(parent), num_dim(_num_dim)
+{
+	this->canvas()->setMinimumSize(150, 150);
+}
+
 void Display_container::closeEvent(QCloseEvent *event)
 {
     emit aboutToClose();

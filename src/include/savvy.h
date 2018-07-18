@@ -300,7 +300,6 @@ static void Array3D_QVector2Ds(const stir::Array<3, float> & input,
 {
 
     assert(output.size() > 0 );
-    QVector<QVector<double> >::iterator ot = output.begin();
 
     for (int i = input.get_min_index(), idp = 0; i <= input.get_max_index() ; ++i, ++idp)
         for (int j = (input)[i].get_min_index(), idx = 0; j <= (input)[i].get_max_index() ; ++j)
