@@ -33,8 +33,13 @@ void Display_container::set_color_map(int i)
 	//! \todo Set colormap could be usefull for 1D arrays, too.
 }
 
-void Display_container::set_display(const QVector<double> & _x_array,
-	const QVector<double> & _y_array)
+void Display_container::set_display(const QVector<double> & _y_array)
 {
 	//!\todo It can be used for Scatter plottings
+}
+
+void Display_container::set_display(const QVector<double> & _x_array,
+                                    const QVector<double> & _y_array, bool symbols)
+{
+    //!\todo It can be used for Scatter plottings
 }

@@ -22,9 +22,9 @@ public:
      *  @{
      */
     //! Set the numBins in the histogram
-    void setNumBin(const int& _n);
+    void setNumBin(const size_t &_n);
     //! As setNumBin plus update_scene
-    void setNumBin_update(const int& _n);
+    void setNumBin_update(const size_t &_n);
     //! Set the cutOff value
     void setCutOff(const float& _n);
     //! setCutOff and update and update_scene
@@ -39,28 +39,28 @@ public:
     //! Set the data array, initialise x_data and update() display, by reference
     void set_display(const QVector<double>& , int _row_size);
     //! Set the data array, initialise x_data and update() display, by pointer
-	void set_display(const QVector< QVector<double> >&);
+    void set_display(const QVector< QVector<double> >&);
     //! Set the data array, initialise x_data and update() display, by reference
-	void set_display(const QVector<QVector< QVector<double> > >&);
+    void set_display(const QVector<QVector< QVector<double> > >&);
     //! Set the data array, initialise x_data and update() display, by reference
-	void set_display(const stir::Array<1, float>&, int row_size);
+    void set_display(const stir::Array<1, float>&, int row_size);
     //! Set the data array, initialise x_data and update() display, by pointer
-	void set_display(const  stir::Array<2, float>&);
+    void set_display(const  stir::Array<2, float>&);
     //! Set the data array, initialise x_data and update() display, by reference
-	void set_display(const  stir::Array<3, float>&);
+    void set_display(const  stir::Array<3, float>&);
 
     void append_curve(const QVector<double> & x_values,
                       const QVector< double>& y_values, const QString & name);
 
-//    void remove_curve();
+    //    void remove_curve();
 
     /** @}*/
 
-    std::shared_ptr< std::vector<double> > get_bin_indices();
+    std::shared_ptr< QVector<double> > get_bin_indices();
 
-    std::shared_ptr< std::vector<double> > get_histogram_values();
+    std::shared_ptr< QVector<double> > get_histogram_values();
 
-    int getNumBin() const ;
+    size_t getNumBin() const ;
 
     void initialiseHistogram();
 signals:
@@ -73,7 +73,7 @@ public slots:
 
 protected:
 
-    int numBins;
+    size_t numBins;
 
     float cutOff;
 
@@ -85,7 +85,9 @@ private:
 
     QwtPlotHistogram *d_histItem = nullptr;
 
-    QVector<Display_container_1d *> curve;
+    //    QwtCurveFitter* curve = nullptr;
+
+    QwtPlotCurve* curve = nullptr;
 
     QVector<QwtIntervalSample> series;
 

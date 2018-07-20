@@ -11,18 +11,18 @@ Display_container_bar::Display_container_bar(int dims, QWidget *parent) :
     initialiseHistogram();
 }
 
-void Display_container_bar::setNumBin(const int& _n)
+void Display_container_bar::setNumBin(const size_t& _n)
 {
     numBins = _n;
     emit settings_updated();
 }
 
-int Display_container_bar::getNumBin() const
+size_t Display_container_bar::getNumBin() const
 {
     return numBins;
 }
 
-void Display_container_bar::setNumBin_update(const int& _n)
+void Display_container_bar::setNumBin_update(const size_t& _n)
 {
     numBins = _n;
     // if linked
@@ -49,11 +49,11 @@ void Display_container_bar::setCutOff_update(const float& _n)
 void Display_container_bar::initialiseHistogram()
 {
     if(!stir::is_null_ptr(hist_data))
-        if(hist_data->range > 0)
+        if(*hist_data->range > 0.0)
             gsl_histogram_free(hist_data);
 
-    series.resize(numBins);
-    intervalA.resize(numBins);
+    series.resize(static_cast<int>(numBins));
+    intervalA.resize(static_cast<int>(numBins));
     hist_data = gsl_histogram_alloc(numBins);
 }
 
@@ -69,12 +69,13 @@ void Display_container_bar::set_display(void* _in)
     return ;
 }
 
-std::shared_ptr< std::vector<double> > Display_container_bar::get_bin_indices()
+std::shared_ptr< QVector<double> > Display_container_bar::get_bin_indices()
 {
-    std::shared_ptr< std::vector<double> > ret(new std::vector<double>(numBins));
+    std::shared_ptr< QVector<double> > ret
+            (new QVector<double>(static_cast<int>(numBins)));
 
     double ls = 0.0, hs = 0.0;
-    for ( int j = 0; j < numBins; ++j)
+    for ( size_t j = 0; j < numBins; ++j)
     {
         gsl_histogram_get_range(hist_data, j, &ls, &hs);
         (*ret)[j] = (ls + hs) / 2.0;
@@ -82,11 +83,13 @@ std::shared_ptr< std::vector<double> > Display_container_bar::get_bin_indices()
     return ret;
 }
 
-std::shared_ptr< std::vector<double> > Display_container_bar::get_histogram_values()
+std::shared_ptr< QVector<double> > Display_container_bar::get_histogram_values()
 {
-    std::shared_ptr< std::vector<double> > ret(new std::vector<double>(numBins));
+    std::shared_ptr< QVector<double> > ret
+            (new QVector<double>(static_cast<int>(numBins)));
 
-    for ( int j = 0; j < numBins; ++j)
+
+    for ( size_t j = 0; j < numBins; ++j)
     {
         (*ret)[j] = gsl_histogram_get(hist_data, j);
     }
@@ -96,7 +99,7 @@ std::shared_ptr< std::vector<double> > Display_container_bar::get_histogram_valu
 void Display_container_bar::update_scene(int i)
 {
     double ls = 0.0, hs = 0.0;
-    for ( int j = 0; j < numBins; ++j)
+    for ( size_t j = 0; j < numBins; ++j)
     {
         gsl_histogram_get_range(hist_data, j, &ls, &hs);
         intervalA[j].setInterval(ls, hs, QwtInterval::IncludeBorders);
@@ -108,12 +111,12 @@ void Display_container_bar::update_scene(int i)
 
     d_histItem->setData(new QwtIntervalSeriesData(series));
 
-    float max = hs;
+    double max = hs;
     gsl_histogram_get_range(hist_data, 0, &ls, &hs);
-    float min = ls;
+    double min = ls;
     this->setAxisScale( QwtPlot::xBottom,min,max);
 
-    double ma = gsl_histogram_max_val(hist_data)*cutOff;
+    double ma = gsl_histogram_max_val(hist_data) * static_cast<double>(cutOff);
     this->setAxisScale(QwtPlot::yLeft, 0, ma);
     d_histItem->attach(this);
     d_histItem->setZ(0);
@@ -190,7 +193,7 @@ void Display_container_bar::set_display(QFile &_inFile)
     }
 
     _in.seek(0);
-    if (min == max)
+    if (max == 0.0)
         return;
 
     gsl_histogram_set_ranges_uniform (hist_data, min, max);
@@ -208,7 +211,18 @@ void Display_container_bar::set_display(QFile &_inFile)
 void Display_container_bar::append_curve(const QVector<double> & x_values,
                   const QVector< double>& y_values, const QString & name)
 {
-    //       Display_container_1d* tmp =  new Display_container_1d(1, this);
+    if (!stir::is_null_ptr(curve))
+    {
+        curve->detach();
+        delete curve;
+    }
+
+    curve = new QwtPlotCurve(name);
+    curve->setPen(Qt::red, 2.0);
+    curve->setSamples(x_values, y_values);
+    curve->attach(this);
+    this->replot();
+
 }
 
 void Display_container_bar::set_display(const QVector< QVector<double> >&)

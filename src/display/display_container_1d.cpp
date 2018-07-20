@@ -90,7 +90,7 @@ void Display_container_1d::initialise()
 }
 
 void Display_container_1d::set_display(const QVector<double> & _x_array,
-                                       const QVector<double> & _y_array)
+                                       const QVector<double> & _y_array, bool symbols)
 {
     data = new QVector<double>(_y_array.size(), 0.0);
     savvy::copy_QVector<double>(_y_array, *data, (*min_value)[0], (*max_value)[0]);
@@ -98,7 +98,22 @@ void Display_container_1d::set_display(const QVector<double> & _x_array,
     x_data = new QVector<double>(_x_array.size(), 0.0);
     savvy::copy_QVector<double>(_x_array, *x_data, (*min_value)[0], (*max_value)[0]);
 
+    if (symbols)
+    {
+        QwtSymbol *symbol = new QwtSymbol( QwtSymbol::Ellipse,
+                                           QBrush( Qt::yellow ), QPen( Qt::red, 2 ), QSize( 8, 8 ) );
+        curve->setSymbol( symbol );
+    }
+
     update_scene();
+}
+
+void Display_container_1d::set_display(const QVector<double> & _y_array)
+{
+    //    data = new QVector<double>(_y_array.size(), 0.0);
+    //    savvy::copy_QVector<double>(_y_array, *data, (*min_value)[0], (*max_value)[0]);
+
+    //    update_scene();
 }
 
 void Display_container_1d::set_display(const QVector<double> & _array, int row_size)
@@ -204,8 +219,10 @@ void Display_container_1d::clear()
 
 Display_container_1d::~Display_container_1d()
 {
-    delete x_data;
-    delete data;
+    if (x_data != nullptr)
+        delete x_data;
+    if(data != nullptr)
+        delete data;
 }
 
 void Display_container_1d::calculate_x_axis()

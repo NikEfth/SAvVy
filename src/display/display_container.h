@@ -36,8 +36,9 @@ public:
      *  @{
      */
     //!
-	virtual void set_display(const QVector<double> & _x_array,
-		const QVector<double> & _y_array);
+    virtual void set_display(const QVector<double> & _y_array);
+    virtual void set_display(const QVector<double> & _x_array,
+        const QVector<double> & _y_array, bool symbols = false);
     //! Set the data array, initialise x_data and update() display, by reference
     virtual void set_display(const QVector<double>&, int row_size) = 0;
     //! Set the data array, initialise x_data and update() display, by pointer

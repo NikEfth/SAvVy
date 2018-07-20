@@ -84,7 +84,7 @@ void serialize_QVector(const QVector<QVector<T> > & in,
         for(int k =  0; k <  row_size; ++k, ++idx)
         {
             double val =  in[j][k];
-            if (val != 0.f)
+            if (val != 0.0)
             {
                 out[0][idx] = val;
 
@@ -201,10 +201,10 @@ static void decompose_Array1D_to_QVectors_XY(const stir::Array<1, float> & input
                                              QVector<double> & x_values, QVector<double> & y_values)
 {
 
-    if (input.size() > x_values.size())
+    if (input.size() > static_cast<size_t>(x_values.size()))
         x_values.resize(static_cast<int>(input.size()));
 
-    if(input.size() > y_values.size())
+    if(input.size() > static_cast<size_t>(y_values.size()))
         y_values.resize(static_cast<int>(input.size()));
 
     QVector<double>::iterator xot = x_values.begin();
