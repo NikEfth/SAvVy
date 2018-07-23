@@ -114,7 +114,7 @@ void Display_container_bar::update_scene(int i)
     double max = hs;
     gsl_histogram_get_range(hist_data, 0, &ls, &hs);
     double min = ls;
-    this->setAxisScale( QwtPlot::xBottom,min,max);
+    this->setAxisScale( QwtPlot::xBottom, min, max);
 
     double ma = gsl_histogram_max_val(hist_data) * static_cast<double>(cutOff);
     this->setAxisScale(QwtPlot::yLeft, 0, ma);
@@ -136,8 +136,8 @@ void Display_container_bar::initialisePlotArea()
     this->canvas()->setPalette( QColor( "LemonChiffon" ) );
     this->setAutoReplot(true);
 
-    this->setAxisTitle(QwtPlot::xBottom, "Value");
-    this->setAxisTitle(QwtPlot::yLeft, "Number");
+    this->setAxisTitle(QwtPlot::xBottom, "Bin");
+    this->setAxisTitle(QwtPlot::yLeft, "Frequency");
 }
 
 
