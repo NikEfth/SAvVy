@@ -4,7 +4,7 @@
 #include <qwt_color_map.h>
 
 #include <QSettings>
-
+#include <qwt_plot_item.h>
 #include "stir/Array.h"
 
 Display_container_1d::Display_container_1d(int dims, QWidget *parent) :
@@ -42,6 +42,17 @@ Display_container_1d::Display_container_1d(const QVector<QVector< QVector<double
     set_display(_in);
 }
 
+std::shared_ptr< QVector<double> >  Display_container_1d::get_x_values() const
+{
+    return std::shared_ptr<QVector<double> >(new QVector<double>(*data));
+}
+
+std::shared_ptr< QVector<double> >  Display_container_1d::get_y_values() const
+{
+    return std::shared_ptr<QVector<double> >(new QVector<double>(*x_data));
+
+}
+
 Display_container_1d::Display_container_1d(const stir::Array<1, float>& _in, int row_size, int dims, QWidget *parent):
     Display_container(dims, parent)
 {
@@ -63,6 +74,10 @@ Display_container_1d::Display_container_1d(const  stir::Array<3, float>& _in, in
     set_display(_in);
 }
 
+size_t Display_container_1d::get_x_axis_size() const
+{
+    return x_data->size();
+}
 
 void Display_container_1d::initialise()
 {
@@ -90,8 +105,19 @@ void Display_container_1d::initialise()
 }
 
 void Display_container_1d::set_display(const QVector<double> & _x_array,
-                                       const QVector<double> & _y_array, bool symbols)
+                                       const QVector<double> & _y_array,
+                                       bool replace,int after, bool symbols, bool line)
 {
+
+    if (replace)
+    {
+        QList<QwtPlotItem* > items = this->itemList(QwtPlotItem::Rtti_PlotCurve);
+        if (after < items.size())
+            for (int i = after; i < items.size(); ++i)
+                items.at(i)->detach();
+        curve = new QwtPlotCurve();
+        curve->setPen(Qt::red,2);
+    }
     data = new QVector<double>(_y_array.size(), 0.0);
     savvy::copy_QVector<double>(_y_array, *data, (*min_value)[0], (*max_value)[0]);
 
@@ -103,6 +129,11 @@ void Display_container_1d::set_display(const QVector<double> & _x_array,
         QwtSymbol *symbol = new QwtSymbol( QwtSymbol::Ellipse,
                                            QBrush( Qt::yellow ), QPen( Qt::red, 2 ), QSize( 8, 8 ) );
         curve->setSymbol( symbol );
+    }
+
+    if (!line)
+    {
+        curve->setStyle(QwtPlotCurve::NoCurve);
     }
 
     update_scene();

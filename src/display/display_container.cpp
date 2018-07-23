@@ -39,7 +39,18 @@ void Display_container::set_display(const QVector<double> & _y_array)
 }
 
 void Display_container::set_display(const QVector<double> & _x_array,
-                                    const QVector<double> & _y_array, bool symbols)
+                                    const QVector<double> & _y_array,
+                                    bool replace, int after, bool symbols, bool line)
 {
     //!\todo It can be used for Scatter plottings
+}
+
+std::shared_ptr< QVector<double> >  Display_container::get_x_values() const
+{
+    //! \todo Do something for raster data
+}
+
+std::shared_ptr< QVector<double> >  Display_container::get_y_values() const
+{
+    //! \todo Do something for raster data
 }

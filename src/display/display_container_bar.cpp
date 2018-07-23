@@ -1,5 +1,6 @@
 #include "display_container_bar.h"
 #include <QMessageBox>
+#include <qwt_plot_item.h>
 
 Display_container_bar::Display_container_bar(int dims, QWidget *parent) :
     Display_container(dims, parent)
@@ -20,6 +21,11 @@ void Display_container_bar::setNumBin(const size_t& _n)
 size_t Display_container_bar::getNumBin() const
 {
     return numBins;
+}
+
+size_t Display_container_bar::get_x_axis_size() const
+{
+    return getNumBin();
 }
 
 void Display_container_bar::setNumBin_update(const size_t& _n)
@@ -209,13 +215,18 @@ void Display_container_bar::set_display(QFile &_inFile)
 }
 
 void Display_container_bar::append_curve(const QVector<double> & x_values,
-                  const QVector< double>& y_values, const QString & name)
+                                         const QVector< double>& y_values, const QString & name, bool replace)
 {
-    if (!stir::is_null_ptr(curve))
+    if (!stir::is_null_ptr(curve) && replace)
     {
-        curve->detach();
-        delete curve;
+        QList<QwtPlotItem *> items = this->itemList(QwtPlotItem::Rtti_PlotCurve);
+        for (QwtPlotItem* i : items)
+        {
+            i->detach();
+            delete i;
+        }
     }
+
 
     curve = new QwtPlotCurve(name);
     curve->setPen(Qt::red, 2.0);

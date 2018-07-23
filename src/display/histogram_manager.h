@@ -31,6 +31,11 @@ public:
     virtual void set_display(const QString& _inFIle);
 
     virtual void set_no_controls(bool);
+
+    virtual void set_curve(const QVector<double> & _x_array,
+                           const QVector<double> & _y_array,
+                           bool replace = true, int after = 1,
+                           bool symbols = false, bool line = false) override;
     /** @}*/
 
     /** \addtogroup Getters
@@ -40,9 +45,15 @@ public:
     Display_container_bar * get_display();
     /** @}*/
 
-    void setNumBin(const int& _n);
+    virtual size_t get_num_points() const override;
+
+    void setNumBin(const size_t& _n);
 
     void setCutOff(const float& _n);
+
+    virtual std::shared_ptr< QVector<double> >  get_x_values() const;
+
+    virtual std::shared_ptr< QVector<double> >  get_y_values() const;
 
 private slots:
     void on_spinBox_valueChanged(int arg1);

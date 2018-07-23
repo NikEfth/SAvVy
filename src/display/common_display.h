@@ -3,6 +3,7 @@
 
 #include <qwt_color_map.h>
 #include <QWidget>
+#include <memory>
 
 namespace display {
 
@@ -12,8 +13,8 @@ class DisplayInterface : public QWidget
 public:
     explicit DisplayInterface(int _id, int _dims, QWidget *parent = nullptr)
         : QWidget(parent),
-          my_id(_id),
-          dims(_dims)
+          dims(_dims),
+          my_id(_id)
     {    }
 
     ~DisplayInterface() {}
@@ -25,6 +26,17 @@ public:
     {
         return dims;
     }
+
+    virtual size_t get_num_points() const = 0;
+
+    virtual std::shared_ptr< QVector<double> >  get_x_values() const = 0;
+
+    virtual std::shared_ptr< QVector<double> >  get_y_values() const = 0;
+
+    virtual void set_curve(const QVector<double> & _x_array,
+                           const QVector<double> & _y_array,
+                           bool replace = true, int after = 1,
+                           bool symbols = false, bool line = false) = 0;
 
     inline QString get_file_name() const
     {
@@ -40,7 +52,7 @@ public:
 
     virtual void set_display(void*_in) = 0;
 
-    virtual void  set_no_controls(bool) = 0;
+    virtual void set_no_controls(bool) = 0;
 
 protected:
 

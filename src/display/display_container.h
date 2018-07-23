@@ -30,7 +30,7 @@ class Display_container : public QwtPlot
 {
     Q_OBJECT
 public:
-	explicit Display_container(int _num_dim, QWidget *parent = nullptr);
+    explicit Display_container(int _num_dim, QWidget *parent = nullptr);
 
     /** \addtogroup Setters
      *  @{
@@ -38,7 +38,9 @@ public:
     //!
     virtual void set_display(const QVector<double> & _y_array);
     virtual void set_display(const QVector<double> & _x_array,
-        const QVector<double> & _y_array, bool symbols = false);
+                             const QVector<double> & _y_array,
+                             bool replace = true, int after = 1,
+                             bool symbols = false, bool line = false);
     //! Set the data array, initialise x_data and update() display, by reference
     virtual void set_display(const QVector<double>&, int row_size) = 0;
     //! Set the data array, initialise x_data and update() display, by pointer
@@ -54,18 +56,24 @@ public:
 
     virtual void set_display(void*) = 0;
 
-	virtual void set_color_map(int i);
+    virtual void set_color_map(int i);
 
     /** @}*/
 
-	virtual int get_num_data() const;
+    virtual int get_num_data() const;
 
     inline int get_num_dimensions() const
     {
         return num_dim;
     }
 
+    virtual size_t get_x_axis_size() const = 0;
+
     virtual ~Display_container();
+
+    virtual std::shared_ptr< QVector<double> >  get_x_values() const;
+
+    virtual std::shared_ptr< QVector<double> >  get_y_values() const;
 
 public slots:
     //! Update the display contents

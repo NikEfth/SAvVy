@@ -40,7 +40,9 @@ public:
     virtual void set_display(const QVector<double> & _y_array);
 
     virtual void set_display(const QVector<double> & _x_array,
-                     const QVector<double> & _y_array, bool symbols = false);
+                             const QVector<double> & _y_array,
+                             bool replace = true, int after = 1,
+                             bool symbols = false, bool line = false) override;
     //! Set the data array, initialise x_data and update() display, by reference
     virtual void set_display(const QVector<double>&, int row_size);
     //! Set the data array, initialise x_data and update() display, by pointer
@@ -60,10 +62,15 @@ public:
 
     /** @}*/
 
+    virtual size_t get_x_axis_size() const;
 
     virtual ~Display_container_1d();
     //! Clear the data and x_data
     void clear();
+
+    virtual std::shared_ptr< QVector<double> >  get_x_values() const;
+
+    virtual std::shared_ptr< QVector<double> >  get_y_values() const;
 
 public slots:
     virtual void update_scene(int i = 0);
