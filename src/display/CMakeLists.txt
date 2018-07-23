@@ -18,30 +18,29 @@ target_sources(savvy_display
     "${CMAKE_CURRENT_LIST_DIR}/display_container_3d.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/display_container_3d.h"
     "${CMAKE_CURRENT_LIST_DIR}/display_container_bar.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/display_container_bar.h"
-    )
+    "${CMAKE_CURRENT_LIST_DIR}/display_container_bar.h")
 
-include_directories( ${Qwt_INCLUDE_DIRS})
+include_directories(${Qwt_INCLUDE_DIRS})
 link_directories(${Qwt_LIBRARIES_DIR})
 
 if(UNIX OR APPLE)
-    find_library (GSL_LIBRARY
-        NAMES gsl IMPORTED)
-    find_library (GSL_BLAS_LIBRARY
-        NAMES gslcblas IMPORTED)
-endif()
 
+    find_library(GSL_LIBRARY NAMES gsl IMPORTED)
+
+    find_library(GSL_BLAS_LIBRARY NAMES gslcblas IMPORTED)
+
+endif()
 
 if(WIN32)
-    find_library (GSL_LIBRARY
-        NAMES gsl_ddl gsl_ddl_d IMPORTED)
 
-set(GSL_INCLUDE_DIR "default value" CACHE FILEPATH "description")
-include_directories(${GSL_INCLUDE_DIR})
-	add_definitions(-D QWT_DLL)
+    find_library(GSL_LIBRARY NAMES gsl_ddl gsl_ddl_d IMPORTED)
+
+    set(GSL_INCLUDE_DIR "default value" CACHE FILEPATH "description")
+
+    include_directories(${GSL_INCLUDE_DIR})
+
+    add_definitions(-D QWT_DLL)
+
 endif()
-    
-#target_include_directories(savvy_gui PUBLIC "${SAVVY_INCLUDE_DIR}")
-target_link_libraries(savvy_display PUBLIC Qt5::Core Qt5::Widgets Qt5::Gui qwt ${GSL_LIBRARY}
-    ${GSL_BLAS_LIBRARY})
- 
+
+target_link_libraries(savvy_display PUBLIC Qt5::Core Qt5::Widgets Qt5::Gui qwt ${GSL_LIBRARY} ${GSL_BLAS_LIBRARY})

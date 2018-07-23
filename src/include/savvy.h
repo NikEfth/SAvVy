@@ -8,268 +8,311 @@
 #include "stir/Array.h"
 #include "stir/VoxelsOnCartesianGrid.h"
 
-namespace savvy {
-
-template<class T>
-void copy_QVector(const QVector<T >& in,
-                  QVector<T>& out, T& _min, T& _max)
+namespace savvy
 {
+template<class T>
+void copy_QVector(const QVector<T> &in, QVector<T> &out, T &_min, T &_max)
+{
+    assert(in.size() > 0);
+
     int row_num = in.size();
-    assert(row_num > 0);
 
     if(out.size() != row_num)
+    {
         out.resize(row_num);
-
-    for(int i = 0; i < row_num; ++i)
-    {
-        T val = in[i];
-        if(val != 0.0)
-        {
-            out[i] = val;
-
-            if (val >  _max)
-                _max = val ;
-            else if(val<  _min)
-                _min = val ;
-        }
     }
-}
 
-
-template<class T>
-void serialize_QVector(const QVector<QVector<T> >& in,
-                       QVector<T>& out, T& _min, T& _max)
-{
-    assert(in.size() > 0);
-    int row_num = in.size();
-    assert(in[0].size() > 0);
-    int row_size = in[0].size();
-
-    if(out.size() == 0)
-        out.resize(row_num*row_size);
-
-    int idx = 0;
     for(int i = 0; i < row_num; ++i)
-        for(int j = 0; j < row_size; ++j, ++idx)
-        {
-            T val = in[i][j];
-            if(val != 0.0)
-            {
-                out[idx] = val;
-
-                if (val >  _max )
-                    _max = val ;
-                else if(val<  _min)
-                    _min = val ;
-            }
-        }
-}
-
-template<class T>
-void serialize_QVector(const QVector<QVector<T> > & in,
-                       QVector< QVector<T> >& out, QVector<T>& _min, QVector<T>& _max)
-{
-
-    assert(in.size() > 0);
-    int row_num  = in.size();
-    assert(in[0].size() > 0);
-    int row_size = in[0].size();
-
-    if(out.size() == 0)
-        out.resize(row_num*row_size);
-
-    int  idx = 0;
-
-    for(int j = 0; j < row_num; ++j)
-        for(int k =  0; k <  row_size; ++k, ++idx)
-        {
-            double val =  in[j][k];
-            if (val != 0.0)
-            {
-                out[0][idx] = val;
-
-                if (val >  _max[0] )
-                    _max[0] = val ;
-                else if(val<  _min[0])
-                    _min[0] = val ;
-            }
-        }
-}
-
-
-template<class T>
-void serialize_QVector(const QVector<QVector<QVector<T> > >& in,
-                       QVector< QVector<T> >& out, QVector<T>& _min, QVector<T>& _max)
-{
-    assert(in.size() > 0);
-    int data_num  = in.size();
-    assert(in[0].size() > 0);
-    int row_num  = in[0].size();
-    assert(in[0][0].size() > 0);
-    int row_size = in[0][0].size();
-
-    assert(out.size() == data_num);
-
-    int idp = 0, idx = 0;
-    for(int i =  0; i <  data_num; ++i, ++idp)
     {
-        for(int j = 0; j < row_num; ++j)
-            for(int k =  0; k <  row_size; ++k, ++idx)
-            {
-                double val =  in[i][j][k];
-                if (val != 0.f)
-                {
-                    out[idp][idx] = val;
+        if(in[i] != 0.0)
+        {
+            out[i] = in[i];
 
-                    if (val >_max[idp])
-                        _max[idp] = val;
-                    else if(val < _min[idp])
-                        _min[idp] = val;
+            if (in[i] >  _max)
+            {
+                _max = in[i];
+            }
+            else
+            {
+                if(in[i]<  _min)
+                {
+                    _min = in[i];
                 }
             }
-        idx = 0;
+        }
     }
 }
 
 template<class T>
-void serialize_QVector(const QVector<QVector<QVector<T> > >& in,
-                       QVector<T> & out, T& _min, T& _max)
+void serialize_QVector(const QVector<QVector<T>> &in, QVector<T> &out, T &_min, T &_max)
 {
     assert(in.size() > 0);
-    int data_num  = in.size();
     assert(in[0].size() > 0);
-    int row_num  = in[0].size();
+
+    int row_num = in.size();
+    int row_size = in[0].size();
+
+    if(out.size() == 0)
+    {
+        out.resize(row_num * row_size);
+    }
+
+    for(int i = 0; i < row_num; ++i)
+    {
+        for(int j = 0; j < row_size; ++j)
+        {
+            if(in[i][j] != 0.0)
+            {
+                out[(row_size * i) + j] = in[i][j];
+
+                if (in[i][j] > _max)
+                {
+                    _max = in[i][j];
+                }
+                else
+                {
+                    if(in[i][j] < _min)
+                    {
+                        _min = in[i][j];
+                    }
+                }
+            }
+        }
+    }
+}
+
+template<class T>
+void serialize_QVector(const QVector<QVector<T>> &in, QVector<QVector<T>> &out, QVector<T> &_min, QVector<T> &_max)
+{
+    assert(in.size() > 0);
+    assert(in[0].size() > 0);
+
+    int row_num  = in.size();
+    int row_size = in[0].size();
+
+    if(out.size() == 0)
+    {
+        out.resize(row_num * row_size);
+    }
+
+    for(int i = 0; i < row_num; ++i)
+    {
+        for(int j =  0; j <  row_size; ++j)
+        {
+            if (in[i][j] != 0.0)
+            {
+                out[0][(row_size * i) + j] = in[i][j];
+
+                if (in[i][j] > _max[0])
+                {
+                    _max[0] = in[i][j];
+                }
+                else
+                {
+                    if(in[i][j]< _min[0])
+                    {
+                        _min[0] = in[i][j];
+                    }
+                }
+            }
+        }
+    }
+}
+
+template<class T>
+void serialize_QVector(const QVector<QVector<QVector<T>>> &in, QVector<T> &out, T &_min, T &_max)
+{
+    assert(in.size() > 0);
+    assert(in[0].size() > 0);
     assert(in[0][0].size() > 0);
+
+    int data_num  = in.size();
+    int row_num  = in[0].size();
     int row_size = in[0][0].size();
 
     if(out.size() == 0)
-        out.resize(row_num*row_size*data_num);
+    {
+        out.resize(row_num * row_size * data_num);
+    }
 
-    int idx = 0;
     for(int i =  0; i <  data_num; ++i)
     {
         for(int j = 0; j < row_num; ++j)
-            for(int k =  0; k <  row_size; ++k, ++idx)
+        {
+            for(int k = 0; k < row_size; ++k)
             {
-                double val =  in[i][j][k];
-                if (val != 0.f)
+                if (in[i][j][k] != 0.0)
                 {
-                    out[idx] = val;
+                    out[(row_size * j) + k] = in[i][j][k];
 
-                    if (val >_max)
-                        _max = val;
-                    else if(val < _min)
-                        _min = val;
+                    if (in[i][j][k] >_max)
+                    {
+                        _max = in[i][j][k];
+                    }
+                    else
+                    {
+                        if(in[i][j][k] < _min)
+                        {
+                            _min = in[i][j][k];
+                        }
+                    }
                 }
             }
-        idx = 0;
+        }
     }
 }
 
+template<class T>
+void serialize_QVector(const QVector<QVector<QVector<T>>> &in, QVector<QVector<T>> &out, QVector<T> &_min, QVector<T> &_max)
+{
+    assert(in.size() > 0);
+    assert(in[0].size() > 0);
+    assert(in[0][0].size() > 0);
+
+    assert(out.size() == in.size());
+
+    int data_num  = in.size();
+    int row_num  = in[0].size();
+    int row_size = in[0][0].size();
+
+    for(int i = 0; i < data_num; ++i)
+    {
+        for(int j = 0; j < row_num; ++j)
+        {
+            for(int k = 0; k < row_size; ++k)
+            {
+                if (in[i][j][k] != 0.0)
+                {
+                    out[i][(row_size * j) + k] = in[i][j][k];
+
+                    if (in[i][j][k] >_max[i])
+                    {
+                        _max[i] = in[i][j][k];
+                    }
+                    else
+                    {
+                        if(in[i][j][k] < _min[i])
+                        {
+                            _min[i] = in[i][j][k];
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 //!
 //! \brief deserialize_QVector
 //! \param in
 //! \param out
-//! \warning Be carefull that [XxY] = size_row_vector
+//! \warning Be carefull that [X * Y] = size_row_vector
+//!
 template<class T>
-void deserialize_QVector(const QVector<T>& in,
-                         QVector<QVector<T> >& out)
+void deserialize_QVector(const QVector<T> &in, QVector<QVector<T>> &out)
 {
     assert(in.size() > 0);
-    int size = in.size();
 
-    int s = sqrt(size);
-    assert((s * s) == size);
+    int size = in.size();
+    int size_sqrt = static_cast<int>(sqrt(size));
 
     if(out.size() == 0)
     {
-        out.resize(s);
+        out.resize(size_sqrt);
 
-        for (int i = 0; i < s; ++i)
-            out[i].resize(s);
-    }
-
-    int idx = 0;
-
-    for(int i = 0; i < s; ++i)
-        for(int j = 0; j < s; ++j, ++idx)
-            out[i][j] = in[idx];
-}
-
-static void decompose_Array1D_to_QVectors_XY(const stir::Array<1, float> & input,
-                                             QVector<double> & x_values, QVector<double> & y_values)
-{
-
-    if (input.size() > static_cast<size_t>(x_values.size()))
-        x_values.resize(static_cast<int>(input.size()));
-
-    if(input.size() > static_cast<size_t>(y_values.size()))
-        y_values.resize(static_cast<int>(input.size()));
-
-    QVector<double>::iterator xot = x_values.begin();
-    QVector<double>::iterator yot = y_values.begin();
-
-    double x_spacing = static_cast<double>(input.get_max_index() - input.get_min_index()) / input.get_length();
-        int idx = 0;
-    for (stir::Array<1, float>::const_full_iterator it = input.begin_all_const(); it != input.end_all(); ++it, ++xot, ++yot,
-         ++idx)
-    {
-        *yot = static_cast<double>(*it);
-        *xot = static_cast<double>(input.get_min_index()) + x_spacing*idx;
-    }
-}
-
-
-static void Array1D_QVector1D(const stir::Array<1, float> & input,
-                              QVector<double> & output, double& _min, double& _max)
-{
-
-    assert(output.size() > 0 );
-    QVector<double>::iterator ot = output.begin();
-
-    for (stir::Array<1, float>::const_full_iterator it = input.begin_all_const(); it != input.end_all(); ++it, ++ot)
-    {
-        double val =static_cast<double>(*it);
-
-        if(val != 0.0)
+        for(int i = 0; i < size_sqrt; ++i)
         {
-            *ot = val;
-            if (val >  _max )
-                _max = val ;
-            else if(val<  _min)
-                _min = val ;
+            out[i].resize(size_sqrt);
+        }
+    }
+
+    for(int i = 0; i < size_sqrt; ++i)
+    {
+        for(int j = 0; j < size_sqrt; ++j)
+        {
+            out[i][j] = in[(size_sqrt * i) + j];
         }
     }
 }
 
-static void Array2D_QVector1D(const stir::Array<2, float> & input,
-                              QVector<double> & output, double& _min, double& _max)
+static void decompose_Array1D_to_QVectors_XY(const stir::Array<1, float> &input, QVector<double> &x_values, QVector<double> &y_values)
 {
-
-    assert(output.size() > 0 );
-    QVector<double>::iterator ot = output.begin();
-
-    for (stir::Array<2, float>::const_full_iterator it = input.begin_all_const(); it != input.end_all(); ++it, ++ot)
+    if (input.size() > static_cast<size_t>(x_values.size()))
     {
-        double val =static_cast<double>(*it);
+        x_values.resize(static_cast<int>(input.size()));
+    }
 
-        if(val != 0.0)
+    if(input.size() > static_cast<size_t>(y_values.size()))
+    {
+        y_values.resize(static_cast<int>(input.size()));
+    }
+
+    double x_spacing = static_cast<double>(input.get_max_index() - input.get_min_index()) / static_cast<double>(input.size());
+
+    for(int i = 0; i < input.size(); ++i)
+    {
+        x_values[i] = static_cast<double>(input.get_min_index()) + (x_spacing * static_cast<double>(i));
+        y_values[i] = static_cast<double>(input[input.get_min_index() + i]);
+    }
+}
+
+
+static void Array1D_QVector1D(const stir::Array<1, float> &input, QVector<double> &output, double &_min, double &_max)
+{
+    assert(output.size() > 0);
+
+    for(int i = 0; i < input.size(); ++i)
+    {
+        if(static_cast<double>(input[input.get_min_index() + i]) != 0.0)
         {
-            *ot = val;
-            if (val >  _max )
-                _max = val ;
-            else if(val<  _min)
-                _min = val ;
+            output[i] = static_cast<double>(input[input.get_min_index() + i]);
+
+            if (static_cast<double>(input[input.get_min_index() + i]) > _max)
+            {
+                _max = static_cast<double>(input[input.get_min_index() + i]);
+            }
+            else
+            {
+                if(static_cast<double>(input[input.get_min_index() + i])<  _min)
+                {
+                    _min = static_cast<double>(input[input.get_min_index() + i]) ;
+                }
+            }
+        }
+    }
+}
+
+static void Array2D_QVector1D(const stir::Array<2, float> &input, QVector<double> &output, double &_min, double &_max)
+{
+    assert(output.size() > 0);
+
+    for(int i = 0; i < input.size(); ++i)
+    {
+        for(int j = 0; j < input[input.get_min_index() + i].size(); ++j)
+        {
+            if(static_cast<double>(input[input.get_min_index() + i][input[input.get_min_index() + i].get_min_index() + j]) != 0.0)
+            {
+                output[(input[input.get_min_index() + i].size() * i) + j] = static_cast<double>(input[input.get_min_index() + i][input[input.get_min_index() + i].get_min_index() + j]);
+
+                if (static_cast<double>(input[input.get_min_index() + i][input[input.get_min_index() + i].get_min_index() + j]) > _max)
+                {
+                    _max = static_cast<double>(input[input.get_min_index() + i][input[input.get_min_index() + i].get_min_index() + j]);
+                }
+                else
+                {
+                    if(static_cast<double>(input[input.get_min_index() + i][input[input.get_min_index() + i].get_min_index() + j]) < _min)
+                    {
+                        _min = static_cast<double>(input[input.get_min_index() + i][input[input.get_min_index() + i].get_min_index() + j]);
+                    }
+                }
+            }
         }
     }
 }
 
 //!\todo montage
-static void Array3D_QVector1D(const stir::Array<3, float> & input,
-                              QVector<double> & output, double& _min, double& _max)
+static void Array3D_QVector1D(const stir::Array<3, float> &input, QVector<double> &output, double &_min, double &_max)
 {
-
     assert(output.size() > 0 );
     QVector<double>::iterator ot = output.begin();
 
@@ -375,7 +418,6 @@ static void Array3D_QVector3D(const stir::Array<3, float> & input,
         ij = 0;
     }
 }
-
 }
 
-#endif
+#endif //SAVVY_H
