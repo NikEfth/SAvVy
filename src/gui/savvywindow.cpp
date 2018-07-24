@@ -27,7 +27,7 @@ SavvyWindow::SavvyWindow(QWidget *parent) :
     ui(new Ui::SavvyWindow)
 {
     ui->setupUi(this);
-    QSettings settings;
+    QSettings settings("settings", QSettings::IniFormat, this);;
 
     restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
     restoreState(settings.value("mainWindowState").toByteArray());
@@ -72,7 +72,7 @@ void SavvyWindow::closeEvent(QCloseEvent *event)
     }
     else
     {
-        QSettings settings;
+        QSettings settings("settings", QSettings::IniFormat, this);;
         settings.setValue("mainWindowGeometry", saveGeometry());
         settings.setValue("mainWindowState", saveState());
         event->accept();
@@ -511,7 +511,7 @@ void SavvyWindow::shadeSubWindows()
 
 bool SavvyWindow::hasRecentFiles()
 {
-    QSettings settings;
+    QSettings settings("settings", QSettings::IniFormat);
     const int count = settings.beginReadArray(recentFilesKey());
     settings.endArray();
     return count > 0;
@@ -519,7 +519,7 @@ bool SavvyWindow::hasRecentFiles()
 
 void SavvyWindow::prependToRecentFiles(const QString &fileName)
 {
-    QSettings settings;
+    QSettings settings("settings", QSettings::IniFormat, this);
 
     const QStringList oldRecentFiles = readRecentFiles(settings);
     QStringList recentFiles = oldRecentFiles;
@@ -539,7 +539,7 @@ void SavvyWindow::setRecentFilesVisible(bool visible)
 
 void SavvyWindow::updateRecentFileActions()
 {
-    QSettings settings;
+    QSettings settings("settings", QSettings::IniFormat, this);;
 
     const QStringList recentFiles = readRecentFiles(settings);
     const int count = qMin(int(MaxRecentFiles), recentFiles.size());
@@ -1167,7 +1167,7 @@ void SavvyWindow::on_actionAbout_triggered()
 
 void SavvyWindow::on_actionAbout_Plugins_triggered()
 {
-    QSettings settings;
+    QSettings settings("settings", QSettings::IniFormat, this);
     if(settings.contains("PluginsPath"))
         pluginsDir.setPath(settings.value("PluginsPath").toString());
 
@@ -1180,7 +1180,7 @@ void SavvyWindow::loadPlugins()
     foreach (QObject *plugin, QPluginLoader::staticInstances())
         populateMenus(plugin);
 
-    QSettings settings;
+    QSettings settings("settings", QSettings::IniFormat, this);;
     if(settings.contains("PluginsPath"))
         pluginsDir = settings.value("PluginsPath").toString();
     else

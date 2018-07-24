@@ -142,7 +142,7 @@ Savvy_settings::Savvy_settings(QWidget *parent) :
     general_setts->setHidden(true);
     view_setts->setHidden(true);
 
-    QSettings settings;
+    QSettings settings("settings", QSettings::IniFormat, this);
     view_setts->colorMapCombo->setCurrentIndex(settings.value("defaultColorMap").toInt());
     general_setts->autoContrast->setChecked(settings.value("AutoScaleImages").toBool());
     general_setts->pluginsPath->setText(settings.value("PluginsPath").toString());
@@ -182,7 +182,7 @@ void Savvy_settings::on_listWidget_currentRowChanged(int currentRow)
 
 void Savvy_settings::on_save_settings()
 {
-    QSettings settings;
+    QSettings settings("settings", QSettings::IniFormat, this);
     settings.setValue("defaultColorMap", view_setts->colorMapCombo->currentIndex());
     settings.setValue("AutoScaleImages", general_setts->autoContrast->isChecked());
     settings.setValue("PluginsPath", general_setts->pluginsPath->text());

@@ -67,7 +67,7 @@ void Display_container_2d::set_display(const QVector<QVector<double> > &_array)
     row_size = _array[0].size();
     row_num = _array.size();
 
-    data = new QVector< double >(_array.size(), 0.0);
+    data = new QVector< double >(row_size * row_num, 0.0);
     savvy::serialize_QVector(_array, *data, (*min_value)[0] ,(*max_value)[0] );
 
     set_axis();

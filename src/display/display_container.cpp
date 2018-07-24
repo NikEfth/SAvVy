@@ -48,9 +48,11 @@ void Display_container::set_display(const QVector<double> & _x_array,
 std::shared_ptr< QVector<double> >  Display_container::get_x_values() const
 {
     //! \todo Do something for raster data
+	return nullptr; 
 }
 
 std::shared_ptr< QVector<double> >  Display_container::get_y_values() const
 {
     //! \todo Do something for raster data
+	return nullptr; 
 }
