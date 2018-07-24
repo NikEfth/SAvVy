@@ -365,12 +365,12 @@ void SavvyWindow::create_docks()
     //    dc_right->setWidget(toolMan);
 
     dc_opened_files = new QDockWidget("Opened Files", this);
-    pnl_workspace = new Workspace(this);
+    pnl_workspace.reset(new Workspace(this));
     connect(ui->mdiArea, &QMdiArea::subWindowActivated,
-            pnl_workspace, &Workspace::updateGUI);
-    connect(pnl_workspace, &Workspace::display_current,
+            pnl_workspace.get(), &Workspace::updateGUI);
+    connect(pnl_workspace.get(), &Workspace::display_current,
             this, &SavvyWindow::display_array);
-    dc_opened_files->setWidget(pnl_workspace);
+    dc_opened_files->setWidget(pnl_workspace.get());
 
     dc_displayed_files = new QDockWidget("Displayed Files", this);
     pnl_displayed_files = new Panel_displayed_files(this);
@@ -1214,6 +1214,8 @@ void SavvyWindow::loadPlugins()
 void SavvyWindow::populateMenus(QObject *plugin)
 {
     ExternalInterface *iProc = qobject_cast<ExternalInterface *>(plugin);
+    iProc->show_workspace_operations(true);
+    iProc->load_from_workspace(pnl_workspace);
     if (iProc)
         addToMenu(iProc, iProc->get_name(), ui->menuPlugins);
 }
@@ -1225,6 +1227,6 @@ void SavvyWindow::addToMenu(ExternalInterface *plugin, const QString text,
     QAction *action = new QAction(text, plugin);
     loaded_plugins.append(action);
 
-    connect(loaded_plugins.back(), SIGNAL(triggered()), plugin, SLOT(exec()));
+    connect(loaded_plugins.back(), SIGNAL(triggered()), plugin, SLOT(show()));
     menu->addAction(action);
 }

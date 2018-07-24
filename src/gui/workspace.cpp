@@ -7,8 +7,8 @@
 
 Workspace::Workspace(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Workspace),
-    next_dataset_id(0)
+    next_dataset_id(0),
+    ui(new Ui::Workspace)
 {
     ui->setupUi(this);
 
@@ -27,6 +27,8 @@ void Workspace::updateGUI()
     ui->remove_array->setEnabled(hasData);
     ui->display_array->setEnabled(hasData);
     ui->duplicate_array->setEnabled(hasData);
+    ui->psh_move_down->setEnabled(hasData);
+    ui->psh_move_up->setEnabled(hasData);
 }
 
 
@@ -83,7 +85,7 @@ Workspace::get_array_ptr(int _i)
 {
     if (_i < openned_files.size())
         return openned_files[_i];
-	return nullptr;
+    return nullptr;
 }
 
 std::shared_ptr<stir::ArrayInterface>
@@ -108,7 +110,7 @@ QString Workspace::get_array_name(int _i)
 {
     if (_i < ui->listOpenedFiles->count())
         return ui->listOpenedFiles->item(_i)->text();
-	return QString("");
+    return QString("");
 }
 
 QString Workspace::get_current_name()
@@ -144,9 +146,9 @@ bool Workspace::has_grouped_items() const
 
 QStringList Workspace::get_groupped() const
 {
-	QStringList ret; 
+    QStringList ret;
     //    return grouped_files;
-	return ret; 
+    return ret;
 }
 
 std::shared_ptr <stir::ArrayInterface> Workspace::open_array(const QString& fileName)
@@ -229,4 +231,41 @@ void Workspace::on_duplicate_array_clicked()
 
     append_to_workspace(wtmp, "copyOf_" + ui->listOpenedFiles->item(current_row)->text() );
     updateGUI();
+}
+
+void Workspace::move_item(int new_location)
+{
+
+}
+
+void Workspace::on_psh_move_up_clicked()
+{
+    int cur_indx = ui->listOpenedFiles->currentRow();
+    if (cur_indx > 0)
+    {
+        int move_to = cur_indx - 1;
+
+        QListWidgetItem* itm = ui->listOpenedFiles->takeItem(cur_indx);
+        ui->listOpenedFiles->insertItem(move_to, itm);
+        ui->listOpenedFiles->setCurrentRow(move_to);
+
+        openned_files.move(cur_indx, move_to);
+    }
+
+}
+
+void Workspace::on_psh_move_down_clicked()
+{
+    int cur_indx = ui->listOpenedFiles->currentRow();
+    if (cur_indx < ui->listOpenedFiles->count())
+    {
+        int move_to = cur_indx + 1;
+
+        QListWidgetItem* itm = ui->listOpenedFiles->takeItem(cur_indx);
+        ui->listOpenedFiles->insertItem(move_to, itm);
+        ui->listOpenedFiles->setCurrentRow(move_to);
+
+        openned_files.move(cur_indx, move_to);
+    }
+
 }

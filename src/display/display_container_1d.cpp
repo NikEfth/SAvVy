@@ -44,12 +44,12 @@ Display_container_1d::Display_container_1d(const QVector<QVector< QVector<double
 
 std::shared_ptr< QVector<double> >  Display_container_1d::get_x_values() const
 {
-    return std::shared_ptr<QVector<double> >(new QVector<double>(*data));
+    return std::shared_ptr<QVector<double> >(new QVector<double>(*x_data));
 }
 
 std::shared_ptr< QVector<double> >  Display_container_1d::get_y_values() const
 {
-    return std::shared_ptr<QVector<double> >(new QVector<double>(*x_data));
+    return std::shared_ptr<QVector<double> >(new QVector<double>(*data));
 
 }
 

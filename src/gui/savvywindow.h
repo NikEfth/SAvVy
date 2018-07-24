@@ -7,6 +7,8 @@
 #include <QDir>
 #include <QActionGroup>
 
+#include <memory>
+
 // GUI elements
 #include "src/gui/workspace.h"
 #include "src/gui/panel_displayed_files.h"
@@ -50,7 +52,7 @@ private slots:
     void on_actionStart_GUI_tests_triggered();
 
     //! Update the state of the interface after every subwindown action
-    void updateGUI(QMdiSubWindow *activeSubWindow = NULL);
+    void updateGUI(QMdiSubWindow *activeSubWindow = nullptr);
 
     /** \addtogroup MDI
      *  @{
@@ -153,7 +155,7 @@ private:
 
     Panel_displayed_files* pnl_displayed_files;
 
-    Workspace* pnl_workspace;
+    std::shared_ptr<Workspace> pnl_workspace;
 
     Panel_opened_file_controls* pnl_opened_file_controls;
 

@@ -3,6 +3,9 @@
 
 #include <QtPlugin>
 #include <QDialog>
+#include <memory>
+
+#include "src/gui/workspace.h"
 
 class ExternalInterface : public QDialog
 {
@@ -13,9 +16,11 @@ public:
 
     virtual ~ExternalInterface() {}
 
-    virtual void load_from_workspace() = 0;
+    virtual void load_from_workspace(std::shared_ptr<Workspace> ) = 0;
 
-    virtual void return_to_workspace() = 0;
+    virtual void return_to_workspace(std::shared_ptr<Workspace> ) = 0;
+
+    virtual void show_workspace_operations(bool state) = 0;
 
     QString get_name()
     {

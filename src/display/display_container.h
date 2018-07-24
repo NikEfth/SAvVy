@@ -69,7 +69,7 @@ public:
 
     virtual size_t get_x_axis_size() const = 0;
 
-    virtual ~Display_container();
+    virtual ~Display_container() override;
 
     virtual std::shared_ptr< QVector<double> >  get_x_values() const;
 
@@ -95,9 +95,9 @@ protected:
     //! from various places.
     void closeEvent(QCloseEvent *event) override;
 
-    QVector< double >* min_value = NULL;
+    QVector< double >* min_value = nullptr;
 
-    QVector< double >* max_value = NULL;
+    QVector< double >* max_value = nullptr;
 
     int num_dim;
 

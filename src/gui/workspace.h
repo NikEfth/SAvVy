@@ -25,7 +25,7 @@ class Workspace : public QWidget
     Q_OBJECT
 
 public:
-    explicit Workspace(QWidget *parent = 0);
+    explicit Workspace(QWidget *parent = nullptr);
     ~Workspace();
     //! Change the name of  the item in ui->ListOpenedFiles
     void rename(const QString& _id, QString _new_name);
@@ -86,6 +86,10 @@ private slots:
 
     void on_duplicate_array_clicked();
 
+    void on_psh_move_up_clicked();
+
+    void on_psh_move_down_clicked();
+
 private:
 
     //! \details This member holds an incremental number for  every window that
@@ -93,13 +97,15 @@ private:
     //! 1.
     qint16 next_dataset_id;
     //! Create a new record in ui->listOpenedFiles with the specified name
-//    void append_to_openedFiles(const QString&);
+    //    void append_to_openedFiles(const QString&);
     //! Remove from listOpenedFiles the item at row _id
     void remove_from_workspace(int _id);
 
     Ui::Workspace *ui;
     //! All the openned files are held by this vector
     QVector< std::shared_ptr<stir::ArrayInterface> > openned_files;
+
+    void move_item(int new_location);
 };
 
 
