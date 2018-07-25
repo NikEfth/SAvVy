@@ -1,33 +1,38 @@
 #ifndef SAVVY_INTERFACE_H
 #define SAVVY_INTERFACE_H
 
+#define ExternalInterface_iid "org.Savvy.ExternalInterface"
+
 #include <QtPlugin>
 #include <QDialog>
 
 class ExternalInterface : public QDialog
 {
 public:
-    explicit ExternalInterface(QWidget *parent = 0) :
+    inline explicit ExternalInterface(QWidget *parent = nullptr) :
         QDialog(parent)
-    {}
-
-    virtual ~ExternalInterface() {}
-
-    virtual void load_from_workspace() = 0;
-
-    virtual void return_to_workspace() = 0;
-
-    QString get_name()
     {
-        return _name;
-    }
-protected:
-    QString _name;
-};
 
-#define ExternalInterface_iid "org.Savvy.ExternalInterface"
+    }
+
+    inline virtual ~ExternalInterface()
+    {
+
+    }
+
+    inline virtual void load_from_workspace() = delete;
+
+    inline virtual void return_to_workspace() = delete;
+
+    inline QString & get_name()
+    {
+        return m_name;
+    }
+
+private:
+    QString m_name;
+};
 
 Q_DECLARE_INTERFACE(ExternalInterface,ExternalInterface_iid)
 
-
-#endif
+#endif //SAVVY_INTERFACE_H

@@ -11,7 +11,7 @@
 namespace savvy
 {
 template<class T>
-void copy_QVector(const QVector<T> &in, QVector<T> &out, T &_min, T &_max)
+static int copy_QVector(const QVector<T> &in, QVector<T> &out, T &_min, T &_max)
 {
     assert(in.size() > 0);
 
@@ -41,10 +41,12 @@ void copy_QVector(const QVector<T> &in, QVector<T> &out, T &_min, T &_max)
             }
         }
     }
+
+    return 1;
 }
 
 template<class T>
-void serialize_QVector(const QVector<QVector<T>> &in, QVector<T> &out, T &_min, T &_max)
+static int serialize_QVector(const QVector<QVector<T>> &in, QVector<T> &out, T &_min, T &_max)
 {
     assert(in.size() > 0);
     assert(in[0].size() > 0);
@@ -79,10 +81,12 @@ void serialize_QVector(const QVector<QVector<T>> &in, QVector<T> &out, T &_min, 
             }
         }
     }
+
+    return 1;
 }
 
 template<class T>
-void serialize_QVector(const QVector<QVector<T>> &in, QVector<QVector<T>> &out, QVector<T> &_min, QVector<T> &_max)
+static int serialize_QVector(const QVector<QVector<T>> &in, QVector<QVector<T>> &out, QVector<T> &_min, QVector<T> &_max)
 {
     assert(in.size() > 0);
     assert(in[0].size() > 0);
@@ -117,10 +121,12 @@ void serialize_QVector(const QVector<QVector<T>> &in, QVector<QVector<T>> &out, 
             }
         }
     }
+
+    return 1;
 }
 
 template<class T>
-void serialize_QVector(const QVector<QVector<QVector<T>>> &in, QVector<T> &out, T &_min, T &_max)
+static int serialize_QVector(const QVector<QVector<QVector<T>>> &in, QVector<T> &out, T &_min, T &_max)
 {
     assert(in.size() > 0);
     assert(in[0].size() > 0);
@@ -160,10 +166,12 @@ void serialize_QVector(const QVector<QVector<QVector<T>>> &in, QVector<T> &out, 
             }
         }
     }
+
+    return 1;
 }
 
 template<class T>
-void serialize_QVector(const QVector<QVector<QVector<T>>> &in, QVector<QVector<T>> &out, QVector<T> &_min, QVector<T> &_max)
+static int serialize_QVector(const QVector<QVector<QVector<T>>> &in, QVector<QVector<T>> &out, QVector<T> &_min, QVector<T> &_max)
 {
     assert(in.size() > 0);
     assert(in[0].size() > 0);
@@ -200,6 +208,8 @@ void serialize_QVector(const QVector<QVector<QVector<T>>> &in, QVector<QVector<T
             }
         }
     }
+
+    return 1;
 }
 
 //!
@@ -209,7 +219,7 @@ void serialize_QVector(const QVector<QVector<QVector<T>>> &in, QVector<QVector<T
 //! \warning Be carefull that [X * Y] = size_row_vector
 //!
 template<class T>
-void deserialize_QVector(const QVector<T> &in, QVector<QVector<T>> &out)
+static int deserialize_QVector(const QVector<T> &in, QVector<QVector<T>> &out)
 {
     assert(in.size() > 0);
 
@@ -233,11 +243,13 @@ void deserialize_QVector(const QVector<T> &in, QVector<QVector<T>> &out)
             out[i][j] = in[(size_sqrt * i) + j];
         }
     }
+
+    return 1;
 }
 
-static void decompose_Array1D_to_QVectors_XY(const stir::Array<1, float> &input, QVector<double> &x_values, QVector<double> &y_values)
+static int decompose_Array1D_to_QVectors_XY(const stir::Array<1, float> &input, QVector<double> &x_values, QVector<double> &y_values)
 {
-    if (input.size() > static_cast<size_t>(x_values.size()))
+    if (input.size() > static_cast<unsigned long>(x_values.size()))
     {
         x_values.resize(static_cast<int>(input.size()));
     }
@@ -249,69 +261,76 @@ static void decompose_Array1D_to_QVectors_XY(const stir::Array<1, float> &input,
 
     double x_spacing = static_cast<double>(input.get_max_index() - input.get_min_index()) / static_cast<double>(input.size());
 
-    for(int i = 0; i < input.size(); ++i)
+    for(unsigned long i = 0; i < input.size(); ++i)
     {
-        x_values[i] = static_cast<double>(input.get_min_index()) + (x_spacing * static_cast<double>(i));
-        y_values[i] = static_cast<double>(input[input.get_min_index() + i]);
+        x_values[static_cast<int>(i)] = static_cast<double>(input.get_min_index()) + (x_spacing * static_cast<double>(i));
+        y_values[static_cast<int>(i)] = static_cast<double>(input[input.get_min_index() + static_cast<int>(i)]);
     }
+
+    return 1;
 }
 
 
-static void Array1D_QVector1D(const stir::Array<1, float> &input, QVector<double> &output, double &_min, double &_max)
+static int Array1D_QVector1D(const stir::Array<1, float> &input, QVector<double> &output, double &_min, double &_max)
 {
     assert(output.size() > 0);
 
-    for(int i = 0; i < input.size(); ++i)
+    for(unsigned long i = 0; i < input.size(); ++i)
     {
-        if(static_cast<double>(input[input.get_min_index() + i]) != 0.0)
+        if(static_cast<double>(input[input.get_min_index() + static_cast<int>(i)]) != 0.0)
         {
-            output[i] = static_cast<double>(input[input.get_min_index() + i]);
+            output[static_cast<int>(i)] = static_cast<double>(input[input.get_min_index() + static_cast<int>(i)]);
 
-            if (static_cast<double>(input[input.get_min_index() + i]) > _max)
+            if (static_cast<double>(input[input.get_min_index() + static_cast<int>(i)]) > _max)
             {
-                _max = static_cast<double>(input[input.get_min_index() + i]);
+                _max = static_cast<double>(input[input.get_min_index() + static_cast<int>(i)]);
             }
             else
             {
-                if(static_cast<double>(input[input.get_min_index() + i])<  _min)
+                if(static_cast<double>(input[input.get_min_index() + static_cast<int>(i)])<  _min)
                 {
-                    _min = static_cast<double>(input[input.get_min_index() + i]) ;
+                    _min = static_cast<double>(input[input.get_min_index() + static_cast<int>(i)]) ;
                 }
             }
         }
     }
+
+    return 1;
 }
 
-static void Array2D_QVector1D(const stir::Array<2, float> &input, QVector<double> &output, double &_min, double &_max)
+static int Array2D_QVector1D(const stir::Array<2, float> &input, QVector<double> &output, double &_min, double &_max)
 {
     assert(output.size() > 0);
 
-    for(int i = 0; i < input.size(); ++i)
+    for(unsigned long i = 0; i < input.size(); ++i)
     {
-        for(int j = 0; j < input[input.get_min_index() + i].size(); ++j)
+        for(unsigned long j = 0; j < input[input.get_min_index() + static_cast<int>(i)].size(); ++j)
         {
-            if(static_cast<double>(input[input.get_min_index() + i][input[input.get_min_index() + i].get_min_index() + j]) != 0.0)
+            if(static_cast<double>(input[input.get_min_index() + static_cast<int>(i)][input[input.get_min_index() + static_cast<int>(i)].get_min_index() + static_cast<int>(j)]) != 0.0)
             {
-                output[(input[input.get_min_index() + i].size() * i) + j] = static_cast<double>(input[input.get_min_index() + i][input[input.get_min_index() + i].get_min_index() + j]);
+                output[(static_cast<int>(input[input.get_min_index() + static_cast<int>(i)].size()) * static_cast<int>(i)) + static_cast<int>(j)] =
+                        static_cast<double>(input[input.get_min_index() + static_cast<int>(i)][input[input.get_min_index() + static_cast<int>(i)].get_min_index() + static_cast<int>(j)]);
 
-                if (static_cast<double>(input[input.get_min_index() + i][input[input.get_min_index() + i].get_min_index() + j]) > _max)
+                if (static_cast<double>(input[input.get_min_index() + static_cast<int>(i)][input[input.get_min_index() + static_cast<int>(i)].get_min_index() + static_cast<int>(j)]) > _max)
                 {
-                    _max = static_cast<double>(input[input.get_min_index() + i][input[input.get_min_index() + i].get_min_index() + j]);
+                    _max = static_cast<double>(input[input.get_min_index() + static_cast<int>(i)][input[input.get_min_index() + static_cast<int>(i)].get_min_index() + static_cast<int>(j)]);
                 }
                 else
                 {
-                    if(static_cast<double>(input[input.get_min_index() + i][input[input.get_min_index() + i].get_min_index() + j]) < _min)
+                    if(static_cast<double>(input[input.get_min_index() + static_cast<int>(i)][input[input.get_min_index() + static_cast<int>(i)].get_min_index() + static_cast<int>(j)]) < _min)
                     {
-                        _min = static_cast<double>(input[input.get_min_index() + i][input[input.get_min_index() + i].get_min_index() + j]);
+                        _min = static_cast<double>(input[input.get_min_index() + static_cast<int>(i)][input[input.get_min_index() + static_cast<int>(i)].get_min_index() + static_cast<int>(j)]);
                     }
                 }
             }
         }
     }
+
+    return 1;
 }
 
 //!\todo montage
-static void Array3D_QVector1D(const stir::Array<3, float> &input, QVector<double> &output, double &_min, double &_max)
+static int Array3D_QVector1D(const stir::Array<3, float> &input, QVector<double> &output, double &_min, double &_max)
 {
     assert(output.size() > 0 );
     QVector<double>::iterator ot = output.begin();
@@ -329,6 +348,8 @@ static void Array3D_QVector1D(const stir::Array<3, float> &input, QVector<double
                 _min = val ;
         }
     }
+
+    return 1;
 }
 
 //!
@@ -338,7 +359,7 @@ static void Array3D_QVector1D(const stir::Array<3, float> &input, QVector<double
 //! \param _min
 //! \param _max
 //! Transform a 3D Vector to a Vector 2D for dipslay
-static void Array3D_QVector2Ds(const stir::Array<3, float> & input,
+static int Array3D_QVector2Ds(const stir::Array<3, float> & input,
                                QVector<QVector<double> > & output, QVector<double>& _min, QVector<double>& _max)
 {
 
@@ -359,9 +380,11 @@ static void Array3D_QVector2Ds(const stir::Array<3, float> & input,
                         _min[idp] = val ;
                 }
             }
+
+    return 1;
 }
 
-static void Array2D_QVector2D(const stir::Array<2, float> & input,
+static int Array2D_QVector2D(const stir::Array<2, float> & input,
                               QVector<QVector<double> > & output)
 {
 
@@ -376,7 +399,7 @@ static void Array2D_QVector2D(const stir::Array<2, float> & input,
     assert(input.size() == output.size());
 
     int ii = 0, ij = 0;
-    for( int i = input.get_min_index(); i <= input.get_max_index(); ++i, ++ii)
+    for(int i = input.get_min_index(); i <= input.get_max_index(); ++i, ++ii)
     {
         for (int j = input[i].get_min_index(); j <= input[i].get_max_index(); ++j, ++ij)
         {
@@ -384,9 +407,11 @@ static void Array2D_QVector2D(const stir::Array<2, float> & input,
         }
         ij = 0;
     }
+
+    return 1;
 }
 
-static void Array3D_QVector3D(const stir::Array<3, float> & input,
+static int Array3D_QVector3D(const stir::Array<3, float> & input,
                               QVector<QVector<QVector<double> > > & output)
 {
     if (output.size() == 0)
@@ -417,6 +442,8 @@ static void Array3D_QVector3D(const stir::Array<3, float> & input,
         }
         ij = 0;
     }
+
+    return 1;
 }
 }
 
