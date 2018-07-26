@@ -25,7 +25,7 @@ class Panel_displayed_files : public QWidget
     Q_OBJECT
 
 public:
-    explicit Panel_displayed_files(QWidget *parent = 0);
+    explicit Panel_displayed_files(QWidget *parent = nullptr);
     ~Panel_displayed_files();
     //! Get the row of the Display_container that has _id
     qint16 findQListWidgetItem( const QString& _id);

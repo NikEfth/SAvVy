@@ -19,7 +19,7 @@ class GeneralSettings : public QWidget
     Q_OBJECT
 
 public:
-    explicit GeneralSettings(QWidget *parent = 0);
+    explicit GeneralSettings(QWidget *parent = nullptr);
 
      QCheckBox* autoPlotOpenedFiles;
 
@@ -46,7 +46,7 @@ class ViewSettings : public QWidget
     Q_OBJECT
 
 public:
-    explicit ViewSettings(QWidget *parent = 0);
+    explicit ViewSettings(QWidget *parent = nullptr);
 
     QVBoxLayout* mainLayout;
 
@@ -62,7 +62,7 @@ class AppearanceSettings : public QWidget
     Q_OBJECT
 
 public:
-    explicit AppearanceSettings(QWidget *parent = 0);
+    explicit AppearanceSettings(QWidget *parent = nullptr);
 
 
 };
@@ -77,7 +77,7 @@ class Savvy_settings : public QDialog
     Q_OBJECT
 
 public:
-    explicit Savvy_settings(QWidget *parent = 0);
+    explicit Savvy_settings(QWidget *parent = nullptr);
     ~Savvy_settings();
 
 private slots:

@@ -25,13 +25,13 @@ public:
 
     virtual ~Display_container_raster();
 protected:
-    QwtPlotSpectrogram *d_spectrogram = NULL;
+    QwtPlotSpectrogram *d_spectrogram = nullptr;
 
-    QwtMatrixRasterData *p_raster = NULL;
+    QwtMatrixRasterData *p_raster = nullptr;
 
-    QwtPlotRescaler *d_rescaler = NULL;
+    QwtPlotRescaler *d_rescaler = nullptr;
     //! Current ColorMap
-    display::ColorMap *myColorMap = NULL;
+    display::ColorMap *myColorMap = nullptr;
 
     int row_num;
 

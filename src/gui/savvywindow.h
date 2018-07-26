@@ -32,7 +32,7 @@ class SavvyWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit SavvyWindow(QWidget *parent = 0);
+    explicit SavvyWindow(QWidget *parent = nullptr);
     ~SavvyWindow();
 
 public slots:
@@ -50,7 +50,7 @@ private slots:
     void on_actionStart_GUI_tests_triggered();
 
     //! Update the state of the interface after every subwindown action
-    void updateGUI(QMdiSubWindow *activeSubWindow = NULL);
+    void updateGUI(QMdiSubWindow *activeSubWindow = nullptr);
 
     /** \addtogroup MDI
      *  @{

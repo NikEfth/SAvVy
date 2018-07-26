@@ -25,7 +25,7 @@ class Workspace : public QWidget
     Q_OBJECT
 
 public:
-    explicit Workspace(QWidget *parent = 0);
+    explicit Workspace(QWidget *parent = nullptr);
     ~Workspace();
     //! Change the name of  the item in ui->ListOpenedFiles
     void rename(const QString& _id, QString _new_name);

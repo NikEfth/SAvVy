@@ -16,9 +16,9 @@ class Display_manager : public DisplayInterface
     Q_OBJECT
 
 public:
-    explicit Display_manager(int _my_id, int _num_dim, QWidget *parent = 0);
+    explicit Display_manager(int _my_id, int _num_dim, QWidget *parent = nullptr);
 
-    explicit Display_manager(int _my_id, stir::ArrayInterface* __display, QWidget *parent = 0);
+    explicit Display_manager(int _my_id, stir::ArrayInterface* __display, QWidget *parent = nullptr);
 
     ~Display_manager();
 
@@ -34,6 +34,12 @@ public:
     //!
     virtual void set_display(void*_in)
     {
+        // to silence warning
+        if(_in)
+        {
+
+        }
+
         //        _display->set_display(_in);
     }
 

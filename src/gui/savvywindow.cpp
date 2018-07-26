@@ -130,6 +130,12 @@ bool SavvyWindow::open_file(const QString& fileName, bool _mute_open)
 {
     int num_of_data = 1;
 
+    // to silence warning
+    if(num_of_data)
+    {
+
+    }
+
     std::shared_ptr <stir::ArrayInterface> tmp_sptr =
             pnl_workspace->open_array(fileName);
 
@@ -204,7 +210,7 @@ QMdiSubWindow *SavvyWindow::findMdiChild(const QString &_id) const
         if (QString::number(mdiChild->get_my_id()) == _id)
             return window;
     }
-    return 0;
+    return nullptr;
 
 }
 
@@ -212,6 +218,12 @@ bool SavvyWindow::append_to_mdi(Display_container *child,
                                 bool prepend_to_recent,
                                 bool minimized)
 {
+    // to silence warning
+    if(child || prepend_to_recent || minimized)
+    {
+
+    }
+
     //    QObject::connect(child, &Display_container::aboutToClose, this, &SavvyWindow::remove_from_mdi);
 
     //    ui->mdiArea->addSubWindow(child);
@@ -230,6 +242,12 @@ bool SavvyWindow::append_to_mdi(Display_manager *child,
                                 bool prepend_to_recent,
                                 bool minimized)
 {
+    // to silence warning
+    if(prepend_to_recent)
+    {
+
+    }
+
     QObject::connect(child, &Display_manager::aboutToClose, this, &SavvyWindow::remove_from_mdi);
 
     ui->mdiArea->addSubWindow(child);
@@ -315,6 +333,11 @@ void SavvyWindow::on_actionDuplicate_triggered()
     Display_container* active =
             qobject_cast<Display_container *>(ui->mdiArea->activeSubWindow()->widget());
 
+    // to silence warning
+    if(active)
+    {
+
+    }
 
     //    active->rename(result);
 
@@ -730,8 +753,8 @@ bool SavvyWindow::create_test_2d_data()
     for (int i = test2->get_min_index(); i <= test2->get_max_index() ; ++i)
         for (int j = (*test2)[i].get_min_index(); j <= (*test2)[i].get_max_index() ; ++j)
         {
-            float f = sqrt(i*i + j*j);
-            if( f != 0)
+            float f = static_cast<float>(sqrt(i*i + j*j));
+            if( f != 0.0f)
                 (*test2)[i][j]  = sin(f) / f;
             else
                 (*test2)[i][j] = 1;
@@ -772,8 +795,8 @@ bool SavvyWindow::create_test_3d_data()
         for (int j = (*test5)[i].get_min_index(); j <= (*test5)[i].get_max_index() ; ++j)
             for (int k = (*test5)[i][j].get_min_index(); k <= (*test5)[i][j].get_max_index() ; ++k)
             {
-                float f = sqrt(i*i + k*k + j*j);
-                if( f != 0)
+                float f = static_cast<float>(sqrt(i*i + k*k + j*j));
+                if( f != 0.0f)
                     (*test5)[i][j][k] = sin(f) / f;
                 else
                     (*test5)[i][j][k] = 1;

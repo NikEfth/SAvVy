@@ -54,20 +54,20 @@ void Display_container_3d::set_axis(int _offset_h, int _offset_v, int _offset_d,
     v_spacing = _v_spacing;
     d_spacing = _d_spacing;
 
-    p_raster->setInterval( Qt::XAxis,
-                           QwtInterval( static_cast<double>(offset_v)*v_spacing,
-                                        static_cast<double>( (offset_v + row_num) )*v_spacing,
-                                        QwtInterval::IncludeBorders ) );
-    p_raster->setInterval( Qt::YAxis, QwtInterval(static_cast<double>(offset_h)*h_spacing,
-                                                  static_cast<double>(offset_h + row_size)*h_spacing,
-                                                  QwtInterval::IncludeBorders ) );
+    p_raster->setInterval(Qt::XAxis, QwtInterval(static_cast<double>(offset_v) * static_cast<double>(v_spacing),
+                                                 static_cast<double>((offset_v + row_num) ) * static_cast<double>(v_spacing),
+                                                 QwtInterval::IncludeBorders));
 
-    if ( static_cast<double>(offset_h + row_size)*h_spacing < static_cast<double>( (offset_v + row_num) )*v_spacing)
+    p_raster->setInterval(Qt::YAxis, QwtInterval(static_cast<double>(offset_h) * static_cast<double>(h_spacing),
+                                                  static_cast<double>(offset_h + row_size) * static_cast<double>(h_spacing),
+                                                  QwtInterval::IncludeBorders));
+
+    if(static_cast<double>(offset_h + row_size) * static_cast<double>(h_spacing) < static_cast<double>((offset_v + row_num)) * static_cast<double>(v_spacing))
     {
         d_rescaler = new QwtPlotRescaler(this->canvas(),QwtPlot::xBottom, QwtPlotRescaler::Fixed);
         d_rescaler->setExpandingDirection(QwtPlot::yLeft, QwtPlotRescaler::ExpandBoth);
     }
-    else if  ( static_cast<double>(offset_h + row_size)*h_spacing > static_cast<double>( (offset_v + row_num) )*v_spacing)
+    else if (static_cast<double>(offset_h + row_size) * static_cast<double>(h_spacing) > static_cast<double>((offset_v + row_num) ) * static_cast<double>(v_spacing))
     {
         d_rescaler = new QwtPlotRescaler(this->canvas(),QwtPlot::yLeft, QwtPlotRescaler::Fixed);
         d_rescaler->setExpandingDirection(QwtPlot::xBottom, QwtPlotRescaler::ExpandBoth);
@@ -98,6 +98,12 @@ void Display_container_3d::set_display(const QVector<double>  &_array, int _row_
 
 void Display_container_3d::set_display(const QVector<QVector<double> >  &_array)
 {
+    // to silence warning
+    if(_array.size())
+    {
+
+    }
+
     //    data_num = 1;
     //    row_num  = _array.size();
     //    row_size   = _array[0].size();
@@ -151,6 +157,12 @@ void Display_container_3d::set_display(const stir::Array<3, float>& _array)
 
 void Display_container_3d::set_display(void* _in)
 {
+    // to silence warning
+    if(_in)
+    {
+
+    }
+
     //    stir::Array<3, float>* tmp =
     //            static_cast<stir::Array<3, float>* >(_in);
 
@@ -264,14 +276,22 @@ void Display_container_3d::set_display(void* _in)
 //    }
 //}
 
-void Display_container_3d::set_display(const stir::Array<1, float>& a, int row_size) 
+void Display_container_3d::set_display(const stir::Array<1, float>& a, int row_size)
 {
+    // to silence warning
+    if(a.size() || row_size)
+    {
 
+    }
 }
 
 void Display_container_3d::set_display(const  stir::Array<2, float>& a)
 {
+    // to silence warning
+    if(a.size())
+    {
 
+    }
 }
 
 void Display_container_3d::update_scene(int i)

@@ -18,7 +18,7 @@ class Histogram_manager : public DisplayInterface
     Q_OBJECT
 
 public:
-    explicit Histogram_manager(int _my_id, int _num_dim, QWidget *parent = 0);
+    explicit Histogram_manager(int _my_id, int _num_dim, QWidget *parent = nullptr);
     ~Histogram_manager();
 
     /** \addtogroup Setters

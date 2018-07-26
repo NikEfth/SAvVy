@@ -67,7 +67,7 @@ void Display_container_2d::set_display(const QVector<QVector<double> > &_array)
     row_size = _array[0].size();
     row_num = _array.size();
 
-    data = new QVector< double >(_array.size(), 0.0);
+    data = new QVector< double >(row_num*row_size, 0.0);
     savvy::serialize_QVector(_array, *data, (*min_value)[0] ,(*max_value)[0] );
 
     set_axis();
@@ -102,7 +102,7 @@ void Display_container_2d::set_display(const stir::Array<1, float>& _array, int 
 
 void Display_container_2d::set_display(const stir::Array<2, float>& _array)
 {
-	row_num = static_cast<int>(_array.size());
+    row_num = static_cast<int>(_array.size());
     row_size = static_cast<int>(_array[0].size());
 
     data = new QVector< double >(row_num* row_size, 0.0);
@@ -115,6 +115,11 @@ void Display_container_2d::set_display(const stir::Array<2, float>& _array)
 //!\todo
 void Display_container_2d::set_display(const stir::Array<3, float>& _array)
 {
+    // to silence warning
+    if(_array.size())
+    {
+
+    }
 //    data_num =_array.size();
 
 //    row_size = static_cast<float>(data_num) / 2.f + 0.5f ;//_array[0][0].size() * data_num;

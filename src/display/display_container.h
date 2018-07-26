@@ -30,7 +30,7 @@ class Display_container : public QwtPlot
 {
     Q_OBJECT
 public:
-	explicit Display_container(int _num_dim, QWidget *parent = nullptr);
+    explicit Display_container(int _num_dim, QWidget *parent = nullptr);
 
     /** \addtogroup Setters
      *  @{
@@ -54,11 +54,11 @@ public:
 
     virtual void set_display(void*) = 0;
 
-	virtual void set_color_map(int i);
+    virtual void set_color_map(int i);
 
     /** @}*/
 
-	virtual int get_num_data() const;
+    virtual int get_num_data() const;
 
     inline int get_num_dimensions() const
     {
@@ -87,9 +87,9 @@ protected:
     //! from various places.
     void closeEvent(QCloseEvent *event) override;
 
-    QVector< double >* min_value = NULL;
+    QVector< double >* min_value = nullptr;
 
-    QVector< double >* max_value = NULL;
+    QVector< double >* max_value = nullptr;
 
     int num_dim;
 
