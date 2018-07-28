@@ -233,11 +233,6 @@ void Workspace::on_duplicate_array_clicked()
     updateGUI();
 }
 
-void Workspace::move_item(int new_location)
-{
-
-}
-
 void Workspace::on_psh_move_up_clicked()
 {
     int cur_indx = ui->listOpenedFiles->currentRow();
@@ -267,5 +262,14 @@ void Workspace::on_psh_move_down_clicked()
 
         openned_files.move(cur_indx, move_to);
     }
+}
+
+std::shared_ptr<QVector<double> > Workspace::get_next_item_in_group()
+{
+
+}
+
+bool Workspace::check_all_grouped_have_same_characteristics()
+{
 
 }

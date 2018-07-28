@@ -202,14 +202,6 @@ void Display_container_2d::update_scene(int i)
     replot();
 }
 
-void Display_container_2d::clear()
-{
-    data->clear();
-
-    row_size = -1;
-    row_num = -1;
-}
-
 void Display_container_2d::set_color_map(int index)
 {
     myColorMap->setColormap(index);

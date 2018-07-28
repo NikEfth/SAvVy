@@ -22,10 +22,10 @@ PROJECT(SAVVY VERSION 0.5 LANGUAGES CXX)
 set(COPYRIGHT "Copyright (c) 2017 Nikos Efthimiou. All rights reserved.")
 
 ############################  Options: Build What?  ############################
-option(Stir_DOWNLOAD "Downlaod STIR image reconstruction toolkit" OFF)
+option(Stir_DOWNLOAD "Download STIR image reconstruction toolkit" OFF)
 option(Stir_LOCAL "Use local STIR image reconstruction toolkit" ON)
 
-option(Qwt_DOWNLOAD "Downlaod QWT visualisation" OFF)
+option(Qwt_DOWNLOAD "Download QWT visualisation" OFF)
 option(Qwt_LOCAL "Use local QWT visualisation" ON)
 
 option(BUILD_DOC "Build documentation" ON)

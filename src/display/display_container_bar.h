@@ -34,7 +34,7 @@ public:
     //! - QVector<double>
     virtual void set_display(void* _in);
 
-    void set_display(QFile &_in);
+    bool set_display(QFile &_in);
 
     //! Set the data array, initialise x_data and update() display, by reference
     void set_display(const QVector<double>& , int _row_size);

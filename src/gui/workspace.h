@@ -49,6 +49,10 @@ public:
     std::shared_ptr<stir::ArrayInterface> get_array_ptr(const QString& _s);
 
     std::shared_ptr<stir::ArrayInterface> get_current_array_ptr();
+
+    std::shared_ptr<QVector<double> > get_next_item_in_group();
+
+    bool check_all_grouped_have_same_characteristics();
     /** @}*/
 
     //! Create a stir::Array with the specified range and append the _name to

@@ -33,47 +33,51 @@ public:
 
     explicit Display_container_1d(const  stir::Array<3, float>&, int dims = 1, QWidget *parent = nullptr);
 
-    //    virtual Display_container_1d* clone() const;
     /** \addtogroup Setters
      *  @{
      */
-    virtual void set_display(const QVector<double> & _y_array);
-
+    //! Set display a single vector only y valyes. X will be generated
+    //! naively.
+    //! \todo Currently is used and defined only for display_container_1d
+    virtual void set_display(const QVector<double> & _y_array) override;
+    //! Set a set of X and Y values.
+    //! replace and after define how many curves or plots will be replaced on the process.
+    //! That is particulary usefull for removed overlays.
+    //! symbols plots symbols
+    //! line plots a line connecting the symbols.
     virtual void set_display(const QVector<double> & _x_array,
                              const QVector<double> & _y_array,
                              bool replace = true, int after = 1,
                              bool symbols = false, bool line = false) override;
     //! Set the data array, initialise x_data and update() display, by reference
-    virtual void set_display(const QVector<double>&, int row_size);
+    virtual void set_display(const QVector<double>&, int row_size) override;
     //! Set the data array, initialise x_data and update() display, by pointer
-    virtual void set_display(const QVector< QVector<double> >&);
+    virtual void set_display(const QVector< QVector<double> >&) override;
     //! Set th data array, initialise x_data and update() display, by reference
-    virtual void set_display(const QVector<QVector< QVector<double> > >&);
+    virtual void set_display(const QVector<QVector< QVector<double> > >&) override;
     //! Set the data array, initialise x_data and update() display, by reference
-    virtual void set_display(const stir::Array<1, float>&, int _row_size);
+    virtual void set_display(const stir::Array<1, float>&, int _row_size) override;
     //! Set the data array, initialise x_data and update() display, by pointer
-    virtual void set_display(const  stir::Array<2, float>&);
+    virtual void set_display(const  stir::Array<2, float>&) override;
     //! Set the data array, initialise x_data and update() display, by reference
-    virtual void set_display(const  stir::Array<3, float>&);
+    virtual void set_display(const  stir::Array<3, float>&) override;
     //!
-    virtual void set_display(void*_in);
+    virtual void set_display(void*_in) override;
     //! Set the physical dimentions of the x axis
-    void set_sizes(float _min_x = 0.f, float  _min_y = 0.f);
+    void set_sizes(double _min_x = 0.0, double _min_y = 0.0);
 
     /** @}*/
 
-    virtual size_t get_x_axis_size() const;
+    virtual size_t get_x_axis_size() const override;
 
-    virtual ~Display_container_1d();
-    //! Clear the data and x_data
-    void clear();
+    virtual ~Display_container_1d() override;
 
-    virtual std::shared_ptr< QVector<double> >  get_x_values() const;
+    virtual std::shared_ptr< QVector<double> >  get_x_values() const override;
 
-    virtual std::shared_ptr< QVector<double> >  get_y_values() const;
+    virtual std::shared_ptr< QVector<double> >  get_y_values() const override;
 
 public slots:
-    virtual void update_scene(int i = 0);
+    virtual void update_scene(int i = 0) override;
 
 private:
     //! QVector of y data
@@ -89,7 +93,7 @@ private:
     //! The incremental step along the x axis
     double inc_x;
 
-    QwtPlotCurve* curve;
+    QwtPlotCurve* curve = nullptr;
 
     void calculate_x_axis();
 

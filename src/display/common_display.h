@@ -33,11 +33,6 @@ public:
 
     virtual std::shared_ptr< QVector<double> >  get_y_values() const = 0;
 
-    virtual void set_curve(const QVector<double> & _x_array,
-                           const QVector<double> & _y_array,
-                           bool replace = true, int after = 1,
-                           bool symbols = false, bool line = false) = 0;
-
     inline QString get_file_name() const
     {
         return fullFileName;
@@ -50,9 +45,18 @@ public:
     }
     /** @}*/
 
-    virtual void set_display(void*_in) = 0;
+    /** \addtogroup Setters
+     *  @{
+     */
+
+    virtual void set_curve(const QVector<double> & _x_array,
+                           const QVector<double> & _y_array,
+                           bool replace = true, int after = 1,
+                           bool symbols = false, bool line = false) = 0;
 
     virtual void set_no_controls(bool) = 0;
+
+    /** @}*/
 
 protected:
 

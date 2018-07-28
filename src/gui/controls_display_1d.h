@@ -12,7 +12,7 @@ class Controls_display_1d : public QWidget
     Q_OBJECT
 
 public:
-    explicit Controls_display_1d(QWidget *parent = 0);
+    explicit Controls_display_1d(QWidget *parent = nullptr);
     ~Controls_display_1d();
 
 private:

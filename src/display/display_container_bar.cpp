@@ -161,7 +161,7 @@ void Display_container_bar::set_display(const QVector<double>& _in, int row_size
     update_scene();
 }
 
-void Display_container_bar::set_display(QFile &_inFile)
+bool Display_container_bar::set_display(QFile &_inFile)
 {
     if (!_inFile.open(QFile::ReadOnly | QFile::Text))
     {
@@ -171,7 +171,7 @@ void Display_container_bar::set_display(QFile &_inFile)
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.setIcon(QMessageBox::Icon::Critical);
         msgBox.exec();
-        return;
+        return false;
     }
 
     QTextStream _in(&_inFile);
@@ -200,7 +200,7 @@ void Display_container_bar::set_display(QFile &_inFile)
 
     _in.seek(0);
     if (max == 0.0)
-        return;
+        return false;
 
     gsl_histogram_set_ranges_uniform (hist_data, min, max);
 
@@ -212,6 +212,8 @@ void Display_container_bar::set_display(QFile &_inFile)
     }
     _inFile.close();
     update_scene();
+
+    return true;
 }
 
 void Display_container_bar::append_curve(const QVector<double> & x_values,

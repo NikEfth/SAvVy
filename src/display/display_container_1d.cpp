@@ -44,13 +44,18 @@ Display_container_1d::Display_container_1d(const QVector<QVector< QVector<double
 
 std::shared_ptr< QVector<double> >  Display_container_1d::get_x_values() const
 {
-    return std::shared_ptr<QVector<double> >(new QVector<double>(*x_data));
+    if(x_data != nullptr)
+        return std::shared_ptr<QVector<double> >(new QVector<double>(*x_data));
+    else
+        return nullptr;
 }
 
 std::shared_ptr< QVector<double> >  Display_container_1d::get_y_values() const
 {
-    return std::shared_ptr<QVector<double> >(new QVector<double>(*data));
-
+    if(x_data != nullptr)
+        return std::shared_ptr<QVector<double> >(new QVector<double>(*data));
+    else
+        return nullptr;
 }
 
 Display_container_1d::Display_container_1d(const stir::Array<1, float>& _in, int row_size, int dims, QWidget *parent):
@@ -76,7 +81,7 @@ Display_container_1d::Display_container_1d(const  stir::Array<3, float>& _in, in
 
 size_t Display_container_1d::get_x_axis_size() const
 {
-    return x_data->size();
+    return static_cast<unsigned long>(x_data->size());
 }
 
 void Display_container_1d::initialise()
@@ -94,9 +99,9 @@ void Display_container_1d::initialise()
 
     if(settings.contains("showAxisDefault"))
     {
-        //        bool state = settings.value("showAxisDefault").toBool();
-        //        this->enableAxis(QwtPlot::xBottom, state);
-        //        this->enableAxis(QwtPlot::yLeft, state);
+        bool state = settings.value("showAxisDefault").toBool();
+        this->enableAxis(QwtPlot::xBottom, state);
+        this->enableAxis(QwtPlot::yLeft, state);
     }
 
     min_value = new QVector<double>(1,100000);
@@ -182,7 +187,7 @@ void Display_container_1d::set_display(const stir::Array<1, float>& _array, int 
 
 void Display_container_1d::set_display(const  stir::Array<2, float>& _array)
 {
-    data = new QVector<double>(_array.size()* _array[0].size(), 0.0);
+    data = new QVector<double>( static_cast<int>(_array.size()* _array[0].size()), 0.0);
     savvy::Array2D_QVector1D(_array, *data, (*min_value)[0], (*max_value)[0]);
     calculate_x_axis();
     update_scene();
@@ -190,7 +195,7 @@ void Display_container_1d::set_display(const  stir::Array<2, float>& _array)
 
 void Display_container_1d::set_display(const  stir::Array<3, float>& _array)
 {
-    data = new QVector<double>(_array.size()* _array[0].size() * _array[0][0].size(), 0.0);
+    data = new QVector<double>( static_cast<int>(_array.size() * _array[0].size() * _array[0][0].size()), 0.0);
     savvy::Array3D_QVector1D(_array, *data, (*min_value)[0], (*max_value)[0]);
     calculate_x_axis();
     update_scene();
@@ -223,7 +228,7 @@ void Display_container_1d::set_display(void* _in)
 }
 
 void Display_container_1d::set_sizes(
-        float _min_x, float  _max_x)
+        double _min_x, double  _max_x)
 {
     min_x = _min_x;
     max_x = _max_x;
@@ -241,12 +246,6 @@ void Display_container_1d::update_scene(int i)
     this->replot();
 }
 
-void Display_container_1d::clear()
-{
-    data->clear();
-    x_data->clear();
-    data_offset = 0;
-}
 
 Display_container_1d::~Display_container_1d()
 {
