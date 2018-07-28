@@ -10,7 +10,7 @@
 //!
 //! \brief The definition of Display_container_2d class
 //!
-//! \details The data in 2D are held by a 1D array with size [cols \times rows], which
+//! \details The data in 2D are held by a 1D array with size [cols /times rows], which
 //! is encapsulated in a QVector.The outtermost vector will never have more
 //! arrays other from the first. I implemented it this way, so it can be used
 //! as a parent class for the Display_container_3d.

@@ -81,10 +81,11 @@ std::shared_ptr< QVector<double> > Display_container_bar::get_bin_indices()
             (new QVector<double>(static_cast<int>(numBins)));
 
     double ls = 0.0, hs = 0.0;
-    for ( size_t j = 0; j < numBins; ++j)
+    for (size_t j = 0; j < numBins; ++j)
     {
         gsl_histogram_get_range(hist_data, j, &ls, &hs);
-        (*ret)[j] = (ls + hs) / 2.0;
+
+        (*ret)[static_cast<int>(j)] = (ls + hs) / 2.0;
     }
     return ret;
 }
@@ -97,22 +98,28 @@ std::shared_ptr< QVector<double> > Display_container_bar::get_histogram_values()
 
     for ( size_t j = 0; j < numBins; ++j)
     {
-        (*ret)[j] = gsl_histogram_get(hist_data, j);
+        (*ret)[static_cast<int>(j)] = gsl_histogram_get(hist_data, j);
     }
     return ret;
 }
 
 void Display_container_bar::update_scene(int i)
 {
+    // to silence warning
+    if(i)
+    {
+
+    }
+
     double ls = 0.0, hs = 0.0;
     for ( size_t j = 0; j < numBins; ++j)
     {
         gsl_histogram_get_range(hist_data, j, &ls, &hs);
-        intervalA[j].setInterval(ls, hs, QwtInterval::IncludeBorders);
+        intervalA[static_cast<int>(j)].setInterval(ls, hs, QwtInterval::IncludeBorders);
         double val = gsl_histogram_get(hist_data, j);
         //        if (val > 0)
         //            maxNZBin = j;
-        series[j] = QwtIntervalSample(val, intervalA[j]);
+        series[static_cast<int>(j)] = QwtIntervalSample(val, intervalA[static_cast<int>(j)]);
     }
 
     d_histItem->setData(new QwtIntervalSeriesData(series));
@@ -149,6 +156,12 @@ void Display_container_bar::initialisePlotArea()
 
 void Display_container_bar::set_display(const QVector<double>& _in, int row_size)
 {
+    // to silence warning
+    if(row_size)
+    {
+
+    }
+
     double max = *std::max_element(_in.begin(), _in.end());
     double min = *std::min_element(_in.begin(), _in.end());
     gsl_histogram_set_ranges_uniform (hist_data, min, max);
@@ -245,7 +258,13 @@ void Display_container_bar::set_display(const QVector<QVector< QVector<double> >
 {}
 
 void Display_container_bar::set_display(const stir::Array<1, float>&, int row_size)
-{}
+{
+    // to silence warning
+    if(row_size)
+    {
+
+    }
+}
 
 void Display_container_bar::set_display(const  stir::Array<2, float>&)
 {}

@@ -3,14 +3,13 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-
+    QApplication application(argc, argv);
     QCoreApplication::setOrganizationName("University_Of_Hull");
     QCoreApplication::setOrganizationDomain("hull.ac.uk");
     QCoreApplication::setApplicationName("SAvVy");
 
-    SavvyWindow w;
-    w.show();
+    SavvyWindow savvy_window;
+    savvy_window.show();
 
-    return a.exec();
+    return application.exec();
 }

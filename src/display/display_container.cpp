@@ -8,6 +8,12 @@ Display_container::Display_container(int _num_dim, QWidget *parent)
 
 void Display_container::closeEvent(QCloseEvent *event)
 {
+    // to silence warning
+    if(event)
+    {
+
+    }
+
     emit aboutToClose();
 }
 
@@ -30,11 +36,23 @@ int Display_container::get_num_data() const
 
 void Display_container::set_color_map(int i)
 {
+    // to silence warning
+    if(i)
+    {
+
+    }
+
     //! \todo Set colormap could be usefull for 1D arrays, too.
 }
 
 void Display_container::set_display(const QVector<double> & _y_array)
 {
+    // to silence warning
+    if(_y_array.size())
+    {
+
+    }
+
     //!\todo It can be used for Scatter plottings
 }
 
@@ -42,6 +60,12 @@ void Display_container::set_display(const QVector<double> & _x_array,
                                     const QVector<double> & _y_array,
                                     bool replace, int after, bool symbols, bool line)
 {
+    // to silence warning
+    if(_x_array.size() || _y_array.size() || symbols)
+    {
+
+    }
+
     //!\todo It can be used for Scatter plottings
 }
 

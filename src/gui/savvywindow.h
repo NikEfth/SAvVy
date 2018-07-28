@@ -35,6 +35,7 @@ class SavvyWindow : public QMainWindow
 
 public:
     explicit SavvyWindow(QWidget *parent = nullptr);
+
     ~SavvyWindow() override;
 
 public slots:

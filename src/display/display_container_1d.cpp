@@ -13,8 +13,7 @@ Display_container_1d::Display_container_1d(int dims, QWidget *parent) :
     initialise();
 }
 
-Display_container_1d::Display_container_1d(const QVector<double>& x_data,
-                                           const QVector<double> & y_data, int dims, QWidget *parent) :
+Display_container_1d::Display_container_1d(const QVector<double>& x_data, const QVector<double> & y_data, int dims, QWidget *parent) :
     Display_container(dims, parent)
 {
     initialise();
@@ -146,6 +145,12 @@ void Display_container_1d::set_display(const QVector<double> & _x_array,
 
 void Display_container_1d::set_display(const QVector<double> & _y_array)
 {
+    // to silence warning
+    if(_y_array.size())
+    {
+
+    }
+
     //    data = new QVector<double>(_y_array.size(), 0.0);
     //    savvy::copy_QVector<double>(_y_array, *data, (*min_value)[0], (*max_value)[0]);
 
@@ -154,6 +159,12 @@ void Display_container_1d::set_display(const QVector<double> & _y_array)
 
 void Display_container_1d::set_display(const QVector<double> & _array, int row_size)
 {
+    // to silence warning
+    if(row_size)
+    {
+
+    }
+
     data = new QVector<double>(_array.size(), 0.0);
     savvy::copy_QVector<double>(_array, *data, (*min_value)[0], (*max_value)[0]);
     calculate_x_axis();
@@ -170,6 +181,12 @@ void Display_container_1d::set_display(const QVector<QVector<double> >&  _array)
 
 void Display_container_1d::set_display(const QVector<QVector<QVector<double> > >&  _array)
 {
+    // to silence warning
+    if(_array.size())
+    {
+
+    }
+
     //    data = new QVector<double>(_array.size(), 0.0);
     //    savvy::serialize_QVector<double>(_array, *data, *min_value, *max_value);
     //    calculate_x_axis();
@@ -178,6 +195,12 @@ void Display_container_1d::set_display(const QVector<QVector<QVector<double> > >
 
 void Display_container_1d::set_display(const stir::Array<1, float>& _array, int _row_size)
 {
+    // to silence warning
+    if(_row_size)
+    {
+
+    }
+
     data = new QVector<double>(static_cast<int>(_array.size()), 0.0);
     savvy::Array1D_QVector1D(_array, *data, (*min_value)[0], (*max_value)[0]);
     data_offset = _array.get_min_index();
@@ -187,7 +210,7 @@ void Display_container_1d::set_display(const stir::Array<1, float>& _array, int 
 
 void Display_container_1d::set_display(const  stir::Array<2, float>& _array)
 {
-    data = new QVector<double>( static_cast<int>(_array.size()* _array[0].size()), 0.0);
+    data = new QVector<double>(static_cast<int>(_array.size() * _array[0].size()), 0.0);
     savvy::Array2D_QVector1D(_array, *data, (*min_value)[0], (*max_value)[0]);
     calculate_x_axis();
     update_scene();
@@ -195,7 +218,7 @@ void Display_container_1d::set_display(const  stir::Array<2, float>& _array)
 
 void Display_container_1d::set_display(const  stir::Array<3, float>& _array)
 {
-    data = new QVector<double>( static_cast<int>(_array.size() * _array[0].size() * _array[0][0].size()), 0.0);
+    data = new QVector<double>(static_cast<int>(_array.size() * _array[0].size() * _array[0][0].size()), 0.0);
     savvy::Array3D_QVector1D(_array, *data, (*min_value)[0], (*max_value)[0]);
     calculate_x_axis();
     update_scene();
@@ -203,6 +226,12 @@ void Display_container_1d::set_display(const  stir::Array<3, float>& _array)
 
 void Display_container_1d::set_display(void* _in)
 {
+    // to silence warning
+    if(_in)
+    {
+
+    }
+
     //    stir::Array<1, float>* tmp =
     //            static_cast<stir::Array<1, float>* >(_in);
 
@@ -237,6 +266,12 @@ void Display_container_1d::set_sizes(
 
 void Display_container_1d::update_scene(int i)
 {
+    // to silence warning
+    if(i)
+    {
+
+    }
+
     this->setAxisScale(QwtPlot::yLeft,
                        *std::min_element(data->constBegin(), data->constEnd()),
                        *std::max_element(data->constBegin(), data->constEnd()));

@@ -114,7 +114,6 @@ protected:
     unsigned long data_num;
     //! Size of a single dataset.
     unsigned long row_size;
-
 };
 
 #endif // DISPLAY_CONTAINER_H

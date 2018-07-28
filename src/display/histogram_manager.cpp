@@ -22,7 +22,7 @@ Histogram_manager::~Histogram_manager()
 
 void Histogram_manager::on_spinBox_valueChanged(int arg1)
 {
-    _histogram->setNumBin(arg1);
+    _histogram->setNumBin(static_cast<const size_t>(arg1));
 }
 
 void Histogram_manager::on_doubleSpinBox_valueChanged(double arg1)
@@ -32,6 +32,12 @@ void Histogram_manager::on_doubleSpinBox_valueChanged(double arg1)
 
 void Histogram_manager::set_display(void*_in)
 {
+    // to silence warning
+    if(_in)
+    {
+
+    }
+
     //    _histogram->set_display(_in);
 }
 
@@ -86,7 +92,7 @@ void Histogram_manager::refresh_display()
 
 void Histogram_manager::setNumBin(const size_t& _n)
 {
-    _histogram->setNumBin(_n);
+    _histogram->setNumBin(static_cast<const size_t>(_n));
     ui->spinBox->blockSignals(true);
     ui->spinBox->setValue(static_cast<int>(_n));
     ui->spinBox->blockSignals(false);
@@ -107,7 +113,7 @@ void Histogram_manager::setCutOff(const float& _n)
 {
     _histogram->setCutOff(_n);
     ui->doubleSpinBox->blockSignals(true);
-    ui->doubleSpinBox->setValue(_n);
+    ui->doubleSpinBox->setValue(static_cast<const size_t>(_n));
     ui->doubleSpinBox->blockSignals(false);
 }
 

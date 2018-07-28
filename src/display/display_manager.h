@@ -39,6 +39,12 @@ public:
     //!
     virtual void set_display(void*_in)
     {
+        // to silence warning
+        if(_in)
+        {
+
+        }
+
         //        _display->set_display(_in);
     }
 

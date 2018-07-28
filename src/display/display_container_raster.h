@@ -24,7 +24,6 @@ public:
     }
 
     virtual ~Display_container_raster();
-
     virtual size_t get_x_axis_size() const;
 
 protected:

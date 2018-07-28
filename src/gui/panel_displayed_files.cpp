@@ -32,6 +32,12 @@ void Panel_displayed_files::set_active(int _id)
 
 void Panel_displayed_files::appendToOpenedList(Display_container* child)
 {
+    // to silence warning
+    if(child)
+    {
+
+    }
+
     //! \todo Display_container cannot be used for display outside of a wrapper
 //    QListWidgetItem* tmp_itm =  new QListWidgetItem();
 

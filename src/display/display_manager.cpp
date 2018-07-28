@@ -82,6 +82,12 @@ Display_manager::~Display_manager()
 
 void Display_manager::closeEvent(QCloseEvent *event)
 {
+    // to silence warning
+    if(event)
+    {
+
+    }
+
     emit aboutToClose();
 }
 

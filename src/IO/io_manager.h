@@ -27,7 +27,11 @@ stir::ArrayInterface* open_array(std::string file_name)
 
 void open_header(std::string file_name)
 {
+    // to silence warning
+    if(file_name.size())
+    {
 
+    }
 }
 
 
