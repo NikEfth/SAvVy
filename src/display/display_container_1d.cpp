@@ -4,7 +4,7 @@
 #include <qwt_color_map.h>
 
 #include <QSettings>
-
+#include <qwt_plot_item.h>
 #include "stir/Array.h"
 
 Display_container_1d::Display_container_1d(int dims, QWidget *parent) :
@@ -41,6 +41,22 @@ Display_container_1d::Display_container_1d(const QVector<QVector< QVector<double
     set_display(_in);
 }
 
+std::shared_ptr< QVector<double> >  Display_container_1d::get_x_values() const
+{
+    if(x_data != nullptr)
+        return std::shared_ptr<QVector<double> >(new QVector<double>(*x_data));
+    else
+        return nullptr;
+}
+
+std::shared_ptr< QVector<double> >  Display_container_1d::get_y_values() const
+{
+    if(x_data != nullptr)
+        return std::shared_ptr<QVector<double> >(new QVector<double>(*data));
+    else
+        return nullptr;
+}
+
 Display_container_1d::Display_container_1d(const stir::Array<1, float>& _in, int row_size, int dims, QWidget *parent):
     Display_container(dims, parent)
 {
@@ -62,6 +78,10 @@ Display_container_1d::Display_container_1d(const  stir::Array<3, float>& _in, in
     set_display(_in);
 }
 
+size_t Display_container_1d::get_x_axis_size() const
+{
+    return static_cast<unsigned long>(x_data->size());
+}
 
 void Display_container_1d::initialise()
 {
@@ -78,9 +98,9 @@ void Display_container_1d::initialise()
 
     if(settings.contains("showAxisDefault"))
     {
-        //        bool state = settings.value("showAxisDefault").toBool();
-        //        this->enableAxis(QwtPlot::xBottom, state);
-        //        this->enableAxis(QwtPlot::yLeft, state);
+        bool state = settings.value("showAxisDefault").toBool();
+        this->enableAxis(QwtPlot::xBottom, state);
+        this->enableAxis(QwtPlot::yLeft, state);
     }
 
     min_value = new QVector<double>(1,100000);
@@ -88,8 +108,20 @@ void Display_container_1d::initialise()
     inc_x = 1.;
 }
 
-void Display_container_1d::set_display(const QVector<double> & _x_array, const QVector<double> & _y_array, bool symbols)
+void Display_container_1d::set_display(const QVector<double> & _x_array,
+                                       const QVector<double> & _y_array,
+                                       bool replace,int after, bool symbols, bool line)
 {
+
+    if (replace)
+    {
+        QList<QwtPlotItem* > items = this->itemList(QwtPlotItem::Rtti_PlotCurve);
+        if (after < items.size())
+            for (int i = after; i < items.size(); ++i)
+                items.at(i)->detach();
+        curve = new QwtPlotCurve();
+        curve->setPen(Qt::red,2);
+    }
     data = new QVector<double>(_y_array.size(), 0.0);
     savvy::copy_QVector<double>(_y_array, *data, (*min_value)[0], (*max_value)[0]);
 
@@ -101,6 +133,11 @@ void Display_container_1d::set_display(const QVector<double> & _x_array, const Q
         QwtSymbol *symbol = new QwtSymbol( QwtSymbol::Ellipse,
                                            QBrush( Qt::yellow ), QPen( Qt::red, 2 ), QSize( 8, 8 ) );
         curve->setSymbol( symbol );
+    }
+
+    if (!line)
+    {
+        curve->setStyle(QwtPlotCurve::NoCurve);
     }
 
     update_scene();
@@ -219,10 +256,11 @@ void Display_container_1d::set_display(void* _in)
     //    return true;
 }
 
-void Display_container_1d::set_sizes(float _min_x, float  _max_x)
+void Display_container_1d::set_sizes(
+        double _min_x, double  _max_x)
 {
-    min_x = static_cast<double>(_min_x);
-    max_x = static_cast<double>(_max_x);
+    min_x = _min_x;
+    max_x = _max_x;
 }
 
 
@@ -243,12 +281,6 @@ void Display_container_1d::update_scene(int i)
     this->replot();
 }
 
-void Display_container_1d::clear()
-{
-    data->clear();
-    x_data->clear();
-    data_offset = 0;
-}
 
 Display_container_1d::~Display_container_1d()
 {

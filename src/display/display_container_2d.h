@@ -77,7 +77,7 @@ public:
     {return offset_v + row_num; }
     /** @}*/
 
-    void clear();
+//    void clear();
 
     virtual ~Display_container_2d();
 public slots:

@@ -66,8 +66,8 @@ void Display_container_2d::set_display(const QVector<QVector<double> > &_array)
 {
     row_size = _array[0].size();
     row_num = _array.size();
+    data = new QVector< double >(row_size * row_num, 0.0);
 
-    data = new QVector< double >(row_num*row_size, 0.0);
     savvy::serialize_QVector(_array, *data, (*min_value)[0] ,(*max_value)[0] );
 
     set_axis();
@@ -218,14 +218,6 @@ void Display_container_2d::update_scene(int i)
     p_raster->setInterval( Qt::ZAxis, QwtInterval((*min_value)[0],  (*max_value)[0]));
     d_spectrogram->setData(p_raster);
     replot();
-}
-
-void Display_container_2d::clear()
-{
-    data->clear();
-
-    row_size = -1;
-    row_num = -1;
 }
 
 void Display_container_2d::set_color_map(int index)

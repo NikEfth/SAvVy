@@ -90,12 +90,23 @@ void Histogram_manager::refresh_display()
     }
 }
 
-void Histogram_manager::setNumBin(const int& _n)
+void Histogram_manager::setNumBin(const size_t& _n)
 {
     _histogram->setNumBin(static_cast<const size_t>(_n));
     ui->spinBox->blockSignals(true);
-    ui->spinBox->setValue(_n);
+    ui->spinBox->setValue(static_cast<int>(_n));
     ui->spinBox->blockSignals(false);
+}
+
+size_t Histogram_manager::get_num_points() const
+{
+    return _histogram->getNumBin();
+}
+
+void Histogram_manager::set_curve(const QVector<double> & _x_array,
+    const QVector<double> & _y_array, bool replace, int after, bool symbols, bool line)
+{
+    _histogram->append_curve(_x_array, _y_array,  "line", true);
 }
 
 void Histogram_manager::setCutOff(const float& _n)
@@ -104,4 +115,15 @@ void Histogram_manager::setCutOff(const float& _n)
     ui->doubleSpinBox->blockSignals(true);
     ui->doubleSpinBox->setValue(static_cast<const size_t>(_n));
     ui->doubleSpinBox->blockSignals(false);
+}
+
+
+std::shared_ptr< QVector<double> >  Histogram_manager::get_x_values() const
+{
+    return _histogram->get_bin_indices();
+}
+
+std::shared_ptr< QVector<double> >  Histogram_manager::get_y_values() const
+{
+    return _histogram->get_histogram_values();
 }

@@ -27,6 +27,8 @@ void Workspace::updateGUI()
     ui->remove_array->setEnabled(hasData);
     ui->display_array->setEnabled(hasData);
     ui->duplicate_array->setEnabled(hasData);
+    ui->psh_move_down->setEnabled(hasData);
+    ui->psh_move_up->setEnabled(hasData);
 }
 
 
@@ -229,4 +231,45 @@ void Workspace::on_duplicate_array_clicked()
 
     append_to_workspace(wtmp, "copyOf_" + ui->listOpenedFiles->item(current_row)->text() );
     updateGUI();
+}
+
+void Workspace::on_psh_move_up_clicked()
+{
+    int cur_indx = ui->listOpenedFiles->currentRow();
+    if (cur_indx > 0)
+    {
+        int move_to = cur_indx - 1;
+
+        QListWidgetItem* itm = ui->listOpenedFiles->takeItem(cur_indx);
+        ui->listOpenedFiles->insertItem(move_to, itm);
+        ui->listOpenedFiles->setCurrentRow(move_to);
+
+        openned_files.move(cur_indx, move_to);
+    }
+
+}
+
+void Workspace::on_psh_move_down_clicked()
+{
+    int cur_indx = ui->listOpenedFiles->currentRow();
+    if (cur_indx < ui->listOpenedFiles->count())
+    {
+        int move_to = cur_indx + 1;
+
+        QListWidgetItem* itm = ui->listOpenedFiles->takeItem(cur_indx);
+        ui->listOpenedFiles->insertItem(move_to, itm);
+        ui->listOpenedFiles->setCurrentRow(move_to);
+
+        openned_files.move(cur_indx, move_to);
+    }
+}
+
+std::shared_ptr<QVector<double> > Workspace::get_next_item_in_group()
+{
+
+}
+
+bool Workspace::check_all_grouped_have_same_characteristics()
+{
+
 }

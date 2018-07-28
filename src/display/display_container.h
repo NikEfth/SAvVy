@@ -35,10 +35,19 @@ public:
     /** \addtogroup Setters
      *  @{
      */
-    //!
+    //! Set display a single vector only y valyes. X will be generated
+    //! naively.
+    //! \todo Currently is used and defined only for display_container_1d
     virtual void set_display(const QVector<double> & _y_array);
+    //! Set a set of X and Y values.
+    //! replace and after define how many curves or plots will be replaced on the process.
+    //! That is particulary usefull for removed overlays.
+    //! symbols plots symbols
+    //! line plots a line connecting the symbols.
     virtual void set_display(const QVector<double> & _x_array,
-        const QVector<double> & _y_array, bool symbols = false);
+                             const QVector<double> & _y_array,
+                             bool replace = true, int after = 1,
+                             bool symbols = false, bool line = false);
     //! Set the data array, initialise x_data and update() display, by reference
     virtual void set_display(const QVector<double>&, int row_size) = 0;
     //! Set the data array, initialise x_data and update() display, by pointer
@@ -60,12 +69,21 @@ public:
 
     virtual int get_num_data() const;
 
-    inline int get_num_dimensions() const
+    inline unsigned long get_num_dimensions() const
     {
         return num_dim;
     }
 
-    virtual ~Display_container();
+    virtual size_t get_x_axis_size() const = 0;
+
+    virtual ~Display_container() override;
+
+    void clearAllPlotItems();
+
+    //! \todo
+    virtual std::shared_ptr< QVector<double> >  get_x_values() const;
+    //! \todo
+    virtual std::shared_ptr< QVector<double> >  get_y_values() const;
 
 public slots:
     //! Update the display contents
@@ -86,17 +104,16 @@ protected:
     //! to let know the application that this window must be removed
     //! from various places.
     void closeEvent(QCloseEvent *event) override;
-
+    //! Minimum value per data_num
     QVector< double >* min_value = nullptr;
-
+    //! Maximum value per data_num
     QVector< double >* max_value = nullptr;
-
-    int num_dim;
-
-    int data_num;
-
-    int row_size;
-
+    //! Number of dimentions of the display_container
+    unsigned long num_dim;
+    //! Number of datasets
+    unsigned long data_num;
+    //! Size of a single dataset.
+    unsigned long row_size;
 };
 
 #endif // DISPLAY_CONTAINER_H

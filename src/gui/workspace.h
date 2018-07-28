@@ -49,6 +49,10 @@ public:
     std::shared_ptr<stir::ArrayInterface> get_array_ptr(const QString& _s);
 
     std::shared_ptr<stir::ArrayInterface> get_current_array_ptr();
+
+    std::shared_ptr<QVector<double> > get_next_item_in_group();
+
+    bool check_all_grouped_have_same_characteristics();
     /** @}*/
 
     //! Create a stir::Array with the specified range and append the _name to
@@ -86,6 +90,10 @@ private slots:
 
     void on_duplicate_array_clicked();
 
+    void on_psh_move_up_clicked();
+
+    void on_psh_move_down_clicked();
+
 private:
 
     //! \details This member holds an incremental number for  every window that
@@ -93,13 +101,15 @@ private:
     //! 1.
     qint16 next_dataset_id;
     //! Create a new record in ui->listOpenedFiles with the specified name
-//    void append_to_openedFiles(const QString&);
+    //    void append_to_openedFiles(const QString&);
     //! Remove from listOpenedFiles the item at row _id
     void remove_from_workspace(int _id);
 
     Ui::Workspace *ui;
     //! All the openned files are held by this vector
     QVector< std::shared_ptr<stir::ArrayInterface> > openned_files;
+
+    void move_item(int new_location);
 };
 
 

@@ -1,5 +1,6 @@
 #include "display_container_bar.h"
 #include <QMessageBox>
+#include <qwt_plot_item.h>
 
 Display_container_bar::Display_container_bar(int dims, QWidget *parent) :
     Display_container(dims, parent)
@@ -20,6 +21,11 @@ void Display_container_bar::setNumBin(const size_t& _n)
 size_t Display_container_bar::getNumBin() const
 {
     return numBins;
+}
+
+size_t Display_container_bar::get_x_axis_size() const
+{
+    return getNumBin();
 }
 
 void Display_container_bar::setNumBin_update(const size_t& _n)
@@ -121,7 +127,7 @@ void Display_container_bar::update_scene(int i)
     double max = hs;
     gsl_histogram_get_range(hist_data, 0, &ls, &hs);
     double min = ls;
-    this->setAxisScale( QwtPlot::xBottom,min,max);
+    this->setAxisScale( QwtPlot::xBottom, min, max);
 
     double ma = gsl_histogram_max_val(hist_data) * static_cast<double>(cutOff);
     this->setAxisScale(QwtPlot::yLeft, 0, ma);
@@ -143,8 +149,8 @@ void Display_container_bar::initialisePlotArea()
     this->canvas()->setPalette( QColor( "LemonChiffon" ) );
     this->setAutoReplot(true);
 
-    this->setAxisTitle(QwtPlot::xBottom, "Value");
-    this->setAxisTitle(QwtPlot::yLeft, "Number");
+    this->setAxisTitle(QwtPlot::xBottom, "Bin");
+    this->setAxisTitle(QwtPlot::yLeft, "Frequency");
 }
 
 
@@ -168,7 +174,7 @@ void Display_container_bar::set_display(const QVector<double>& _in, int row_size
     update_scene();
 }
 
-void Display_container_bar::set_display(QFile &_inFile)
+bool Display_container_bar::set_display(QFile &_inFile)
 {
     if (!_inFile.open(QFile::ReadOnly | QFile::Text))
     {
@@ -178,7 +184,7 @@ void Display_container_bar::set_display(QFile &_inFile)
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.setIcon(QMessageBox::Icon::Critical);
         msgBox.exec();
-        return;
+        return false;
     }
 
     QTextStream _in(&_inFile);
@@ -207,7 +213,7 @@ void Display_container_bar::set_display(QFile &_inFile)
 
     _in.seek(0);
     if (max == 0.0)
-        return;
+        return false;
 
     gsl_histogram_set_ranges_uniform (hist_data, min, max);
 
@@ -219,16 +225,23 @@ void Display_container_bar::set_display(QFile &_inFile)
     }
     _inFile.close();
     update_scene();
+
+    return true;
 }
 
 void Display_container_bar::append_curve(const QVector<double> & x_values,
-                  const QVector< double>& y_values, const QString & name)
+                                         const QVector< double>& y_values, const QString & name, bool replace)
 {
-    if (!stir::is_null_ptr(curve))
+    if (!stir::is_null_ptr(curve) && replace)
     {
-        curve->detach();
-        delete curve;
+        QList<QwtPlotItem *> items = this->itemList(QwtPlotItem::Rtti_PlotCurve);
+        for (QwtPlotItem* i : items)
+        {
+            i->detach();
+            delete i;
+        }
     }
+
 
     curve = new QwtPlotCurve(name);
     curve->setPen(Qt::red, 2.0);

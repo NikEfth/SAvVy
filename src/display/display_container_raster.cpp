@@ -39,3 +39,8 @@ Display_container_raster::~Display_container_raster()
 {
     delete d_spectrogram;
 }
+
+size_t Display_container_raster::get_x_axis_size() const
+{
+    return row_size;
+}

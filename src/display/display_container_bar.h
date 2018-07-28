@@ -34,7 +34,7 @@ public:
     //! - QVector<double>
     virtual void set_display(void* _in);
 
-    void set_display(QFile &_in);
+    bool set_display(QFile &_in);
 
     //! Set the data array, initialise x_data and update() display, by reference
     void set_display(const QVector<double>& , int _row_size);
@@ -50,7 +50,8 @@ public:
     void set_display(const  stir::Array<3, float>&);
 
     void append_curve(const QVector<double> & x_values,
-                      const QVector< double>& y_values, const QString & name);
+                      const QVector< double>& y_values,
+                      const QString & name, bool replace);
 
     //    void remove_curve();
 
@@ -61,6 +62,8 @@ public:
     std::shared_ptr< QVector<double> > get_histogram_values();
 
     size_t getNumBin() const ;
+
+    virtual size_t get_x_axis_size() const;
 
     void initialiseHistogram();
 signals:

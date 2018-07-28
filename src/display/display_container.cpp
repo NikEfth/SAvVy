@@ -56,7 +56,9 @@ void Display_container::set_display(const QVector<double> & _y_array)
     //!\todo It can be used for Scatter plottings
 }
 
-void Display_container::set_display(const QVector<double> & _x_array, const QVector<double> & _y_array, bool symbols)
+void Display_container::set_display(const QVector<double> & _x_array,
+                                    const QVector<double> & _y_array,
+                                    bool replace, int after, bool symbols, bool line)
 {
     // to silence warning
     if(_x_array.size() || _y_array.size() || symbols)
@@ -65,4 +67,25 @@ void Display_container::set_display(const QVector<double> & _x_array, const QVec
     }
 
     //!\todo It can be used for Scatter plottings
+}
+
+std::shared_ptr< QVector<double> >  Display_container::get_x_values() const
+{
+    //! \todo Do something for raster data
+    return nullptr;
+}
+
+std::shared_ptr< QVector<double> >  Display_container::get_y_values() const
+{
+    //! \todo Do something for raster data
+    return nullptr;
+}
+
+void Display_container::clearAllPlotItems()
+{
+    QList<QwtPlotItem* > items = this->itemList(QwtPlotItem::Rtti_PlotCurve);
+    for (int i = 0; i < items.size(); ++i)
+        items.at(i)->detach();
+
+    this->replot();
 }

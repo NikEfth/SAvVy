@@ -31,6 +31,11 @@ public:
         this->setWindowTitle(_s);
     }
 
+    virtual void set_curve(const QVector<double> & _x_array,
+                           const QVector<double> & _y_array,
+                           bool replace = true, int after = 1,
+                           bool symbols = false, bool line = false) override;
+
     //!
     virtual void set_display(void*_in)
     {
@@ -43,7 +48,7 @@ public:
         //        _display->set_display(_in);
     }
 
-    void set_no_controls(bool _f);
+    void set_no_controls(bool _f) override;
 
     //! Set the Colormap of choise
     virtual void set_color_map(int i)
@@ -60,6 +65,12 @@ public:
     {
         return QString::number(_page) + " / " + QString::number(num_pages);
     }
+
+    virtual std::shared_ptr< QVector<double> >  get_x_values() const override;
+
+    virtual std::shared_ptr< QVector<double> >  get_y_values() const override;
+
+    virtual size_t get_num_points() const override;
 
 signals:
     //! Signal to let the application know that this window should be

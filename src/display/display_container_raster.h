@@ -24,7 +24,10 @@ public:
     }
 
     virtual ~Display_container_raster();
+    virtual size_t get_x_axis_size() const;
+
 protected:
+
     QwtPlotSpectrogram *d_spectrogram = nullptr;
 
     QwtMatrixRasterData *p_raster = nullptr;
@@ -32,25 +35,25 @@ protected:
     QwtPlotRescaler *d_rescaler = nullptr;
     //! Current ColorMap
     display::ColorMap *myColorMap = nullptr;
-
-    int row_num;
-
+    //! Number of rows of data. - Nomrally Y axis
+    unsigned long row_num;
+    //! Offset of the horizontal axis
     int offset_h;
-
+    //! Offset of the vertical axis
     int offset_v;
-
+    //! Offeset of the depth - z axis. Meaningly only in the Display_container_3d.
     int offset_d;
     //! Pixel spacing, Horizontal, this will follow the convension in the header
     float h_spacing;
     //! Pixel spacing, Vertical, this will follow the convensions in the header
     float v_spacing;
-
+    //! Pixel spacing on the z axis.
     float d_spacing;
-
+    //! Origin on the x axis.
     float origin_x;
-
+    //! Origin on the y axis.
     float origin_y;
-
+    //! Origin on the z axis.
     float origin_z;
 
 };
