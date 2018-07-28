@@ -4,6 +4,7 @@
 #include <qwt_color_map.h>
 #include <QWidget>
 #include <QFile>
+#include <QTextStream>
 
 #include<array>
 

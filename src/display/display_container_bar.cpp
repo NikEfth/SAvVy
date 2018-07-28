@@ -150,6 +150,12 @@ void Display_container_bar::initialisePlotArea()
 
 void Display_container_bar::set_display(const QVector<double>& _in, int row_size)
 {
+    // to silence warning
+    if(row_size)
+    {
+
+    }
+
     double max = *std::max_element(_in.begin(), _in.end());
     double min = *std::min_element(_in.begin(), _in.end());
     gsl_histogram_set_ranges_uniform (hist_data, min, max);
@@ -239,7 +245,13 @@ void Display_container_bar::set_display(const QVector<QVector< QVector<double> >
 {}
 
 void Display_container_bar::set_display(const stir::Array<1, float>&, int row_size)
-{}
+{
+    // to silence warning
+    if(row_size)
+    {
+
+    }
+}
 
 void Display_container_bar::set_display(const  stir::Array<2, float>&)
 {}
