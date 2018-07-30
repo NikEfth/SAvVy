@@ -51,7 +51,7 @@ public:
     void set_no_controls(bool _f) override;
 
     //! Set the Colormap of choise
-    virtual void set_color_map(int i)
+    inline void set_color_map(const QSharedPointer<QwtLinearColorMap> i)
     {
         _display->set_color_map(i);
     }

@@ -6,6 +6,7 @@
 #include <qwt_plot_spectrogram.h>
 #include <qwt_matrix_raster_data.h>
 #include <qwt_plot_rescaler.h>
+#include <qwt_scale_widget.h>
 
 class Display_container_raster : public Display_container
 {
@@ -13,12 +14,11 @@ class Display_container_raster : public Display_container
 public:
     explicit Display_container_raster(int dims, QWidget *parent = nullptr);
 
-    virtual void set_color_map(int i)
+    inline void set_color_map(const QSharedPointer<QwtColorMap> cm)
     {
-        if(!stir::is_null_ptr(myColorMap))
+        if(cm != nullptr)
         {
-            myColorMap->setColormap(i);
-            d_spectrogram->setColorMap(myColorMap);
+            d_spectrogram->setColorMap(cm);
             replot();
         }
     }
@@ -28,13 +28,15 @@ public:
 
 protected:
 
+    bool cm_set = false;
+
     QwtPlotSpectrogram *d_spectrogram = nullptr;
 
     QwtMatrixRasterData *p_raster = nullptr;
 
     QwtPlotRescaler *d_rescaler = nullptr;
-    //! Current ColorMap
-    display::ColorMap *myColorMap = nullptr;
+
+    QwtScaleWidget *p_colorScale = nullptr;
     //! Number of rows of data. - Nomrally Y axis
     unsigned long row_num;
     //! Offset of the horizontal axis

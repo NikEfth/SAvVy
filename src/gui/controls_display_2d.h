@@ -14,7 +14,7 @@ class Controls_display_2d : public QWidget
     Q_OBJECT
 
 public:
-    explicit Controls_display_2d(QWidget *parent = nullptr);
+    explicit Controls_display_2d(const QStringList &colorMapNames, QWidget *parent = nullptr);
     ~Controls_display_2d();
 
 signals:

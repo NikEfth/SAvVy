@@ -5,7 +5,10 @@
 #include <QWidget>
 #include <QFile>
 #include <QTextStream>
-
+#include <QDir>
+#include <QDirIterator>
+#include <QSharedPointer>
+#include<memory>
 #include<array>
 
 using namespace std;
@@ -40,9 +43,9 @@ public:
 
     virtual size_t get_num_points() const = 0;
 
-    virtual std::shared_ptr< QVector<double> >  get_x_values() const = 0;
+    virtual shared_ptr< QVector<double> >  get_x_values() const = 0;
 
-    virtual std::shared_ptr< QVector<double> >  get_y_values() const = 0;
+    virtual shared_ptr< QVector<double> >  get_y_values() const = 0;
 
     inline QString get_file_name() const
     {
@@ -80,27 +83,37 @@ protected:
 };
 
 //! Colormaps. Defaults at BW grayscale.
-class ColorMap: public QwtLinearColorMap
+class ColorMap
 {
 public:
-    inline explicit ColorMap():
-        QwtLinearColorMap()
+    inline explicit ColorMap(QString plugin_colormaps = "",
+                             QString default_colormap = ""):
+        _plugin_colormaps(plugin_colormaps),
+        _default_colormap(default_colormap)
     {
-        set_ebb_data();
-//        set_BW();
-        Nstops = 256;
-        my_list = ColorMap::getColormapList();
+        set_BW();
+        set_WB();
+        set_qwt();
+        set_JET();
+
+        my_list << "BW" << "WB" << "QWT" << "Jet";
+
+        if (!_plugin_colormaps.isEmpty())
+            load_plugins();
+
+        if(!_default_colormap.isEmpty())
+        {
+            index_of_default_colormap = my_list.indexOf(_default_colormap);
+        }
+
     }
 
-    inline explicit ColorMap(int set):
-        QwtLinearColorMap()
+    inline explicit ColorMap(int set,
+                             QString plugin_colormaps = "",
+                             QString default_colormap = ""):
+        ColorMap(plugin_colormaps, default_colormap)
     {
-//        set_BW();̣
-                set_ebb_data();
-        Nstops = 256;
-        my_list = ColorMap::getColormapList();
-
-        setColormap(set);
+        getColorMap(set);
     }
 
     inline ~ColorMap()
@@ -109,491 +122,222 @@ public:
     }
 
     //! Get the list with all the available options
-    inline static QStringList getColormapList()
+    inline QStringList getColormapList()
     {
-        QStringList ret;
-
-        ret << "BW" << "WB" << "Viridis" << "Extended Black Body" << "QWT" << "Jet";
-
-        return ret;
+        return my_list;
     }
 
     //! Set the active ColorMap by name
-    inline int setColormap(QString name)
+    inline const QSharedPointer<QwtLinearColorMap> getColorMap(QString name) const
     {
-        switch (my_list.indexOf(name))
-        {
-        case 0:
+        int index = my_list.indexOf(name);
 
-            this->set_BW();
+        return getColorMap(index);
+    }
 
-            break;
-
-        case 1:
-
-            this->set_WB();
-
-            break;
-
-        case 2:
-
-            this->set_Viridis();
-
-            break;
-
-        case 3:
-
-            this->set_EBB();
-
-            break;
-
-        case 4:
-
-            this->set_qwt();
-
-            break;
-
-        case 5:
-
-            this->set_JET();
-
-            break;
-
-        default:
-
-            this->set_BW();
-
-            break;
-        }
-
-        return 1;
+    inline const QSharedPointer<QwtLinearColorMap> getDefaultColorMap() const
+    {
+        return get_ColorMap(index_of_default_colormap);
     }
 
     //! Set the active ColorMap by index
-    inline int setColormap(int index)
+    inline const QSharedPointer<QwtLinearColorMap> getColorMap(int index) const
     {
         switch (index)
         {
         case 0:
 
-            this->set_BW();
-
-            break;
+            return this->get_BW();
 
         case 1:
 
-            this->set_WB();
-
-            break;
+            return this->get_WB();
 
         case 2:
 
-            this->set_Viridis();
-
-            break;
+            return this->get_qwt();
 
         case 3:
 
-            this->set_EBB();
-
-            break;
-
-        case 4:
-
-            this->set_qwt();
-
-            break;
-
-        case 5:
-
-            this->set_JET();
-
-            break;
+            return this->get_JET();
 
         default:
 
-            this->set_BW();
-
-            break;
+            return this->get_ColorMap(index);
         }
 
-        return 1;
     }
 
-    inline int set_ebb_data()
+    inline int load_plugins()
     {
-        QFile file("extended-black-body-table-byte-0256.csv");
-        QTextStream file_text_stream(&file);
 
-        if(file.open(QIODevice::ReadOnly))
+        QStringList filter;
+        QDirIterator it(_plugin_colormaps, filter,
+                        QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+
+        while (it.hasNext())
         {
-            for(unsigned long i = 0; i < _ebb_data.size(); i++)
+            QFile file(it.next());
+            if (!file.exists())
+                continue;
+            QFileInfo info(file);
+
+            if(info.suffix() != "csv")
+                continue;
+
+            QTextStream file_text_stream(&file);
+
+            if(file.open(QIODevice::ReadOnly))
             {
-                QString line = file_text_stream.readLine();
-                QStringList split = line.split(',');
+                QSharedPointer<QwtLinearColorMap> tmp( new QwtLinearColorMap());
 
+                QColor firstC;
+                QColor lastC;
 
-                _ebb_data[i][0] = static_cast<unsigned char>(split[1].toInt());
-                _ebb_data[i][1] = static_cast<unsigned char>(split[2].toInt());
-                _ebb_data[i][2] = static_cast<unsigned char>(split[3].toInt());
+                int ind = 0;
+
+                while(!file_text_stream.atEnd())
+                {
+                    QString line = file_text_stream.readLine();
+                    QStringList split = line.split(',');
+
+                    if (ind == 1)
+                    {
+                        firstC.setRgb(split[1].toInt(), split[2].toInt(), split[3].toInt());
+                    }
+
+                    if (ind == 256)
+                    {
+                        lastC.setRgb(split[1].toInt(), split[2].toInt(), split[3].toInt());
+                    }
+
+                    ++ind;
+                }
+
+                file.close();
+                tmp->setColorInterval(firstC, lastC);
+
+                file.open(QIODevice::ReadOnly);
+                ind = 0;
+                while(!file_text_stream.atEnd())
+                {
+                    QString line = file_text_stream.readLine();
+                    QStringList split = line.split(',');
+
+                    if(ind > 0 && ind < 256)
+                    {
+                        QColor clr(static_cast<unsigned char>(split[1].toInt()),
+                                static_cast<unsigned char>(split[2].toInt()),
+                                static_cast<unsigned char>(split[3].toInt()));
+
+                        tmp->addColorStop(split[0].toDouble(), clr);
+                    }
+                    ++ind;
+                }
+
+                file.close();
+
+                my_list << info.fileName();
+                _data_pool.append(tmp);
             }
         }
-
         return 1;
     }
 
     //! Set Black - White grayscale
     inline void set_BW()
     {
-        background = Qt::black;
-        peak = Qt::yellow;
-        setColorInterval(Qt::black, Qt::white);
+        QSharedPointer<QwtLinearColorMap> tmp( new QwtLinearColorMap(Qt::black,
+                                                                     Qt::white));
+
+        _data_pool.append(tmp);
     }
+
+    inline const QSharedPointer<QwtLinearColorMap> get_BW() const
+    {
+        return _data_pool[0];
+    }
+
     //! Set White - Black grayscale
     inline void set_WB()
     {
-        background = Qt::white;
-        peak = Qt::black;
-        setColorInterval(Qt::white, Qt::black);
+        QSharedPointer<QwtLinearColorMap> tmp( new QwtLinearColorMap(Qt::white,
+                                                                     Qt::black));
+
+        _data_pool.append(tmp);
+    }
+    inline const QSharedPointer<QwtLinearColorMap> get_WB() const
+    {
+        return _data_pool[1];
     }
     //! Set Jet, popular by old Matlab
     inline void set_JET()
     {
-        background = Qt::blue;
-        setColorInterval(Qt::blue, Qt::red);
-        peak = Qt::white;
-        addColorStop( 0.35, Qt::cyan );
-        addColorStop( 0.5, Qt::green );
-        addColorStop( 0.75, Qt::yellow );
+        QSharedPointer<QwtLinearColorMap> tmp( new QwtLinearColorMap(Qt::blue,
+                                                                     Qt::red));
+
+        tmp->addColorStop( 0.35, Qt::cyan );
+        tmp->addColorStop( 0.5, Qt::green );
+        tmp->addColorStop( 0.75, Qt::yellow );
+
+        _data_pool.append(tmp);
+    }
+
+    inline const QSharedPointer<QwtLinearColorMap> get_JET() const
+    {
+        return _data_pool.at(3);
     }
     //! Set QWT default ColorMap
     inline void set_qwt()
     {
-        background = Qt::darkCyan;
-        setColorInterval(Qt::darkCyan, Qt::red);
-        peak = Qt::yellow;
-        addColorStop( 0.1, Qt::cyan );
-        addColorStop( 0.6, Qt::green );
-        addColorStop( 0.95, Qt::yellow );
+        QSharedPointer<QwtLinearColorMap> tmp( new QwtLinearColorMap(Qt::darkCyan,
+                                                                     Qt::red));
+
+        tmp->addColorStop( 0.1, Qt::cyan );
+        tmp->addColorStop( 0.6, Qt::green );
+        tmp->addColorStop( 0.95, Qt::yellow );
+
+        _data_pool.append(tmp);
     }
-    //! Set Viridis ColorMap
-    inline void set_Viridis()
+
+    inline QSharedPointer<QwtLinearColorMap> get_qwt() const
     {
-        double step = 1.0 / Nstops;
-        double cur = 0.0;
-
-        for (int i = 0; i < Nstops; i++, cur+=step)
-        {
-            _data[i] = QColor(_viridis_data[i][0],
-                    _viridis_data[i][1],
-                    _viridis_data[i][2]);
-
-            addColorStop(cur,_data[i]);
-        }
-
-        background = _data[0];
-        peak = _data[Nstops-1];
-        setColorInterval(_data[0], _data[Nstops-1]);
+        return _data_pool.at(2);
     }
+
     //! Set Extended Black Body ColorMap
-    inline void set_EBB()
+    inline QSharedPointer<QwtLinearColorMap> get_ColorMap(int index) const
     {
-        double step = 1.0 / Nstops;
-        double cur = 0.0;
-
-        for (int i = 0; i < Nstops; i++, cur+=step)
+        if (index < _data_pool.size() &&
+                index >=0)
         {
-            _data[i] = QColor(_ebb_data[static_cast<unsigned long>(i)][0],
-                    _ebb_data[static_cast<unsigned long>(i)][1],
-                    _ebb_data[static_cast<unsigned long>(i)][2]);
-
-            addColorStop(cur,_data[i]);
+            return _data_pool.at(index);
         }
 
-        background = _data[0];
-        peak = _data[Nstops-1];
-        setColorInterval(_data[0], _data[Nstops-1]);
+        return nullptr;
     }
-    //! Returns the first Color of the ColorMap
-    inline QColor get_background() const
-    { return background; }
-    //! Returns the last Color of the ColorMap
-    inline QColor get_peak_color() const
-    { return peak; }
+
+    //    //! Returns the first Color of the ColorMap
+    //    inline QColor get_background() const
+    //    { return background; }
+    //    //! Returns the last Color of the ColorMap
+    //    inline QColor get_peak_color() const
+    //    { return peak; }
 
 private:
 
-    QColor _data[256];
+    QString _plugin_colormaps;
 
-    //! Vidiris array. I could find the functions.
-    unsigned char _viridis_data[256][3] = {
-        {68, 1,  84},
-        {68, 2,  85},
-        {68, 3,  87},
-        {69, 5,  88},
-        {69, 6,  90},
-        {69, 8,  91},
-        {70, 9,  92},
-        {70, 11, 94},
-        {70, 12, 95},
-        {70, 14, 97},
-        {71, 15, 98},
-        {71, 17, 99},
-        {71, 18, 101},
-        {71, 20, 102},
-        {71, 21, 103},
-        {71, 22, 105},
-        {71, 24, 106},
-        {72, 25, 107},
-        {72, 26, 108},
-        {72, 28, 110},
-        {72, 29, 111},
-        {72, 30, 112},
-        {72, 32, 113},
-        {72, 33, 114},
-        {72, 34, 115},
-        {72, 35, 116},
-        {71, 37, 117},
-        {71, 38, 118},
-        {71, 39, 119},
-        {71, 40, 120},
-        {71, 42, 121},
-        {71, 43, 122},
-        {71, 44, 123},
-        {70, 45, 124},
-        {70, 47, 124},
-        {70, 48, 125},
-        {70, 49, 126},
-        {69, 50, 127},
-        {69, 52, 127},
-        {69, 53, 128},
-        {69, 54, 129},
-        {68, 55, 129},
-        {68, 57, 130},
-        {67, 58, 131},
-        {67, 59, 131},
-        {67, 60, 132},
-        {66, 61, 132},
-        {66, 62, 133},
-        {66, 64, 133},
-        {65, 65, 134},
-        {65, 66, 134},
-        {64, 67, 135},
-        {64, 68, 135},
-        {63, 69, 135},
-        {63, 71, 136},
-        {62, 72, 136},
-        {62, 73, 137},
-        {61, 74, 137},
-        {61, 75, 137},
-        {61, 76, 137},
-        {60, 77, 138},
-        {60, 78, 138},
-        {59, 80, 138},
-        {59, 81, 138},
-        {58, 82, 139},
-        {58, 83, 139},
-        {57, 84, 139},
-        {57, 85, 139},
-        {56, 86, 139},
-        {56, 87, 140},
-        {55, 88, 140},
-        {55, 89, 140},
-        {54, 90, 140},
-        {54, 91, 140},
-        {53, 92, 140},
-        {53, 93, 140},
-        {52, 94, 141},
-        {52, 95, 141},
-        {51, 96, 141},
-        {51, 97, 141},
-        {50, 98, 141},
-        {50, 99, 141},
-        {49, 100,141},
-        {49, 101,141},
-        {49, 102,141},
-        {48, 103,141},
-        {48, 104,141},
-        {47, 105,141},
-        {47, 106,141},
-        {46, 107,142},
-        {46, 108,142},
-        {46, 109,142},
-        {45, 110,142},
-        {45, 111,142},
-        {44, 112,142},
-        {44, 113,142},
-        {44, 114,142},
-        {43, 115,142},
-        {43, 116,142},
-        {42, 117,142},
-        {42, 118,142},
-        {42, 119,142},
-        {41, 120,142},
-        {41, 121,142},
-        {40, 122,142},
-        {40, 122,142},
-        {40, 123,142},
-        {39, 124,142},
-        {39, 125,142},
-        {39, 126,142},
-        {38, 127,142},
-        {38, 128,142},
-        {38, 129,142},
-        {37, 130,142},
-        {37, 131,141},
-        {36, 132,141},
-        {36, 133,141},
-        {36, 134,141},
-        {35, 135,141},
-        {35, 136,141},
-        {35, 137,141},
-        {34, 137,141},
-        {34, 138,141},
-        {34, 139,141},
-        {33, 140,141},
-        {33, 141,140},
-        {33, 142,140},
-        {32, 143,140},
-        {32, 144,140},
-        {32, 145,140},
-        {31, 146,140},
-        {31, 147,139},
-        {31, 148,139},
-        {31, 149,139},
-        {31, 150,139},
-        {30, 151,138},
-        {30, 152,138},
-        {30, 153,138},
-        {30, 153,138},
-        {30, 154,137},
-        {30, 155,137},
-        {30, 156,137},
-        {30, 157,136},
-        {30, 158,136},
-        {30, 159,136},
-        {30, 160,135},
-        {31, 161,135},
-        {31, 162,134},
-        {31, 163,134},
-        {32, 164,133},
-        {32, 165,133},
-        {33, 166,133},
-        {33, 167,132},
-        {34, 167,132},
-        {35, 168,131},
-        {35, 169,130},
-        {36, 170,130},
-        {37, 171,129},
-        {38, 172,129},
-        {39, 173,128},
-        {40, 174,127},
-        {41, 175,127},
-        {42, 176,126},
-        {43, 177,125},
-        {44, 177,125},
-        {46, 178,124},
-        {47, 179,123},
-        {48, 180,122},
-        {50, 181,122},
-        {51, 182,121},
-        {53, 183,120},
-        {54, 184,119},
-        {56, 185,118},
-        {57, 185,118},
-        {59, 186,117},
-        {61, 187,116},
-        {62, 188,115},
-        {64, 189,114},
-        {66, 190,113},
-        {68, 190,112},
-        {69, 191,111},
-        {71, 192,110},
-        {73, 193,109},
-        {75, 194,108},
-        {77, 194,107},
-        {79, 195,105},
-        {81, 196,104},
-        {83, 197,103},
-        {85, 198,102},
-        {87, 198,101},
-        {89, 199,100},
-        {91, 200,98},
-        {94, 201,97},
-        {96, 201,96},
-        {98, 202,95},
-        {100,203,93},
-        {103,204,92},
-        {105,204,91},
-        {107,205,89},
-        {109,206,88},
-        {112,206,86},
-        {114,207,85},
-        {116,208,84},
-        {119,208,82},
-        {121,209,81},
-        {124,210,79},
-        {126,210,78},
-        {129,211,76},
-        {131,211,75},
-        {134,212,73},
-        {136,213,71},
-        {139,213,70},
-        {141,214,68},
-        {144,214,67},
-        {146,215,65},
-        {149,215,63},
-        {151,216,62},
-        {154,216,60},
-        {157,217,58},
-        {159,217,56},
-        {162,218,55},
-        {165,218,53},
-        {167,219,51},
-        {170,219,50},
-        {173,220,48},
-        {175,220,46},
-        {178,221,44},
-        {181,221,43},
-        {183,221,41},
-        {186,222,39},
-        {189,222,38},
-        {191,223,36},
-        {194,223,34},
-        {197,223,33},
-        {199,224,31},
-        {202,224,30},
-        {205,224,29},
-        {207,225,28},
-        {210,225,27},
-        {212,225,26},
-        {215,226,25},
-        {218,226,24},
-        {220,226,24},
-        {223,227,24},
-        {225,227,24},
-        {228,227,24},
-        {231,228,25},
-        {233,228,25},
-        {236,228,26},
-        {238,229,27},
-        {241,229,28},
-        {243,229,30},
-        {246,230,31},
-        {248,230,33},
-        {250,230,34},
-        {253,231,36}
-    };
+    QString _default_colormap;
 
-    array<array<unsigned char, 3>, 256> _ebb_data;
+    int index_of_default_colormap;
 
-    QColor background;
-    QColor peak;
+    QVector < QSharedPointer<QwtLinearColorMap> > _data_pool;
+
+    //    QColor background;
+    //    QColor peak;
 
     QStringList my_list;
-
-    //! Number of color stops \todo Adjustable
-    int Nstops;
 };
 }
 

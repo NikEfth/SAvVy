@@ -26,9 +26,6 @@
    <property name="bottomMargin">
     <number>1</number>
    </property>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout"/>
-   </item>
   </layout>
  </widget>
  <resources/>

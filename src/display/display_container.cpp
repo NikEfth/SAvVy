@@ -1,9 +1,12 @@
 #include "display_container.h"
+#include <qwt_scale_engine.h>
 
 Display_container::Display_container(int _num_dim, QWidget *parent)
     :QwtPlot(parent), num_dim(_num_dim)
 {
-    this->canvas()->setMinimumSize(150, 150);
+//    this->canvas()->setMinimumSize(150, 150);
+    this->axisScaleEngine(QwtPlot::yLeft)->setAttribute(QwtScaleEngine::Floating,true);
+    this->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating,true);
 }
 
 void Display_container::closeEvent(QCloseEvent *event)
@@ -34,7 +37,7 @@ int Display_container::get_num_data() const
     return data_num;
 }
 
-void Display_container::set_color_map(int i)
+void Display_container::set_color_map(const QSharedPointer<QwtColorMap> i)
 {
     // to silence warning
     if(i)

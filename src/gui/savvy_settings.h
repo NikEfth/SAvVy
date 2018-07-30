@@ -21,7 +21,7 @@ class GeneralSettings : public QWidget
 public:
     explicit GeneralSettings(QWidget *parent = nullptr);
 
-     QCheckBox* autoPlotOpenedFiles;
+    QCheckBox* autoPlotOpenedFiles;
 
     QCheckBox* autoContrast;
 
@@ -38,6 +38,10 @@ public:
     QVBoxLayout* mainLayout;
 
     QLineEdit* pluginsPath;
+
+    QLineEdit* colorMapsPath;
+
+
 };
 
 
@@ -52,9 +56,11 @@ public:
 
     QGroupBox* visualisationGroup;
 
-    QComboBox* colorMapCombo;
+    std::shared_ptr<QComboBox> colorMapCombo;
 
     Display_container_2d* preview;
+
+    std::shared_ptr<ColorMap> colormaps;
 };
 
 class AppearanceSettings : public QWidget

@@ -1,14 +1,15 @@
 #include "panel_opened_file_controls.h"
 #include "ui_panel_opened_file_controls.h"
 
-Panel_opened_file_controls::Panel_opened_file_controls(QWidget *parent) :
+Panel_opened_file_controls::Panel_opened_file_controls(const QStringList &colorMapNames,
+                                                       QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Panel_opened_file_controls)
 {
     ui->setupUi(this);
 
     controls_1d = new Controls_display_1d(this);
-    controls_2d = new Controls_display_2d(this);
+    controls_2d = new Controls_display_2d(colorMapNames, this);
 
     controls_1d->setHidden(true);
     controls_2d->setHidden(true);

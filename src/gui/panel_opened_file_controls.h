@@ -15,7 +15,7 @@ class Panel_opened_file_controls : public QWidget
     Q_OBJECT
 
 public:
-    explicit Panel_opened_file_controls(QWidget *parent = nullptr);
+    explicit Panel_opened_file_controls(const QStringList& colorMapNames, QWidget *parent = nullptr);
     ~Panel_opened_file_controls();
 
     void show_panel(int dim=0);

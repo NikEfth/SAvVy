@@ -7,7 +7,8 @@
 #include <QGridLayout>
 #include <QSettings>
 #include <QHBoxLayout>
-
+#include <QFileDialog>
+#include <QDir>
 #include <cmath>
 
 GeneralSettings::GeneralSettings(QWidget *parent) :
@@ -40,10 +41,35 @@ GeneralSettings::GeneralSettings(QWidget *parent) :
 
         QHBoxLayout* hLayout = new QHBoxLayout(defaultsPage);
         pluginsPath = new QLineEdit(this);
-        QLabel * lbl_pluginsPath = new QLabel("Plugins path: ");
+        QLabel * lbl_pluginsPath = new QLabel("Plugins path:     ",this);
+        QPushButton* pluginsPathSelect = new QPushButton(QIcon(":/icons/resources/gimp-pro/images/gtk-directory.png"),
+                                                         "", this);
+        connect(pluginsPathSelect, &QPushButton::clicked, [=]()
+        {
+            pluginsPath->setText(
+                    QFileDialog::getExistingDirectory(this, QDir::homePath()));
+        }
+        );
         hLayout->addWidget(lbl_pluginsPath);
         hLayout->addWidget(pluginsPath);
-        defaultsPageLayout->addItem(hLayout);
+        hLayout->addWidget(pluginsPathSelect);
+        defaultsPageLayout->addLayout(hLayout);
+
+        QHBoxLayout* hLayout_2 = new QHBoxLayout(defaultsPage);
+        colorMapsPath = new QLineEdit(this);
+        QLabel * lbl_colormapsPath = new QLabel("ColorMaps path:", this);
+        QPushButton* colormapsPathSelect = new QPushButton(QIcon(":/icons/resources/gimp-pro/images/gtk-directory.png"),
+                                                           "", this);
+        connect(colormapsPathSelect, &QPushButton::clicked, [=]()
+        {
+            colorMapsPath->setText(
+                    QFileDialog::getExistingDirectory(this, QDir::homePath()));
+        }
+        );
+        hLayout_2->addWidget(lbl_colormapsPath);
+        hLayout_2->addWidget(colorMapsPath);
+        hLayout_2->addWidget(colormapsPathSelect);
+        defaultsPageLayout->addLayout(hLayout_2);
 
 
         defaultsPageLayout->addStretch();
@@ -77,38 +103,41 @@ ViewSettings::ViewSettings(QWidget *parent) :
     mainLayout->setContentsMargins(1,1,1,1);
     this->setLayout(mainLayout);
 
+    colormaps.reset(new ColorMap);
+
     visualisationGroup = new QGroupBox("Visualisation Options", this);
     QGridLayout* visualisationGroupLayout = new QGridLayout(visualisationGroup);
     visualisationGroupLayout->setContentsMargins(1,1,1,1);
     visualisationGroup->setLayout(visualisationGroupLayout);
     //
     {
-        colorMapCombo = new QComboBox(visualisationGroup);
+        colorMapCombo.reset(new QComboBox(visualisationGroup));
         QLabel* lbl_colormap = new QLabel("Default colormap:", visualisationGroup);
         visualisationGroupLayout->addWidget(lbl_colormap,0,0);
-        colorMapCombo->addItems(display::ColorMap::getColormapList());
-        visualisationGroupLayout->addWidget(colorMapCombo,0,1);
+        colorMapCombo->addItems(colormaps->getColormapList());
+        visualisationGroupLayout->addWidget(colorMapCombo.get(),0,1);
     }
 
     {
         QLabel* lbl_preview =new QLabel("Preview:", visualisationGroup);
         visualisationGroupLayout->addWidget(lbl_preview,1,0);
 
-        int size = 80;
-        QVector<QVector<double> > vtest1(size);
-        for (int i = 0; i < size; ++i)
-        {
-            vtest1[i].resize(size);
-            for(int j = 0; j < size; ++j)
-                vtest1[i][j] = sqrt(i*i + j*j);
-        }
+        QVector<QVector<double> > vtest1(256, QVector<double>(256, 0.0));
+        for (int i = 0; i < 256; ++i)
+            for(int j = 0; j < 256; ++j)
+                vtest1[i][j] = j;
 
         preview = new Display_container_2d(2, visualisationGroup);
         preview->set_display(vtest1);
         preview->enable_axis(false);
+        preview->setMaximumSize(256, 30);
         visualisationGroupLayout->addWidget(preview,1,1);
-        connect(colorMapCombo,  static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-                preview, &Display_container_2d::set_color_map);
+        connect(colorMapCombo.get(),  static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=](int index)
+        {
+            if (index >=0 && index < colorMapCombo->maxCount())
+                preview->set_color_map(colormaps->getColorMap(index));
+        }
+        );
     }
 
     visualisationGroup->setLayout(visualisationGroupLayout);
@@ -146,6 +175,7 @@ Savvy_settings::Savvy_settings(QWidget *parent) :
     view_setts->colorMapCombo->setCurrentIndex(settings.value("defaultColorMap").toInt());
     general_setts->autoContrast->setChecked(settings.value("AutoScaleImages").toBool());
     general_setts->pluginsPath->setText(settings.value("PluginsPath").toString());
+    general_setts->colorMapsPath->setText(settings.value("ColorMapsPath").toString());
     general_setts->autoPlotOpenedFiles->setChecked(settings.value("AutoPlotOpenedImages").toBool());
     general_setts->defaultAxis->setChecked(settings.value("showAxisDefault").toBool());
     general_setts->defaultTabbedMode->setChecked(settings.value("defaultTabbedViewMode").toBool());
@@ -186,6 +216,7 @@ void Savvy_settings::on_save_settings()
     settings.setValue("defaultColorMap", view_setts->colorMapCombo->currentIndex());
     settings.setValue("AutoScaleImages", general_setts->autoContrast->isChecked());
     settings.setValue("PluginsPath", general_setts->pluginsPath->text());
+    settings.setValue("ColorMapsPath", general_setts->colorMapsPath->text());
     settings.setValue("AutoPlotOpenedImages", general_setts->autoPlotOpenedFiles->isChecked());
     settings.setValue("showAxisDefault", general_setts->defaultAxis->isChecked());
     settings.setValue("defaultTabbedViewMode", general_setts->defaultTabbedMode->isChecked());

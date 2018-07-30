@@ -201,7 +201,7 @@ void Display_container_2d::set_axis(int _offset_h, int _offset_v,
     else
     {
         d_rescaler = new QwtPlotRescaler(this->canvas(),QwtPlot::xBottom, QwtPlotRescaler::Fixed);
-        d_rescaler->setExpandingDirection(QwtPlot::yLeft, QwtPlotRescaler::ExpandBoth);
+        d_rescaler->setExpandingDirection(QwtPlot::xBottom, QwtPlotRescaler::ExpandBoth);
     }
 }
 
@@ -220,20 +220,20 @@ void Display_container_2d::update_scene(int i)
     replot();
 }
 
-void Display_container_2d::set_color_map(int index)
-{
-    myColorMap->setColormap(index);
-    d_spectrogram->setColorMap(myColorMap);
+//void Display_container_2d::set_color_map(int index)
+//{
+//    myColorMap->setColormap(index);
+//    d_spectrogram->setColorMap(myColorMap);
 
-    //    title.setColor(myColorMap->get_peak_color());
-    //    lOCD.setColor(myColorMap->get_peak_color());
-    //    rOCD.setColor(myColorMap->get_peak_color());
-    //    tOCD.setColor(myColorMap->get_peak_color());
-    //    bOCD.setColor(myColorMap->get_peak_color());
-    //    setCanvasBackground(QBrush(myColorMap->get_background()));
+//    //    title.setColor(myColorMap->get_peak_color());
+//    //    lOCD.setColor(myColorMap->get_peak_color());
+//    //    rOCD.setColor(myColorMap->get_peak_color());
+//    //    tOCD.setColor(myColorMap->get_peak_color());
+//    //    bOCD.setColor(myColorMap->get_peak_color());
+//    //    setCanvasBackground(QBrush(myColorMap->get_background()));
 
-    replot();
-}
+//    replot();
+//}
 
 void Display_container_2d::initialise()
 {

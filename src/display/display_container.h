@@ -63,7 +63,7 @@ public:
 
     virtual void set_display(void*) = 0;
 
-    virtual void set_color_map(int i);
+    virtual void set_color_map(const QSharedPointer<QwtColorMap> i);
 
     /** @}*/
 

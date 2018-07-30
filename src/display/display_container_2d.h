@@ -80,8 +80,8 @@ public:
 //    void clear();
 
     virtual ~Display_container_2d();
+
 public slots:
-    void set_color_map(int);
 
     virtual void update_scene(int i = 0);
 

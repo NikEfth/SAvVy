@@ -71,7 +71,7 @@ private slots:
 
     void on_actionDuplicate_triggered();
 
-    void on_set_colormap(int _cm);
+    void on_set_colormap(int i = 0);
     /** @}*/
 
     /** \addtogroup GUI
@@ -144,15 +144,17 @@ private:
 
     void shadeSubWindows() const;
     //! QDockWidget witch will hold the ToolManager
-    QDockWidget* dc_tool_manager;
+    QDockWidget* dc_tool_manager = nullptr;
     //! QDockWidget for the Panel_opened_files
-    QDockWidget* dc_opened_files;
+    QDockWidget* dc_opened_files = nullptr;
 
-    QDockWidget* dc_displayed_files;
+    QDockWidget* dc_displayed_files = nullptr;
     //! QDockWidget for Panel_opened_file_controls
-    QDockWidget* dc_opened_file_controls;
+    QDockWidget* dc_opened_file_controls = nullptr;
 
-    QDockWidget* dc_contrast;
+    QDockWidget* dc_contrast = nullptr;
+
+    ColorMap* _colormaps;
 
     Panel_displayed_files* pnl_displayed_files;
 
