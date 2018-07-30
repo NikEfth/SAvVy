@@ -10,8 +10,6 @@ Display_container_raster::Display_container_raster(int dims, QWidget *parent)
     d_spectrogram = new QwtPlotSpectrogram();
     d_spectrogram->setRenderThreadCount(1);
     d_spectrogram->setCachePolicy(QwtPlotRasterItem::CachePolicy::NoCache);
-    this->setAxisAutoScale(Qt::XAxis);
-    this->setAxisAutoScale(Qt::YAxis);
 
 //    if(settings.contains("defaultColorMap"))
 //        myColorMap = new display::ColorMap(settings.value("defaultColorMap").toInt());
@@ -39,8 +37,7 @@ Display_container_raster::Display_container_raster(int dims, QWidget *parent)
 
 Display_container_raster::~Display_container_raster()
 {
-    // N.E: We cannot call this because colormaps will be deleted, too.
-//    delete d_spectrogram;
+    delete d_spectrogram;
 }
 
 size_t Display_container_raster::get_x_axis_size() const
