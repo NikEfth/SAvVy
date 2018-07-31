@@ -46,6 +46,9 @@
        <height>0</height>
       </size>
      </property>
+     <property name="contextMenuPolicy">
+      <enum>Qt::CustomContextMenu</enum>
+     </property>
      <property name="dragDropMode">
       <enum>QAbstractItemView::NoDragDrop</enum>
      </property>
@@ -154,7 +157,21 @@
        </property>
        <property name="icon">
         <iconset resource="../../resources.qrc">
-         <normaloff>:/icons/resources/gimp-pro/images/gimp-merge-down.png</normaloff>:/icons/resources/gimp-pro/images/gimp-merge-down.png</iconset>
+         <normaloff>:/icons/resources/gimp-pro/images/gtk-go-down.png</normaloff>:/icons/resources/gimp-pro/images/gtk-go-down.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="psh_info">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../resources.qrc">
+         <normaloff>:/icons/resources/gimp-pro/images/gimp-info.png</normaloff>:/icons/resources/gimp-pro/images/gimp-info.png</iconset>
        </property>
       </widget>
      </item>

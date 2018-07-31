@@ -8,8 +8,8 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QSharedPointer>
-#include<memory>
-#include<array>
+#include <memory>
+#include <array>
 
 using namespace std;
 

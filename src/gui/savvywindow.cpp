@@ -48,7 +48,8 @@ SavvyWindow::SavvyWindow(QWidget *parent) :
         _colormaps = new ColorMap(settings.value("ColorMapsPath").toString(),
                                   settings.value("defaultColorMap").toString());
     else if (settings.contains("ColorMapsPath"))
-        _colormaps = new ColorMap(settings.value("ColorMapsPath").toString());
+        _colormaps = new ColorMap(settings.value("ColorMapsPath").toString(),
+                                  "BW");
     else
         _colormaps = new ColorMap();
 
@@ -148,7 +149,12 @@ bool SavvyWindow::open_file(const QString& fileName, bool _mute_open)
 
     if(is_null_ptr(tmp_sptr))
     {
-        //error opening file!!
+        QMessageBox msgBox;
+        msgBox.setText("Error opening file "+fileName);
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.setIcon(QMessageBox::Critical);
+        return msgBox.exec();
     }
 
     prependToRecentFiles(fileName);
@@ -190,9 +196,6 @@ void SavvyWindow::updateGUI(QMdiSubWindow * activeSubWindow)
         }
     }
 
-    //    int current_view_mode = ui->mdi
-    //    pnl_opened_file_controls->show_panel();
-
 }
 
 void SavvyWindow::focus_sub_window(QString _id) const
@@ -204,8 +207,7 @@ void SavvyWindow::focus_sub_window(QString _id) const
 
 Display_manager *SavvyWindow::createDisplayManager(int num_dims)
 {
-    Display_manager *ret = new Display_manager(next_window_id,num_dims, this);
-    ret->set_color_map(_colormaps->getDefaultColorMap());
+    Display_manager *ret = new Display_manager(next_window_id, num_dims, this);
     next_window_id++;
     return ret;
 }
@@ -250,11 +252,6 @@ bool SavvyWindow::append_to_mdi(Display_manager *child,
                                 bool prepend_to_recent,
                                 bool minimized) const
 {
-    // to silence warning
-    if(prepend_to_recent)
-    {
-
-    }
 
     QObject::connect(child, &Display_manager::aboutToClose, this, &SavvyWindow::remove_from_mdi);
 
@@ -303,7 +300,6 @@ void SavvyWindow::display_array(std::shared_ptr<stir::ArrayInterface> _array,
     {
         Display_manager * disp =  new Display_manager(next_window_id, _array.get(), this);
         disp->set_file_name(_name);
-        disp->set_color_map(_colormaps->getDefaultColorMap());
         ++next_window_id;
 
         if (is_null_ptr(disp))
@@ -316,7 +312,6 @@ void SavvyWindow::display_array(std::shared_ptr<stir::ArrayInterface> _array,
     {
         Display_manager* disp = new Display_manager(next_window_id, _array.get(), this);
         disp->set_file_name(_name);
-        disp->set_color_map(_colormaps->getDefaultColorMap());
         ++next_window_id;
 
         if (is_null_ptr(disp))
@@ -329,7 +324,6 @@ void SavvyWindow::display_array(std::shared_ptr<stir::ArrayInterface> _array,
     {
         Display_manager* disp = new Display_manager(next_window_id, _array.get(), this);
         disp->set_file_name(_name);
-        disp->set_color_map(_colormaps->getDefaultColorMap());
         ++next_window_id;
 
         if (is_null_ptr(disp))

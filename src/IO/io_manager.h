@@ -14,15 +14,17 @@ namespace io_manager {
 //! \param file_name
 //! \return
 //!
-stir::ArrayInterface* open_array(std::string file_name)
+int open_array(const std::string& file_name,
+                std::shared_ptr<stir::ArrayInterface>& array)
 {
 
     if (!stir::is_interfile_signature(file_name.c_str()))
     {
-        return stir::read_interfile_image(file_name.c_str());
+        array.reset( new stir::VoxelsOnCartesianGrid<float> ( *stir::read_interfile_image(file_name.c_str())) );
+        return 1;
     }
 
-    return nullptr;
+    return 0;
 }
 
 void open_header(std::string file_name)

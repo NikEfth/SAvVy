@@ -21,10 +21,6 @@ namespace Ui {
 class SavvyWindow;
 }
 
-//namespace savvy {
-//class SavvyWindow;
-//}
-
 //!
 //! \brief The SavvyWindow class
 //! The main window class.

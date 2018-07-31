@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QListWidgetItem>
+#include <QPoint>
 
 #include <memory>
 
@@ -70,7 +71,7 @@ signals:
 
 public slots:
     //! Append a window on the  ui->listOpenedFiles
-    void append_to_workspace(std::shared_ptr<stir::ArrayInterface> child, const QString &_name);
+    void append_to_workspace(std::shared_ptr<stir::ArrayInterface> data, const QString &name);
     //! Update the state of the QWidgets on the GUI
     void updateGUI();
 
@@ -94,6 +95,10 @@ private slots:
 
     void on_psh_move_down_clicked();
 
+    void on_psh_info_clicked();
+
+    void showListContextMenu(const QPoint &pos);
+
 private:
 
     //! \details This member holds an incremental number for  every window that
@@ -110,6 +115,8 @@ private:
     QVector< std::shared_ptr<stir::ArrayInterface> > openned_files;
 
     void move_item(int new_location);
+
+    bool hadData = false;
 };
 
 

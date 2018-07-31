@@ -20,6 +20,9 @@ public:
 
     explicit Display_manager(int _my_id, stir::ArrayInterface* __display, QWidget *parent = nullptr);
 
+    explicit Display_manager(int _my_id, stir::ArrayInterface* __display,
+                             QSharedPointer<QwtLinearColorMap> _def_colormap = nullptr, QWidget *parent = nullptr);
+
     ~Display_manager();
 
     /** \addtogroup Setters

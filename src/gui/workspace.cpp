@@ -1,3 +1,6 @@
+#include <QMenu>
+#include <QAction>
+
 #include "workspace.h"
 #include "ui_workspace.h"
 
@@ -14,6 +17,9 @@ Workspace::Workspace(QWidget *parent) :
 
     connect(ui->listOpenedFiles, &QListWidget::itemChanged,
             this, &Workspace::highlightChecked);
+
+    connect(ui->listOpenedFiles, &QListWidget::customContextMenuRequested,
+            this, &Workspace::showListContextMenu);
 }
 
 Workspace::~Workspace()
@@ -24,28 +30,81 @@ Workspace::~Workspace()
 void Workspace::updateGUI()
 {
     bool hasData= (openned_files.size() != 0);
-    ui->remove_array->setEnabled(hasData);
-    ui->display_array->setEnabled(hasData);
-    ui->duplicate_array->setEnabled(hasData);
-    ui->psh_move_down->setEnabled(hasData);
-    ui->psh_move_up->setEnabled(hasData);
+    if(hasData != hadData)
+    {
+        ui->remove_array->setEnabled(hasData);
+        ui->display_array->setEnabled(hasData);
+        ui->duplicate_array->setEnabled(hasData);
+        ui->psh_move_down->setEnabled(hasData);
+        ui->psh_move_up->setEnabled(hasData);
+        ui->psh_info->setEnabled(hasData);
+        hadData = hasData;
+    }
 }
 
+void Workspace::showListContextMenu(const QPoint &pos)
+{
+    bool hasData = (openned_files.size() != 0);
+    if(hasData)
+    {
+        QMenu myMenu;
+        QAction *actSelectAll = myMenu.addAction("Select All");
+        //    actSelect->setIcon(QIcon::fromTheme("gtk-add.png"));
 
-void Workspace::append_to_workspace(std::shared_ptr<stir::ArrayInterface> child,
-                                    const QString& _name)
+        QObject::connect(actSelectAll, &QAction::triggered, [=]()
+        {
+            for(int i = 0; i < ui->listOpenedFiles->count(); ++i)
+            {
+                QListWidgetItem* item = ui->listOpenedFiles->item(i);
+                item->setCheckState(Qt::Checked);
+            }
+        });
+
+        QAction *actDeselectAll = myMenu.addAction("Deselect All");
+        //    actSelect->setIcon(QIcon::fromTheme("gtk-add.png"));
+
+        QObject::connect(actDeselectAll, &QAction::triggered, [=]()
+        {
+            for(int i = 0; i < ui->listOpenedFiles->count(); ++i)
+            {
+                QListWidgetItem* item = ui->listOpenedFiles->item(i);
+                item->setCheckState(Qt::Unchecked);
+            }
+        });
+
+        QAction *actCloseAll = myMenu.addAction("Close Selected");
+        //    actClose->setIcon(QIcon::fromTheme("gimp-clsoe.png"));
+
+        QObject::connect(actCloseAll, &QAction::triggered, [=]()
+        {
+
+            for (int i = 0; i < ui->listOpenedFiles->count(); ++i)
+                if ( ui->listOpenedFiles->item(i)->checkState() == Qt::Checked)
+                {
+                    remove_from_workspace(i);
+                    i == 0 ? i = -1 : i = 0;
+                }
+        });
+
+        myMenu.exec(this->mapToGlobal(pos));
+    }
+}
+
+void Workspace::append_to_workspace(std::shared_ptr<stir::ArrayInterface> data,
+                                    const QString& name)
 {
 
     QListWidgetItem* tmp_itm =  new QListWidgetItem();
 
-    tmp_itm->setText(_name);
+    tmp_itm->setText(name);
     tmp_itm->setFlags(tmp_itm->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     tmp_itm->setCheckState(Qt::Unchecked);
 
     ui->listOpenedFiles->addItem(tmp_itm);
     ui->listOpenedFiles->setCurrentItem(tmp_itm);
 
-    openned_files.append(child);
+    openned_files.append(data);
+
     updateGUI();
 }
 
@@ -118,7 +177,6 @@ QString Workspace::get_current_name()
     return ui->listOpenedFiles->item( ui->listOpenedFiles->currentRow())->text();
 }
 
-
 void Workspace::highlightChecked(QListWidgetItem *item)
 {
     if(item->checkState() == Qt::Checked)
@@ -133,7 +191,8 @@ void Workspace::highlightChecked(QListWidgetItem *item)
         item->setBackgroundColor(QColor("#ffffff"));
         ui->listOpenedFiles->blockSignals(false);
     }
-    //    ui->lbl_num_groupped->setText(QString::number(grouped_files.size()));
+
+    //ui->lbl_num_groupped->setText(QString::number(grouped_files.size()));
 }
 
 bool Workspace::has_grouped_items() const
@@ -153,39 +212,14 @@ QStringList Workspace::get_groupped() const
 
 std::shared_ptr <stir::ArrayInterface> Workspace::open_array(const QString& fileName)
 {
+    std::shared_ptr<stir::ArrayInterface> input;
 
-    stir::ArrayInterface* input = io_manager::open_array(fileName.toStdString());
-
-    if(stir::is_null_ptr(input))
+    if(io_manager::open_array(fileName.toStdString(), input) == 0)
         return nullptr;
 
-    std::shared_ptr<stir::ArrayInterface> wtmp;
-    int dims = input->get_num_dimensions();
-
-    switch (dims) {
-    case 1:
-    {
-        stir::Array<1,float>* tmp = dynamic_cast<stir::Array<1,float>* >(input);
-        wtmp.reset( new stir::Array<1,float>( *tmp ));
-    }
-        break;
-    case 2:
-    {
-        stir::Array<2,float>* tmp = dynamic_cast<stir::Array<2,float>* >(input);
-        wtmp.reset(new stir::Array<2,float>( *tmp ));
-    }
-        break;
-    case 3:
-    {
-        stir::Array<3,float>* tmp = dynamic_cast<stir::Array<3,float>* >(input);
-        wtmp.reset( new stir::Array<3,float>( *tmp ));
-    }
-        break;
-    }
-
-    append_to_workspace(wtmp,fileName);
+    append_to_workspace(input,fileName);
     updateGUI();
-    return wtmp;
+    return input;
 }
 
 void Workspace::on_display_array_pressed()
@@ -270,6 +304,11 @@ std::shared_ptr<QVector<double> > Workspace::get_next_item_in_group()
 }
 
 bool Workspace::check_all_grouped_have_same_characteristics()
+{
+
+}
+
+void Workspace::on_psh_info_clicked()
 {
 
 }
