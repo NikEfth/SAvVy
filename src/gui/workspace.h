@@ -38,20 +38,30 @@ public:
     /** \addtogroup Getters
      *  @{
      */
-    //! Get the list of groupped files
-    QStringList get_groupped() const ;
+    //! Get the index numbers of the groupped items. The function
+    //! returns the number of groupped items.
+    unsigned int get_groupped(QVector<int> *index_list = nullptr) const ;
+
+    unsigned long int get_size_of_data_in_group() const;
+
+    unsigned long int get_num_of_data_in_group() const;
     //! Get the name of the current seleted item at ui->listOpenedFiles
     QString get_current_name();
     //! Get the name of  the name of the item at ui->listOpenedFiles on row _i
     QString get_array_name(int _i);
     //! Get a pointer to an array with index _i
-    std::shared_ptr<stir::ArrayInterface> get_array_ptr(int _i);
+    std::shared_ptr<stir::ArrayInterface> get_array_ptr(int _i) const;
 
     std::shared_ptr<stir::ArrayInterface> get_array_ptr(const QString& _s);
 
     std::shared_ptr<stir::ArrayInterface> get_current_array_ptr();
-
-    std::shared_ptr<QVector<double> > get_next_item_in_group();
+    //! Get the next groupped item. If not existing or end of list then \return
+    //! -1 otherwise \return the current index.
+    int get_next_item_in_group(std::shared_ptr<stir::ArrayInterface> &ret);
+    //! As get_next_item_in_group but in addition perfoms a serialisation of the
+    //! array. min_slice and slice_range can be used to reduce the amount of data returned.
+    //! The operation will take place as min_pos + pos_range.
+    int get_next_item_in_group_as_vector(std::shared_ptr<QVector<double> >& ret, const int min_pos = -1, const int pos_range = -1);
 
     bool check_all_grouped_have_same_characteristics();
     /** @}*/
@@ -83,7 +93,7 @@ private slots:
     //! This function highlights listed items that have been grouped.
     //! In addition, it performs the grouping, by appending the new
     //! object to the grouped list.
-    void highlightChecked(QListWidgetItem *item);
+    void highlightChecked(QListWidgetItem *item) const;
 
     void on_remove_array_pressed();
 
@@ -113,8 +123,6 @@ private:
     Ui::Workspace *ui;
     //! All the openned files are held by this vector
     QVector< std::shared_ptr<stir::ArrayInterface> > openned_files;
-
-    void move_item(int new_location);
 
     bool hadData = false;
 };

@@ -3,7 +3,7 @@
 
 #include "workspace.h"
 #include "ui_workspace.h"
-
+#include "savvy.h"
 #include "src/IO/io_manager.h"
 
 #include "stir/is_null_ptr.h"
@@ -140,7 +140,7 @@ void Workspace::on_remove_array_pressed()
 }
 
 std::shared_ptr<stir::ArrayInterface>
-Workspace::get_array_ptr(int _i)
+Workspace::get_array_ptr(int _i) const
 {
     if (_i < openned_files.size())
         return openned_files[_i];
@@ -177,7 +177,7 @@ QString Workspace::get_current_name()
     return ui->listOpenedFiles->item( ui->listOpenedFiles->currentRow())->text();
 }
 
-void Workspace::highlightChecked(QListWidgetItem *item)
+void Workspace::highlightChecked(QListWidgetItem *item) const
 {
     if(item->checkState() == Qt::Checked)
     {
@@ -192,7 +192,7 @@ void Workspace::highlightChecked(QListWidgetItem *item)
         ui->listOpenedFiles->blockSignals(false);
     }
 
-    //ui->lbl_num_groupped->setText(QString::number(grouped_files.size()));
+    ui->lbl_num_groupped->setText(QString::number( get_groupped() ));
 }
 
 bool Workspace::has_grouped_items() const
@@ -203,11 +203,79 @@ bool Workspace::has_grouped_items() const
     return false;
 }
 
-QStringList Workspace::get_groupped() const
+unsigned int Workspace::get_groupped(QVector<int>* index_list) const
 {
-    QStringList ret;
-    //    return grouped_files;
-    return ret;
+    unsigned int num = 0;
+
+    for (int i = 0; i < ui->listOpenedFiles->count(); ++i)
+        if ( ui->listOpenedFiles->item(i)->checkState() == Qt::Checked)
+        {
+            if (index_list != nullptr)
+                index_list->append(i);
+            ++num;
+        }
+
+    return num;
+}
+
+unsigned long int Workspace::get_size_of_data_in_group() const
+{
+    for (int i = 0; i < ui->listOpenedFiles->count(); ++i)
+        if ( ui->listOpenedFiles->item(i)->checkState() == Qt::Checked)
+        {
+            std::shared_ptr<stir::ArrayInterface> ar = get_array_ptr(i);
+            const int dims = ar->get_num_dimensions();
+            switch (dims) {
+
+            case 1:
+            {
+                stir::Array<1, float> *t  = dynamic_cast<stir::Array<1, float>* >(ar.get());
+                return t->size_all();
+            }
+            case 2:
+            {
+                stir::Array<2, float> *t  = dynamic_cast<stir::Array<2, float>* >(ar.get());
+                return t->size_all();
+            }
+            case 3:
+            {
+                stir::Array<3, float> *t  = dynamic_cast<stir::Array<3, float>* >(ar.get());
+                return (*t)[0].size_all();
+            }
+
+            }
+        }
+
+    return 0;
+}
+
+unsigned long int Workspace::get_num_of_data_in_group() const
+{
+    for (int i = 0; i < ui->listOpenedFiles->count(); ++i)
+        if ( ui->listOpenedFiles->item(i)->checkState() == Qt::Checked)
+        {
+            std::shared_ptr<stir::ArrayInterface> ar = get_array_ptr(i);
+            const int dims = ar->get_num_dimensions();
+            switch (dims) {
+
+            case 1:
+            {
+                return 1;
+            }
+            case 2:
+            {
+                return 1;
+            }
+            case 3:
+            {
+                stir::Array<3, float> *t  = dynamic_cast<stir::Array<3, float>* >(ar.get());
+                return t->size();
+            }
+
+            }
+        }
+
+    return 0;
 }
 
 std::shared_ptr <stir::ArrayInterface> Workspace::open_array(const QString& fileName)
@@ -236,6 +304,8 @@ void Workspace::on_display_array_pressed()
             get_array_name(ui->listOpenedFiles->currentRow()) );
 }
 
+//! \todo Update
+//!
 void Workspace::on_duplicate_array_clicked()
 {
     if (openned_files.size() == 0)
@@ -298,14 +368,59 @@ void Workspace::on_psh_move_down_clicked()
     }
 }
 
-std::shared_ptr<QVector<double> > Workspace::get_next_item_in_group()
+int Workspace::get_next_item_in_group(std::shared_ptr<stir::ArrayInterface>& ret)
 {
+    if (!has_grouped_items())
+        return -1;
 
+    int cur_ind = ui->listOpenedFiles->currentRow();
+
+    if (cur_ind == -1)
+        return -1;
+
+    for (int i = cur_ind; i < ui->listOpenedFiles->count(); ++i)
+    {
+        ui->listOpenedFiles->setCurrentRow(i);
+        if ( ui->listOpenedFiles->item(i)->checkState() == Qt::Checked)
+        {
+            ret = get_array_ptr(i);
+            ui->listOpenedFiles->setCurrentRow(i+1);
+            return i;
+        }
+
+    }
+
+    return -1;
+}
+
+int Workspace::get_next_item_in_group_as_vector(std::shared_ptr<QVector<double> > &ret,
+                                                const int min_pos, const int pos_range)
+{
+    std::shared_ptr<stir::ArrayInterface> array;
+
+    double min, max;
+
+    int status = get_next_item_in_group(array);
+
+    if (status == -1)
+        return -1;
+
+    if (stir::is_null_ptr(array))
+        return -1;
+
+    if (stir::is_null_ptr(ret))
+        ret.reset(new QVector<double>());
+
+    status = savvy::Array_QVector1D(*array.get(), *ret, min, max,
+                           min_pos, pos_range);
+
+    return status;
 }
 
 bool Workspace::check_all_grouped_have_same_characteristics()
 {
 
+    return 1;
 }
 
 void Workspace::on_psh_info_clicked()

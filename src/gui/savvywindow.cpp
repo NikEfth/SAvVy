@@ -118,8 +118,8 @@ void SavvyWindow::on_actionOpen_triggered()
 
     bool _mute = false;
 
-    //    if (fileNames.size() > 1)
-    //        _mute = true;
+    if (fileNames.size() > 1)
+        _mute = true;
 
     for (QString fileName : fileNames)
         open_file(fileName, _mute);
@@ -138,12 +138,6 @@ void SavvyWindow::on_actionOpen_triggered()
 bool SavvyWindow::open_file(const QString& fileName, bool _mute_open)
 {
 
-    //    // to silence warning
-    //    if(num_of_data)
-    //    {
-
-    //    }
-
     std::shared_ptr <stir::ArrayInterface> tmp_sptr =
             pnl_workspace->open_array(fileName);
 
@@ -151,8 +145,8 @@ bool SavvyWindow::open_file(const QString& fileName, bool _mute_open)
     {
         QMessageBox msgBox;
         msgBox.setText("Error opening file "+fileName);
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.setStandardButtons(QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Cancel);
         msgBox.setIcon(QMessageBox::Critical);
         return msgBox.exec();
     }
@@ -1213,8 +1207,7 @@ void SavvyWindow::loadPlugins()
 void SavvyWindow::populateMenus(QObject *plugin)
 {
     ExternalInterface *iProc = qobject_cast<ExternalInterface *>(plugin);
-    iProc->show_workspace_operations(true);
-    iProc->load_from_workspace(pnl_workspace);
+    iProc->link_workspace(pnl_workspace);
     if (iProc)
         addToMenu(iProc, iProc->get_name(), ui->menuPlugins);
 }

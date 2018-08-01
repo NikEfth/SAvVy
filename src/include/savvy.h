@@ -281,7 +281,7 @@ public:
 
             if (!stir::is_null_ptr(t))
             {
-                output.resize(static_cast<int>(t->size_all()));
+//                output.resize(static_cast<int>(t->size_all()));
                 return Array1D_QVector1D(*t, output, min, max,
                                          min_pos, pos_range);
             }
@@ -291,7 +291,7 @@ public:
 
             if (!stir::is_null_ptr(t))
             {
-                output.resize(static_cast<int>(t->size_all()));
+//                output.resize(static_cast<int>(t->size_all()));
                 return Array2D_QVector1D(*t, output, min, max,
                                          min_pos, pos_range);
             }
@@ -301,7 +301,7 @@ public:
 
             if (!stir::is_null_ptr(t))
             {
-                output.resize(static_cast<int>(t->size_all()));
+//                output.resize(static_cast<int>(t->size_all()));
                 return Array3D_QVector1D(*t, output, min, max,
                                          min_pos, pos_range);
             }
@@ -361,7 +361,10 @@ public:
         {
             for(unsigned long j = 0; j < input[input.get_min_index() + static_cast<int>(i)].size(); ++j)
             {
-                if(static_cast<double>(input[input.get_min_index() + static_cast<int>(i)][input[input.get_min_index() + static_cast<int>(i)].get_min_index() + static_cast<int>(j)]) != 0.0)
+                if(static_cast<double>(
+                            input[input.get_min_index() + static_cast<int>(i)]
+                            [input[input.get_min_index() + static_cast<int>(i)].get_min_index() + static_cast<int>(j)]
+                            ) != 0.0)
                 {
                     output[(static_cast<int>(input[input.get_min_index() + static_cast<int>(i)].size()) * static_cast<int>(i)) + static_cast<int>(j)] =
                             static_cast<double>(input[input.get_min_index() + static_cast<int>(i)][input[input.get_min_index() + static_cast<int>(i)].get_min_index() + static_cast<int>(j)]);
@@ -401,30 +404,29 @@ public:
         if(pos_range == -1)
             pos_range = static_cast<int>(input.size());
 
-        for(unsigned long i = static_cast<unsigned long>(min_pos); i < static_cast<unsigned long>(pos_range); ++i)
+        for(unsigned long i = static_cast<unsigned long>(min_pos); i < static_cast<unsigned long>(min_pos+pos_range); ++i)
         {
-            for(unsigned long j = 0; j < input[input.get_min_index() + static_cast<int>(i)].size(); ++j)
+            int zz = input.get_min_index() + i;
+            for(unsigned long j = 0; j < input[zz].size(); ++j)
             {
-                for(unsigned long k = 0; k < input[input.get_min_index() + static_cast<int>(i)][input[input.get_min_index() + static_cast<int>(i)].get_min_index() + static_cast<int>(j)].size(); ++k)
+                int yy = input[zz].get_min_index() + j;
+                for(unsigned long k = 0; k < input[zz][yy].size(); ++k)
                 {
-                    if(static_cast<double>(input[input.get_min_index() + static_cast<int>(i)][input[input.get_min_index() + static_cast<int>(i)].get_min_index() + static_cast<int>(j)]
-                                           [input[input.get_min_index() + static_cast<int>(i)][input[input.get_min_index() + static_cast<int>(i)].get_min_index() + static_cast<int>(j)].get_min_index() + static_cast<int>(k)] ) != 0.0)
+                    int xx = input[zz][yy].get_min_index() + k;
+                    if(static_cast<double>(input[zz][yy][xx]) != 0.0)
                     {
+                        int calc = k + j * input[zz][yy].size() + i * j * input[zz].size();
+                        output[calc] = static_cast<double>(input[zz][yy][xx]);
 
-                        output[(static_cast<int>(input[input.get_min_index() + static_cast<int>(i)].size()) * static_cast<int>(i)) + static_cast<int>(j)] =
-                                static_cast<double>(input[input.get_min_index() + static_cast<int>(i)][input[input.get_min_index() + static_cast<int>(i)].get_min_index() + static_cast<int>(j)]
-                                [ input[input.get_min_index() + static_cast<int>(i)][input[input.get_min_index() + static_cast<int>(i)].get_min_index() + static_cast<int>(j)].get_min_index() + static_cast<int>(k)]);
-
-                        if (output[(static_cast<int>(input[input.get_min_index() + static_cast<int>(i)].size()) * static_cast<int>(i)) + static_cast<int>(j)] > max)
+                        if (output[calc] > max)
                         {
-                            max = output[(static_cast<int>(input[input.get_min_index() + static_cast<int>(i)].size()) * static_cast<int>(i)) + static_cast<int>(j)];
+                            max = output[calc];
                         }
                         else
                         {
-                            if(output[(static_cast<int>(input[input.get_min_index() + static_cast<int>(i)].size()) * static_cast<int>(i)) + static_cast<int>(j)] <
-                                    min)
+                            if(output[calc] < min)
                             {
-                                min = output[(static_cast<int>(input[input.get_min_index() + static_cast<int>(i)].size()) * static_cast<int>(i)) + static_cast<int>(j)];
+                                min = output[calc];
                             }
                         }
                     }
