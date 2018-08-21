@@ -31,10 +31,12 @@ size_t Display_container_bar::get_x_axis_size() const
 void Display_container_bar::setNumBin_update(const size_t& _n)
 {
     numBins = _n;
-    // if linked
+    if(!stir::is_null_ptr(link))
+    {
     initialiseHistogram();
-    //    set_display(local_copy);
+        set_display(*link->get_current_data());
     update_scene();
+    }
 }
 
 void Display_container_bar::setCutOff(const float& _n)
@@ -46,10 +48,12 @@ void Display_container_bar::setCutOff(const float& _n)
 void Display_container_bar::setCutOff_update(const float& _n)
 {
     cutOff = _n * 0.01f;
-    // if linked
-    initialiseHistogram();
-    //    set_display(local_copy);
-    update_scene();
+    if(!stir::is_null_ptr(link))
+    {
+        initialiseHistogram();
+            set_display(*link->get_current_data());
+        update_scene();
+    }
 }
 
 void Display_container_bar::initialiseHistogram()
@@ -61,18 +65,6 @@ void Display_container_bar::initialiseHistogram()
     series.resize(static_cast<int>(numBins));
     intervalA.resize(static_cast<int>(numBins));
     hist_data = gsl_histogram_alloc(numBins);
-}
-
-void Display_container_bar::set_display(void* _in)
-{
-    QVector<double>* tmp =
-            static_cast<QVector<double>* >(_in);
-
-    if(!stir::is_null_ptr(tmp)){
-        set_display(tmp);
-        return ;
-    }
-    return ;
 }
 
 std::shared_ptr< QVector<double> > Display_container_bar::get_bin_indices()
@@ -154,16 +146,17 @@ void Display_container_bar::initialisePlotArea()
 }
 
 
-void Display_container_bar::set_display(const QVector<double>& _in, int row_size)
+void Display_container_bar::set_display(const QVector<double>& _in,
+                                        unsigned int row_size)
 {
-    // to silence warning
-    if(row_size)
-    {
-
-    }
+    if(row_size) {}
 
     double max = *std::max_element(_in.begin(), _in.end());
     double min = *std::min_element(_in.begin(), _in.end());
+
+    if (max == min)
+        return;
+
     gsl_histogram_set_ranges_uniform (hist_data, min, max);
 
     for(QVector<double>::ConstIterator cur = _in.begin();cur != _in.end(); ++cur)
@@ -251,13 +244,31 @@ void Display_container_bar::append_curve(const QVector<double> & x_values,
 
 }
 
-void Display_container_bar::set_display(const QVector< QVector<double> >&)
-{}
+void Display_container_bar::update_display()
+{
+    set_display(*link->get_current_data());
+}
+
+void Display_container_bar::set_display(const QVector< QVector<double> >& _in)
+{
+    //    double max = *std::max_element(_in.begin(), _in.end());
+    //    double min = *std::min_element(_in.begin(), _in.end());
+    //    gsl_histogram_set_ranges_uniform (hist_data, min, max);
+
+    //    for(QVector<double>::ConstIterator cur = _in.begin();cur != _in.end(); ++cur)
+    //    {
+    //        gsl_histogram_increment (hist_data, *cur);
+    //    }
+
+    //    update_scene();
+}
 
 void Display_container_bar::set_display(const QVector<QVector< QVector<double> > >&)
-{}
+{
+    int nikos  = 0;
+}
 
-void Display_container_bar::set_display(const stir::Array<1, float>&, int row_size)
+void Display_container_bar::set_display(const stir::Array<1, float>&, unsigned int row_size)
 {
     // to silence warning
     if(row_size)

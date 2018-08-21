@@ -17,4 +17,4 @@ target_sources(savvy_gui_tests
     "${CMAKE_CURRENT_LIST_DIR}/notsosimple_guitests.cpp"
     )
 
-target_link_libraries(savvy_gui_tests PUBLIC Qt5::Core Qt5::Widgets Qt5::Gui qwt)
+target_link_libraries(savvy_gui_tests PUBLIC Qt5::Core Qt5::Widgets Qt5::Gui Qt5::PrintSupport qwt)

@@ -2,9 +2,10 @@
 
 #include <qwt_symbol.h>
 #include <qwt_color_map.h>
-
+#include <qwt_series_data.h>
 #include <QSettings>
 #include <qwt_plot_item.h>
+#include <qwt_scale_engine.h>
 #include "stir/Array.h"
 
 Display_container_1d::Display_container_1d(int dims, QWidget *parent) :
@@ -20,7 +21,7 @@ Display_container_1d::Display_container_1d(const QVector<double>& x_data, const 
     set_display(x_data, y_data);
 }
 
-Display_container_1d::Display_container_1d(const QVector<double>& _in, int row_size, int dims, QWidget *parent):
+Display_container_1d::Display_container_1d(const QVector<double>& _in, unsigned int row_size, int dims, QWidget *parent):
     Display_container(dims, parent)
 {
     initialise();
@@ -51,10 +52,15 @@ std::shared_ptr< QVector<double> >  Display_container_1d::get_x_values() const
 
 std::shared_ptr< QVector<double> >  Display_container_1d::get_y_values() const
 {
-    if(x_data != nullptr)
-        return std::shared_ptr<QVector<double> >(new QVector<double>(*data));
+    if(!stir::is_null_ptr(data))
+        return std::shared_ptr<QVector<double> >( new QVector<double>(*data));
     else
         return nullptr;
+}
+
+void Display_container_1d::get_min_max(double& min, double& max) const
+{
+
 }
 
 Display_container_1d::Display_container_1d(const stir::Array<1, float>& _in, int row_size, int dims, QWidget *parent):
@@ -83,11 +89,25 @@ size_t Display_container_1d::get_x_axis_size() const
     return static_cast<unsigned long>(x_data->size());
 }
 
-void Display_container_1d::initialise()
+void Display_container_1d::
+initialise()
 {
     QSettings settings;
 
     setCanvasBackground( Qt::white );
+
+    this->axisScaleEngine(QwtPlot::yLeft)->setAttribute(QwtScaleEngine::Floating, true);
+
+    this->canvas()->setPalette( QColor( "LemonChiffon" ) );
+
+    low_thres = new QwtPlotMarker("low thres");
+    low_thres->setLineStyle(QwtPlotMarker::VLine);
+    low_thres->setLinePen(Qt::red, 2.0, Qt::DashLine);
+    low_thres->setXValue(-1.0);
+    high_thres = new QwtPlotMarker("high thres");
+    high_thres->setLineStyle(QwtPlotMarker::VLine);
+    high_thres->setLinePen(Qt::red, 2.0, Qt::DashLine);
+    high_thres->setXValue(-1.0);
 
     QwtPlotGrid *grid = new QwtPlotGrid();
     grid->setMajorPen(Qt::lightGray, 1.0);
@@ -108,6 +128,19 @@ void Display_container_1d::initialise()
     inc_x = 1.;
 }
 
+void Display_container_1d::set_low_thres_mark(double pos)
+{
+    low_thres->setXValue(pos);
+    low_thres->attach(this);
+    this->replot();
+}
+
+void Display_container_1d::set_high_thres_mark(double pos)
+{
+    high_thres->setXValue(pos);high_thres->attach(this);
+    this->replot();
+}
+
 void Display_container_1d::set_display(const QVector<double> & _x_array,
                                        const QVector<double> & _y_array,
                                        bool replace,int after, bool symbols, bool line)
@@ -120,18 +153,44 @@ void Display_container_1d::set_display(const QVector<double> & _x_array,
             for (int i = after; i < items.size(); ++i)
                 items.at(i)->detach();
         curve = new QwtPlotCurve();
-        curve->setPen(Qt::red,2);
+        curve->setPen(Qt::blue, 2);
     }
+
+    if (after < 0)
+    {
+        QList<QwtPlotItem* > items = this->itemList(QwtPlotItem::Rtti_PlotCurve);
+        if(items.size() > 1)
+        {
+            items.at(items.size() - 1)->detach();
+        }
+        return;
+    }
+
     data = new QVector<double>(_y_array.size(), 0.0);
+    (*max_value)[0] = 0.0;
+    (*min_value)[0] = 10000000.0;
     savvy::copy_QVector<double>(_y_array, *data, (*min_value)[0], (*max_value)[0]);
 
+    if(replace && after > 0)
+    {
+        //            double max = *std::max_element(_y_array.constBegin(), _y_array.constEnd());
+        m_viz_max = std::max((*max_value)[0], m_viz_max);
+        m_viz_min = std::min((*min_value)[0], m_viz_min);
+    }
+    else
+    {
+        m_viz_max = (*std::max_element(data->constBegin(), data->constEnd()));
+        m_viz_min = (*std::min_element(data->constBegin(), data->constEnd()));
+    }
+
     x_data = new QVector<double>(_x_array.size(), 0.0);
-    savvy::copy_QVector<double>(_x_array, *x_data, (*min_value)[0], (*max_value)[0]);
+    double mi, ma;
+    savvy::copy_QVector<double>(_x_array, *x_data, mi, ma);
 
     if (symbols)
     {
         QwtSymbol *symbol = new QwtSymbol( QwtSymbol::Ellipse,
-                                           QBrush( Qt::yellow ), QPen( Qt::red, 2 ), QSize( 8, 8 ) );
+                                           QBrush( Qt::black ), QPen( Qt::black, 1 ), QSize( 7, 7 ) );
         curve->setSymbol( symbol );
     }
 
@@ -157,7 +216,7 @@ void Display_container_1d::set_display(const QVector<double> & _y_array)
     //    update_scene();
 }
 
-void Display_container_1d::set_display(const QVector<double> & _array, int row_size)
+void Display_container_1d::set_display(const QVector<double> & _array, unsigned int row_size)
 {
     // to silence warning
     if(row_size)
@@ -193,7 +252,7 @@ void Display_container_1d::set_display(const QVector<QVector<QVector<double> > >
     //    update_scene();
 }
 
-void Display_container_1d::set_display(const stir::Array<1, float>& _array, int _row_size)
+void Display_container_1d::set_display(const stir::Array<1, float>& _array, unsigned int _row_size)
 {
     // to silence warning
     if(_row_size)
@@ -224,38 +283,6 @@ void Display_container_1d::set_display(const  stir::Array<3, float>& _array)
     update_scene();
 }
 
-void Display_container_1d::set_display(void* _in)
-{
-    // to silence warning
-    if(_in)
-    {
-
-    }
-
-    //    stir::Array<1, float>* tmp =
-    //            static_cast<stir::Array<1, float>* >(_in);
-
-    //    if(stir::is_null_ptr(_in))
-    //        return false;
-
-    //    set_array(tmp);
-
-    //    x_data.resize(data->size());
-    //    QVector<double>::iterator it = x_data.begin();
-    //    double acc = tmp->get_min_index();
-    //    *it = acc; ++it;
-
-    //    for (; it != x_data.end(); ++it)
-    //    {
-    //        acc += inc_x;
-    //        *it = acc;
-    //    }
-
-    //    update_scene();
-
-    //    return true;
-}
-
 void Display_container_1d::set_sizes(
         double _min_x, double  _max_x)
 {
@@ -273,8 +300,8 @@ void Display_container_1d::update_scene(int i)
     }
 
     this->setAxisScale(QwtPlot::yLeft,
-                       *std::min_element(data->constBegin(), data->constEnd()),
-                       *std::max_element(data->constBegin(), data->constEnd()));
+                       m_viz_min,
+                       m_viz_max);
 
     curve->setSamples(*x_data, *data);
     curve->attach(this);

@@ -20,10 +20,6 @@ public:
 signals:
     void colormap_changed(int);
 
-    void show_axis(bool);
-
-    void show_cursor(bool);
-
 private:
     Ui::Controls_display_2d *ui;
 };

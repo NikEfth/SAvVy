@@ -23,8 +23,8 @@ public:
 
     }
 
-    inline virtual void load_from_workspace(std::shared_ptr<Workspace> ) = 0;
-
+    inline virtual void link_workspace(std::shared_ptr<Workspace> ) = 0;
+    //! \obsolete
     inline virtual void return_to_workspace(std::shared_ptr<Workspace> ) = 0;
 
     inline virtual void show_workspace_operations(bool state) = 0;

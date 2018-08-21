@@ -2,7 +2,6 @@
 #define DISPLAY_MANAGER_H
 
 #include <QWidget>
-#include "display_container.h"
 #include "common_display.h"
 
 using namespace display;
@@ -16,14 +15,19 @@ class Display_manager : public DisplayInterface
     Q_OBJECT
 
 public:
+    //! Create Display_manager without any data
     explicit Display_manager(int _my_id, int _num_dim, QWidget *parent = nullptr);
-
+    //! Create Display_manager with data to display from stir::ArrayInterface
     explicit Display_manager(int _my_id, stir::ArrayInterface* __display, QWidget *parent = nullptr);
-
+    //! Create Display_manager with data to display and set the ColorMap
     explicit Display_manager(int _my_id, stir::ArrayInterface* __display,
                              QSharedPointer<QwtLinearColorMap> _def_colormap = nullptr, QWidget *parent = nullptr);
+    //! Create Display_manager with data to display from  QVector
+    explicit Display_manager(int _my_id,
+                             std::shared_ptr<QVector<QVector<QVector<double> > > > _prod_image,
+                             QWidget *parent = nullptr);
 
-    ~Display_manager();
+    ~Display_manager() override;
 
     /** \addtogroup Setters
      *  @{
@@ -59,10 +63,6 @@ public:
         _display->set_color_map(i);
     }
     /** @}*/
-    inline Display_container* get_display()
-    {
-        return _display;
-    }
 
     inline QString get_label(int _page, int num_pages)
     {
@@ -91,10 +91,11 @@ private slots:
     void updated_display(int position);
 
     void initialised_display();
-private:
-    Ui::Display_manager *ui;
+    void on_psh_save_image_clicked();
 
-    Display_container* _display;
+private:
+    Ui::Display_manager *ui = nullptr;
+
 };
 
 #endif // DISPLAY_MANAGER_H

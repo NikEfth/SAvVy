@@ -36,7 +36,7 @@
      <x>0</x>
      <y>0</y>
      <width>640</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -44,12 +44,13 @@
      <string>Fi&amp;le</string>
     </property>
     <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string>&amp;Edit</string>
     </property>
     <addaction name="separator"/>
     <addaction name="actionDefault_Settings"/>
@@ -72,7 +73,7 @@
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
-     <string>Tools</string>
+     <string>&amp;Tools</string>
     </property>
     <addaction name="actionSlicer"/>
     <addaction name="actionThreshold"/>
@@ -84,7 +85,7 @@
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>&amp;Help</string>
     </property>
     <addaction name="separator"/>
     <addaction name="actionStart_GUI_tests"/>
@@ -271,7 +272,16 @@
      <normaloff>:/icons/resources/gimp-pro/images/gimp-plugin.png</normaloff>:/icons/resources/gimp-pro/images/gimp-plugin.png</iconset>
    </property>
    <property name="text">
-    <string>About Plugins</string>
+    <string>&amp;About Plugins</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="icon">
+    <iconset resource="../../resources.qrc">
+     <normaloff>:/icons/resources/gimp-pro/images/gtk-save.png</normaloff>:/icons/resources/gimp-pro/images/gtk-save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save</string>
    </property>
   </action>
  </widget>

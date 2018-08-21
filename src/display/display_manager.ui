@@ -13,41 +13,52 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
-   <property name="spacing">
-    <number>1</number>
-   </property>
+  <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
-    <number>1</number>
+    <number>3</number>
    </property>
    <property name="topMargin">
-    <number>1</number>
+    <number>3</number>
    </property>
    <property name="rightMargin">
-    <number>1</number>
+    <number>3</number>
    </property>
    <property name="bottomMargin">
-    <number>1</number>
+    <number>3</number>
    </property>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
+   <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QSlider" name="sld_plane">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="lbl_plane">
-         <property name="text">
-          <string>0 / 0</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QSlider" name="sld_plane">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lbl_plane">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>55</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>55</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>55</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>000 / 000</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

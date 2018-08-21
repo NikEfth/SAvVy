@@ -173,7 +173,8 @@ public:
     }
 
     template<class T>
-    static int serialize_QVector(const QVector<QVector<QVector<T>>> &in, QVector<QVector<T>> &out, QVector<T> &min, QVector<T> &max)
+    static int serialize_QVector(const QVector<QVector<QVector<T>>> &in, QVector<QVector<T>> &out,
+                                 QVector<T> &min, QVector<T> &max)
     {
         assert(in.size() > 0);
         assert(in[0].size() > 0);
@@ -272,6 +273,133 @@ public:
         return 1;
     }
 
+    static int Array_MinMax(const stir::ArrayInterface &input, double &min, double &max,
+                            int min_pos = -1, int pos_range = -1)
+    {
+        if(min_pos == -1)
+            min_pos = 0;
+
+        {
+            const stir::Array<1, float>* t = dynamic_cast<const stir::Array<1, float>* >(&input);
+
+            if (!stir::is_null_ptr(t))
+            {
+
+                if(pos_range == -1)
+                    pos_range = static_cast<int>(t->size());
+
+                for(unsigned long i = static_cast<unsigned long>(min_pos); i < static_cast<unsigned long>(pos_range); ++i)
+                {
+                    int cur_pos = t->get_min_index() + static_cast<int>(i);
+                    if(static_cast<double>(t->at(cur_pos)) != 0.0)
+                    {
+                        if (static_cast<double>(t->at(cur_pos)) > max)
+                        {
+                            max = static_cast<double>(t->at(cur_pos));
+                        }
+                        else
+                        {
+                            if(static_cast<double>(t->at(cur_pos)) < min)
+                            {
+                                min = static_cast<double>(t->at(cur_pos)) ;
+                            }
+                        }
+                    }
+                }
+                return 1;
+            }
+
+        }
+        {
+            const stir::Array<2, float>* t = dynamic_cast<const stir::Array<2, float>* >(&input);
+
+            if (!stir::is_null_ptr(t))
+            {
+                //! \todo
+                return 1;
+            }
+
+        }
+        {
+            const stir::Array<3, float>* t = dynamic_cast<const stir::Array<3, float>* >(&input);
+
+            if (!stir::is_null_ptr(t))
+            {
+                if(pos_range == -1)
+                    pos_range = static_cast<int>(t->size());
+
+                for(unsigned long i = static_cast<unsigned long>(min_pos); i < static_cast<unsigned long>(min_pos+pos_range); ++i)
+                {
+                    int zz = t->get_min_index() + i;
+                    int i_min = i - min_pos;
+                    for(unsigned long j = 0; j < (*t)[zz].size(); ++j)
+                    {
+                        int yy = (*t)[zz].get_min_index() + j;
+                        for(unsigned long k = 0; k < (*t)[zz][yy].size(); ++k)
+                        {
+                            int xx = (*t)[zz][yy].get_min_index() + k;
+                            if(static_cast<double>((*t)[zz][yy][xx]) != 0.0)
+                            {
+                                if (static_cast<double>((*t)[zz][yy][xx]) > max)
+                                {
+                                    max = static_cast<double>((*t)[zz][yy][xx]);
+                                }
+                                else
+                                {
+                                    if(static_cast<double>((*t)[zz][yy][xx]) < min)
+                                    {
+                                        min = static_cast<double>((*t)[zz][yy][xx]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return 1;
+            }
+        }
+
+        return -1;
+    }
+
+    static int fill_Array(stir::ArrayInterface &input, float num = 0.0)
+    {
+        int dims = input.get_num_dimensions();
+        switch (dims) {
+        case 1:
+        {
+            stir::Array<1, float>* t = dynamic_cast<stir::Array<1, float>* >(&input);
+
+            if (!stir::is_null_ptr(t))
+            {
+                t->fill(num);
+                return 1;
+            }
+        }
+        case 2:
+        {
+            stir::Array<2, float>* t = dynamic_cast<stir::Array<2, float>* >(&input);
+
+            if (!stir::is_null_ptr(t))
+            {
+                t->fill(num);
+                return 1;
+            }
+        }
+        case 3:
+        {
+            stir::Array<3, float>* t = dynamic_cast<stir::Array<3, float>* >(&input);
+
+            if (!stir::is_null_ptr(t))
+            {
+                t->fill(num);
+                return 1;
+            }
+        }
+        default:
+            return -1;
+        };
+    }
 
     static int Array_QVector1D(const stir::ArrayInterface &input, QVector<double> &output, double &min, double &max,
                                int min_pos = -1, int pos_range = -1)
@@ -281,7 +409,7 @@ public:
 
             if (!stir::is_null_ptr(t))
             {
-//                output.resize(static_cast<int>(t->size_all()));
+                //                output.resize(static_cast<int>(t->size_all()));
                 return Array1D_QVector1D(*t, output, min, max,
                                          min_pos, pos_range);
             }
@@ -291,7 +419,7 @@ public:
 
             if (!stir::is_null_ptr(t))
             {
-//                output.resize(static_cast<int>(t->size_all()));
+                //                output.resize(static_cast<int>(t->size_all()));
                 return Array2D_QVector1D(*t, output, min, max,
                                          min_pos, pos_range);
             }
@@ -301,7 +429,7 @@ public:
 
             if (!stir::is_null_ptr(t))
             {
-//                output.resize(static_cast<int>(t->size_all()));
+                //                output.resize(static_cast<int>(t->size_all()));
                 return Array3D_QVector1D(*t, output, min, max,
                                          min_pos, pos_range);
             }
@@ -392,7 +520,8 @@ public:
     }
 
     //!\todo montage
-    static int Array3D_QVector1D(const stir::Array<3, float> &input, QVector<double> &output, double &min, double &max,
+    static int Array3D_QVector1D(const stir::Array<3, float> &input, QVector<double> &output,
+                                 double &min, double &max,
                                  int min_pos = -1, int pos_range = -1)
     {
         if(output.size() == 0 )
@@ -407,6 +536,7 @@ public:
         for(unsigned long i = static_cast<unsigned long>(min_pos); i < static_cast<unsigned long>(min_pos+pos_range); ++i)
         {
             int zz = input.get_min_index() + i;
+            int i_min = i - min_pos;
             for(unsigned long j = 0; j < input[zz].size(); ++j)
             {
                 int yy = input[zz].get_min_index() + j;
@@ -415,7 +545,7 @@ public:
                     int xx = input[zz][yy].get_min_index() + k;
                     if(static_cast<double>(input[zz][yy][xx]) != 0.0)
                     {
-                        int calc = k + j * input[zz][yy].size() + i * j * input[zz].size();
+                        int calc = k + j * input[zz][yy].size() + i_min * input[zz][yy].size() * input[zz].size();
                         output[calc] = static_cast<double>(input[zz][yy][xx]);
 
                         if (output[calc] > max)

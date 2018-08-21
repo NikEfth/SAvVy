@@ -33,33 +33,36 @@ public:
      *  @{
      */
     //! Set the data array, initialise x_data and update() display, by reference
-    void set_display(const QVector<double>& , int _row_size);
+    void set_display(const QVector<double>& , unsigned int _row_size) override;
     //! Set the data array, initialise x_data and update() display, by pointer
-    void set_display(const QVector< QVector<double> >&);
+    void set_display(const QVector< QVector<double> >&) override;
     //! Set the data array, initialise x_data and update() display, by reference
-    void set_display(const QVector<QVector< QVector<double> > >&);
+    void set_display(const QVector<QVector< QVector<double> > >&) override;
     //! Set the data array, initialise x_data and update() display, by reference
-	void set_display(const stir::Array<1, float>&, int row_size);
+    void set_display(const stir::Array<1, float>&, unsigned int row_size) override;
     //! Set the data array, initialise x_data and update() display, by pointer
-	void set_display(const  stir::Array<2, float>&);
+    void set_display(const  stir::Array<2, float>&) override;
     //! Set the data array, initialise x_data and update() display, by reference
-    void set_display(const  stir::Array<3, float>&);
-    //!
-    virtual void set_display(void*_in);
-    //!
-    void set_axis(int _offset_h = 0, int _offset_v = 0, int _offset_d = 0,
-                  float _h_spacing= 1, float _v_spacing = 1, float _d_spacing =1 );
+    void set_display(const  stir::Array<3, float>&) override;
+
     /** @}*/
 
-    virtual ~Display_container_3d();
+    virtual QVector< double > * get_current_data() const override;
+
+    virtual void get_min_max(double& min, double& max) const override;
+
+    virtual void set_min_max(const double min, const double max) override;
+
+    virtual ~Display_container_3d() override;
+
 public slots:
 
-    virtual void update_scene(int i = 0);
+    virtual void update_scene(int i = 0) override;
 
-protected:
+private:
+    //! The current slice in display
+    int current_slice = 0;
 
-    //! QVector of data.
-    QVector< QVector< double > > *data;
 
 };
 

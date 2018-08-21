@@ -3,6 +3,8 @@ target_sources(savvy_gui
     "${CMAKE_CURRENT_LIST_DIR}/savvywindow.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/savvywindow.ui"
     "${CMAKE_CURRENT_LIST_DIR}/savvywindow.h"
+    "${CMAKE_CURRENT_LIST_DIR}/watchdog.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/watchdog.h"
     "${CMAKE_CURRENT_LIST_DIR}/aboutdialog.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/aboutdialog.ui"
     "${CMAKE_CURRENT_LIST_DIR}/aboutdialog.h"
@@ -31,4 +33,4 @@ target_sources(savvy_gui
 include_directories( ${Stir_INCLUDE_DIRS})
 link_directories(${Stir_LIBRARIES_DIR})
 
-target_link_libraries(savvy_gui PUBLIC Qt5::Core Qt5::Widgets Qt5::Gui buildblock)
+target_link_libraries(savvy_gui PUBLIC Qt5::Core Qt5::Widgets Qt5::Gui Qt5::PrintSupport buildblock)

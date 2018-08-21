@@ -10,6 +10,7 @@
 #include "src/display/display_manager.h"
 #include "stir/Array.h"
 #include "stir/VectorWithOffset.h"
+#include "src/gui/panel_opened_file_controls.h"
 
 
 namespace Ui {
@@ -31,6 +32,8 @@ public:
     qint16 findQListWidgetItem( const QString& _id);
     //! Highlight the entry with _id
     void set_active(int _id);
+
+    Display_manager *get_active();
     //! Change the name of  the item in ui->ListOpenedFiles
     void rename(const QString& _id, QString _new_name);
     //! Change the name of  the item in ui->ListOpenedFiles
@@ -47,8 +50,7 @@ public slots:
     //! Append a window on the  ui->listOpenedFiles
     void appendToOpenedList(Display_container* child);
     //! Append a window on the  ui->listOpenedFiles
-    void appendToOpenedList(Display_manager* child);
-
+    void appendToOpenedList(Display_manager* child, unsigned int _id);
     //! Remove item from the ui->listOpenedFiles list.
     void removeFromOpenedList(DisplayInterface *child);
 
@@ -62,13 +64,30 @@ private slots:
     //! object to the grouped list.
     void highlightChecked(QListWidgetItem *item);
 
+    void on_psh_print_image_clicked();
+
+    void on_psh_save_image_clicked();
+
+    void on_set_colormap(int i = 0);
+
+    void on_psh_zoom_in_clicked();
+
+    void on_psh_zoom_out_clicked();
+
 private:
-    Ui::Panel_displayed_files *ui;
+
+    void updateGUI(Display_manager* _cur);
+
+    Ui::Panel_displayed_files *ui = nullptr;
+
+    Panel_opened_file_controls* pnl_opened_file_controls = nullptr;
 
     //! Groupped items, saved by their unique ids.
     QVector<QString> grouped_windows;
 
-    std::vector< std::shared_ptr<stir::ArrayInterface> > openned_files;
+    QMap<unsigned int, Display_manager* > displs;
+
+    ColorMap* _colormaps = nullptr;
 };
 
 #endif // PANEL_OPENED_FILES_H

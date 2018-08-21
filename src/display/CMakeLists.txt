@@ -6,6 +6,9 @@ target_sources(savvy_display
     "${CMAKE_CURRENT_LIST_DIR}/display_manager.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/display_manager.h"
     "${CMAKE_CURRENT_LIST_DIR}/display_manager.ui"
+    "${CMAKE_CURRENT_LIST_DIR}/ctrl_levels.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/ctrl_levels.h"
+    "${CMAKE_CURRENT_LIST_DIR}/ctrl_levels.ui"
     "${CMAKE_CURRENT_LIST_DIR}/histogram_manager.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/histogram_manager.h"
     "${CMAKE_CURRENT_LIST_DIR}/histogram_manager.ui"
@@ -43,4 +46,4 @@ if(WIN32)
 
 endif()
 
-target_link_libraries(savvy_display PUBLIC Qt5::Core Qt5::Widgets Qt5::Gui qwt ${GSL_LIBRARY} ${GSL_BLAS_LIBRARY})
+target_link_libraries(savvy_display PUBLIC Qt5::Core Qt5::Widgets Qt5::Gui savvy_gui qwt ${GSL_LIBRARY} ${GSL_BLAS_LIBRARY})

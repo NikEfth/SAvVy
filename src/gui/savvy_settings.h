@@ -21,25 +21,27 @@ class GeneralSettings : public QWidget
 public:
     explicit GeneralSettings(QWidget *parent = nullptr);
 
-    QCheckBox* autoPlotOpenedFiles;
+    QCheckBox* autoPlotOpenedFiles = nullptr;
 
-    QCheckBox* autoContrast;
+    QCheckBox* autoContrast = nullptr;
 
-    QCheckBox* autoUpdates;
+    QCheckBox* autoUpdates = nullptr;
     //! \warning There is a small condrum with this option. We initialise
     //! our window before we set data into it. Therefore the size has not been
     //! determined, yet. Only the axis give a meaningfull size to the window. Therfore
     //! if they are deactivated, early from the contructor, the window will been drawn
     //! collapsed.
-    QCheckBox* defaultAxis;
+    QCheckBox* defaultAxis = nullptr;
 
-    QCheckBox* defaultTabbedMode;
+    QCheckBox* defaultColorbar = nullptr;
 
-    QVBoxLayout* mainLayout;
+    QCheckBox* defaultTabbedMode = nullptr;
 
-    QLineEdit* pluginsPath;
+    QVBoxLayout* mainLayout = nullptr;
 
-    QLineEdit* colorMapsPath;
+    QLineEdit* pluginsPath = nullptr;
+
+    QLineEdit* colorMapsPath = nullptr;
 
 
 };
@@ -52,13 +54,13 @@ class ViewSettings : public QWidget
 public:
     explicit ViewSettings(QWidget *parent = nullptr);
 
-    QVBoxLayout* mainLayout;
+    QVBoxLayout* mainLayout = nullptr;
 
-    QGroupBox* visualisationGroup;
+    QGroupBox* visualisationGroup = nullptr;
 
     std::shared_ptr<QComboBox> colorMapCombo;
 
-    Display_container_2d* preview;
+    Display_container_2d* preview = nullptr;
 
     std::shared_ptr<ColorMap> colormaps;
 };
@@ -90,14 +92,15 @@ private slots:
     void on_listWidget_currentRowChanged(int currentRow);
     //! Activated when ui->pb_save is pressed.
     void on_save_settings();
+
 private:
-    Ui::Savvy_settings *ui;
+    Ui::Savvy_settings *ui = nullptr;
     //! General settings of the application
-    GeneralSettings* general_setts;
+    GeneralSettings* general_setts = nullptr;
     //! View related settings
-    ViewSettings* view_setts;
+    ViewSettings* view_setts = nullptr;
     //! Settings of color for different visual elements
-    AppearanceSettings* appearance_setts;
+    AppearanceSettings* appearance_setts = nullptr;
 };
 
 #endif // SAVVY_SETTINGS_H

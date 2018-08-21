@@ -21,17 +21,17 @@ public:
 
     explicit Display_container_1d(const QVector<double>& x_data, const QVector<double> & y_data, int dims = 1, QWidget *parent = nullptr);
 
-    explicit Display_container_1d(const QVector<double>&, int row_size, int dims = 1, QWidget *parent = nullptr);
+    explicit Display_container_1d(const QVector<double>&, unsigned int row_size, int dims = 1, QWidget *parent = nullptr);
 
-    explicit Display_container_1d(const QVector< QVector<double> >&, int dims = 1, QWidget *parent = nullptr);
+    explicit Display_container_1d(const QVector<QVector<double> >&, int dims = 1, QWidget *parent = nullptr);
 
     explicit Display_container_1d(const QVector<QVector< QVector<double> > >&, int dims = 1, QWidget *parent = nullptr);
 
     explicit Display_container_1d(const stir::Array<1, float>&, int row_size, int dims = 1, QWidget *parent = nullptr);
 
-    explicit Display_container_1d(const  stir::Array<2, float>&, int dims = 1, QWidget *parent = nullptr);
+    explicit Display_container_1d(const stir::Array<2, float>&, int dims = 1, QWidget *parent = nullptr);
 
-    explicit Display_container_1d(const  stir::Array<3, float>&, int dims = 1, QWidget *parent = nullptr);
+    explicit Display_container_1d(const stir::Array<3, float>&, int dims = 1, QWidget *parent = nullptr);
 
     /** \addtogroup Setters
      *  @{
@@ -50,31 +50,41 @@ public:
                              bool replace = true, int after = 1,
                              bool symbols = false, bool line = false) override;
     //! Set the data array, initialise x_data and update() display, by reference
-    virtual void set_display(const QVector<double>&, int row_size) override;
+    virtual void set_display(const QVector<double>&, unsigned int row_size) override;
     //! Set the data array, initialise x_data and update() display, by pointer
     virtual void set_display(const QVector< QVector<double> >&) override;
     //! Set th data array, initialise x_data and update() display, by reference
     virtual void set_display(const QVector<QVector< QVector<double> > >&) override;
     //! Set the data array, initialise x_data and update() display, by reference
-    virtual void set_display(const stir::Array<1, float>&, int _row_size) override;
+    virtual void set_display(const stir::Array<1, float>&, unsigned int _row_size) override;
     //! Set the data array, initialise x_data and update() display, by pointer
     virtual void set_display(const  stir::Array<2, float>&) override;
     //! Set the data array, initialise x_data and update() display, by reference
     virtual void set_display(const  stir::Array<3, float>&) override;
-    //!
-    virtual void set_display(void*_in) override;
+
     //! Set the physical dimentions of the x axis
     void set_sizes(double _min_x = 0.0, double _min_y = 0.0);
+
+    void set_low_thres_mark(double pos);
+
+    void set_high_thres_mark(double pos);
 
     /** @}*/
 
     virtual size_t get_x_axis_size() const override;
+
+    inline QSize get_default_size() const override
+    {
+        return QSize(row_size, 1);
+    }
 
     virtual ~Display_container_1d() override;
 
     virtual std::shared_ptr< QVector<double> >  get_x_values() const override;
 
     virtual std::shared_ptr< QVector<double> >  get_y_values() const override;
+
+    virtual void get_min_max(double& min, double& max) const override;
 
 public slots:
     virtual void update_scene(int i = 0) override;
@@ -98,6 +108,10 @@ private:
     void calculate_x_axis();
 
     void initialise();
+
+    QwtPlotMarker *low_thres = nullptr;
+
+    QwtPlotMarker *high_thres = nullptr;
 
 };
 

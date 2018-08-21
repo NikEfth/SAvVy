@@ -8,35 +8,65 @@
 #include <qwt_plot_rescaler.h>
 #include <qwt_scale_widget.h>
 
+#include <qwt_scale_draw.h>
+#include <qwt_plot_renderer.h>
+#include <qwt_plot_layout.h>
+#include <qwt_scale_engine.h>
+
 class Display_container_raster : public Display_container
 {
     Q_OBJECT
 public:
     explicit Display_container_raster(int dims, QWidget *parent = nullptr);
 
-    inline void set_color_map(const QSharedPointer<QwtColorMap> cm)
+    inline void set_color_map(const QSharedPointer<QwtColorMap> cm) override
     {
         if(cm != nullptr)
         {
             d_spectrogram->setColorMap(cm);
+            p_colorScale->setColorMap( m_zInterval, d_spectrogram->colorMap_sptr() );
             replot();
         }
     }
 
-    virtual ~Display_container_raster();
-    virtual size_t get_x_axis_size() const;
+    inline QSize get_default_size() const override
+    {
+        return  QSize(row_num, row_size);
+    }
+
+    virtual ~Display_container_raster() override;
+
+    virtual size_t get_x_axis_size() const override;
+
+    //    void set_min_max(const double min,
+    //                     const double max);
+protected slots:
+
+    //    virtual void popUpMenu(const QPoint &pos) override;
 
 protected:
+    //! Set the axis. As a weird convention X axis is the
+    //! vertical axis and Y the horizontal.
+    void set_axis(int _offset_h = 0, int _offset_v = 0, int _offset_d = 0,
+                  float _h_origin = 0.f, float _v_origin = 0.f, float _d_origin = 0.f,
+                  float _h_spacing= 1.f, float _v_spacing = 1.f, float _d_spacing = 1.f );
+
+    void set_size(int _offset_h = 0, int _offset_v = 0, int _offset_d = 0);
 
     bool cm_set = false;
+    //! Scale the colormap to the max and min of the
+    //! current frame.
+    bool auto_scale = true;
 
     QwtPlotSpectrogram *d_spectrogram = nullptr;
 
     QwtMatrixRasterData *p_raster = nullptr;
 
-    QwtPlotRescaler *d_rescaler = nullptr;
-
     QwtScaleWidget *p_colorScale = nullptr;
+
+    QwtLinearScaleEngine e;
+
+    QwtInterval m_zInterval;
     //! Number of rows of data. - Nomrally Y axis
     unsigned long row_num;
     //! Offset of the horizontal axis
@@ -57,6 +87,7 @@ protected:
     float origin_y;
     //! Origin on the z axis.
     float origin_z;
+
 
 };
 

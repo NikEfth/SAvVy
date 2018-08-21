@@ -1,17 +1,22 @@
 #ifndef DISPLAY_CONTAINER_H
 #define DISPLAY_CONTAINER_H
 
+#include <QPoint>
+#include <QEvent>
+#include <QMouseEvent>
+
 #include <qwt_plot.h>
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_marker.h>
 #include <qwt_symbol.h>
 
-#include "common_display.h"
+#include "colormaps_display.h"
 #include "stir/Array.h"
 #include "stir/is_null_ptr.h"
 #include "savvy.h"
 
-using namespace display;
+#include <memory>
+
 //!
 //! \brief The Display_container class
 //! \details The maximum dimention of the supported arrays is 4D. Thats the why the
@@ -49,48 +54,117 @@ public:
                              bool replace = true, int after = 1,
                              bool symbols = false, bool line = false);
     //! Set the data array, initialise x_data and update() display, by reference
-    virtual void set_display(const QVector<double>&, int row_size) = 0;
+    virtual void set_display(const QVector<double>&, unsigned int row_size) = 0;
     //! Set the data array, initialise x_data and update() display, by pointer
     virtual void set_display(const QVector< QVector<double> >&) = 0;
     //! Set the data array, initialise x_data and update() display, by reference
     virtual void set_display(const QVector<QVector< QVector<double> > >&) = 0;
     //! Set the data array, initialise x_data and update() display, by reference
-    virtual void set_display(const stir::Array<1, float>&, int row_size) = 0;
+    virtual void set_display(const stir::Array<1, float>&, unsigned int row_size) = 0;
     //! Set the data array, initialise x_data and update() display, by pointer
     virtual void set_display(const  stir::Array<2, float>&) = 0;
     //! Set the data array, initialise x_data and update() display, by reference
     virtual void set_display(const  stir::Array<3, float>&) = 0;
 
-    virtual void set_display(void*) = 0;
-
     virtual void set_color_map(const QSharedPointer<QwtColorMap> i);
 
     /** @}*/
 
+    /** \addtogroup Getters
+     *  @{
+     */
     virtual int get_num_data() const;
+
+    virtual std::shared_ptr<QVector< QVector< double > > > get_data_all() const
+    {
+        return data;
+    }
+
+    virtual QVector< double > * get_data(int pos = 0) const
+    {
+        if (pos < data->size())
+            return &(*data)[pos];
+        else
+            return nullptr;
+    }
+
+    virtual QVector< double > * get_current_data() const;
 
     inline unsigned long get_num_dimensions() const
     {
         return num_dim;
     }
+    //! Show / hide axis
+    inline void enable_axis(bool state = true)
+    {
+        this->enableAxis(QwtPlot::xBottom, state);
+        this->enableAxis(QwtPlot::yLeft, state);
+    }
+    //! True if the axis are shown
+    inline bool has_axis() const
+    {
+        return this->axisEnabled(QwtPlot::xBottom) || this->axisEnabled(QwtPlot::yLeft);
+    }
+
+    inline virtual QSize get_default_size() const = 0;
 
     virtual size_t get_x_axis_size() const = 0;
+
+    /** @}*/
 
     virtual ~Display_container() override;
 
     void clearAllPlotItems();
+
+    inline void setCOG(QPoint cog)
+    {
+        m_cog = cog;
+        m_state = 0;
+    }
+
+
+    void resetCOG(int _state = -1);
 
     //! \todo
     virtual std::shared_ptr< QVector<double> >  get_x_values() const;
     //! \todo
     virtual std::shared_ptr< QVector<double> >  get_y_values() const;
 
+    void linkTo(std::shared_ptr<Display_container> l)
+    {
+        link = l;
+        connect(link.get(), &Display_container::display_updated,
+                this, &Display_container::update_display);
+    }
+
+    void unLink()
+    {
+        disconnect(link.get(), &Display_container::display_updated,
+                this, &Display_container::update_display);
+        link  = nullptr;
+    }
+
+    //! The function is used to get the min and max value of raster data
+    //! in order to scale (or not) propertly the colormap.
+    //! \todo Find something meaningfull for the 1D case.
+    virtual void get_min_max(double& min, double& max) const
+    {}
+
+    //! The function is used to set the min and max value of raster data
+    //! in order to scale (or not) propertly the colormap.
+    //! \todo Find something meaningfull for the 1D case.
+    virtual void set_min_max(const double min, const double max)
+    {}
+
 public slots:
     //! Update the display contents
     //! \details Try to keep this as minimal as possible
     virtual void update_scene(int i = 0) = 0;
 
-    void enable_axis(bool state = true);
+    virtual void update_display()
+    {}
+
+    virtual bool event( QEvent * );
 
 signals:
     //! Signal to let the application know that this window should be
@@ -98,6 +172,8 @@ signals:
     void aboutToClose();
 
     void setup_ready();
+
+    void display_updated();
 
 protected:
     //! We hack this QEvent because upon close we emit aboutToClose()
@@ -108,12 +184,24 @@ protected:
     QVector< double >* min_value = nullptr;
     //! Maximum value per data_num
     QVector< double >* max_value = nullptr;
+    //! QVector of data.
+    std::shared_ptr<QVector< QVector< double > > > data;
     //! Number of dimentions of the display_container
-    unsigned long num_dim;
+    unsigned int num_dim;
     //! Number of datasets
-    unsigned long data_num;
+    unsigned int data_num;
     //! Size of a single dataset.
-    unsigned long row_size;
+    unsigned int row_size;
+
+    QPoint m_cog;
+
+    quint8 m_state;
+    //! The minimum value of the colormap scale.
+    double m_viz_min = 0.0;
+    //! The maximum value of the colormap scale.
+    double m_viz_max = 0.0;
+
+    std::shared_ptr<Display_container> link = nullptr;
 };
 
 #endif // DISPLAY_CONTAINER_H

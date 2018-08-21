@@ -32,22 +32,21 @@ public:
     //! Set the data of which the histogram will be visualised
     //! It accepts:
     //! - QVector<double>
-    virtual void set_display(void* _in);
 
     bool set_display(QFile &_in);
 
     //! Set the data array, initialise x_data and update() display, by reference
-    void set_display(const QVector<double>& , int _row_size);
+    void set_display(const QVector<double>& , unsigned int _row_size = 0) override;
     //! Set the data array, initialise x_data and update() display, by pointer
-    void set_display(const QVector< QVector<double> >&);
+    void set_display(const QVector< QVector<double> >&_in) override;
     //! Set the data array, initialise x_data and update() display, by reference
-    void set_display(const QVector<QVector< QVector<double> > >&);
+    void set_display(const QVector<QVector< QVector<double> > >&) override;
     //! Set the data array, initialise x_data and update() display, by reference
-    void set_display(const stir::Array<1, float>&, int row_size);
+    void set_display(const stir::Array<1, float>&, unsigned int row_size) override;
     //! Set the data array, initialise x_data and update() display, by pointer
-    void set_display(const  stir::Array<2, float>&);
+    void set_display(const  stir::Array<2, float>&) override;
     //! Set the data array, initialise x_data and update() display, by reference
-    void set_display(const  stir::Array<3, float>&);
+    void set_display(const  stir::Array<3, float>&) override;
 
     void append_curve(const QVector<double> & x_values,
                       const QVector< double>& y_values,
@@ -57,22 +56,35 @@ public:
 
     /** @}*/
 
+    /** \addtogroup Getters
+     *  @{
+     */
     std::shared_ptr< QVector<double> > get_bin_indices();
 
     std::shared_ptr< QVector<double> > get_histogram_values();
 
     size_t getNumBin() const ;
 
-    virtual size_t get_x_axis_size() const;
+    virtual size_t get_x_axis_size() const override;
+
+    inline QSize get_default_size() const override
+    {
+        return QSize(row_size, 1);
+    }
+
+    /** @}*/
 
     void initialiseHistogram();
+
 signals:
 
     void settings_updated();
 
 public slots:
 
-    virtual void update_scene(int i = 0);
+    virtual void update_scene(int i = 0) override;
+
+    virtual void update_display() override;
 
 protected:
 
@@ -87,8 +99,6 @@ private:
     gsl_histogram * hist_data = nullptr;
 
     QwtPlotHistogram *d_histItem = nullptr;
-
-    //    QwtCurveFitter* curve = nullptr;
 
     QwtPlotCurve* curve = nullptr;
 

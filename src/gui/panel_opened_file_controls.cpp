@@ -19,10 +19,6 @@ Panel_opened_file_controls::Panel_opened_file_controls(const QStringList &colorM
 
     connect(controls_2d, &Controls_display_2d::colormap_changed,
             this, &Panel_opened_file_controls::colormap_changed);
-    connect(controls_2d, &Controls_display_2d::show_axis,
-            this, &Panel_opened_file_controls::show_axis);
-    connect(controls_2d, &Controls_display_2d::show_cursor,
-            this, &Panel_opened_file_controls::show_cursor);
 }
 
 Panel_opened_file_controls::~Panel_opened_file_controls()

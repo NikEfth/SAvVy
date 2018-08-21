@@ -36,6 +36,9 @@ GeneralSettings::GeneralSettings(QWidget *parent) :
         defaultAxis = new QCheckBox("Show axis by default ", defaultsPage);
         defaultsPageLayout->addWidget(defaultAxis);
 
+        defaultColorbar = new QCheckBox("Show color bar by default ", defaultsPage);
+        defaultsPageLayout->addWidget(defaultColorbar);
+
         defaultTabbedMode = new QCheckBox("Use Tabbed view mode by default ", defaultsPage);
         defaultsPageLayout->addWidget(defaultTabbedMode);
 
@@ -174,6 +177,7 @@ Savvy_settings::Savvy_settings(QWidget *parent) :
     QSettings settings;
     view_setts->colorMapCombo->setCurrentIndex(settings.value("defaultColorMap").toInt());
     general_setts->autoContrast->setChecked(settings.value("AutoScaleImages").toBool());
+    general_setts->defaultColorbar->setChecked(settings.value("showColorbar").toBool());
     general_setts->pluginsPath->setText(settings.value("PluginsPath").toString());
     general_setts->colorMapsPath->setText(settings.value("ColorMapsPath").toString());
     general_setts->autoPlotOpenedFiles->setChecked(settings.value("AutoPlotOpenedImages").toBool());
@@ -213,8 +217,9 @@ void Savvy_settings::on_listWidget_currentRowChanged(int currentRow)
 void Savvy_settings::on_save_settings()
 {
     QSettings settings;
-    settings.setValue("defaultColorMap", view_setts->colorMapCombo->currentIndex());
+    settings.setValue("defaultColorMap", view_setts->colorMapCombo->currentText());
     settings.setValue("AutoScaleImages", general_setts->autoContrast->isChecked());
+    settings.setValue("showColorbar", general_setts->defaultColorbar->isChecked());
     settings.setValue("PluginsPath", general_setts->pluginsPath->text());
     settings.setValue("ColorMapsPath", general_setts->colorMapsPath->text());
     settings.setValue("AutoPlotOpenedImages", general_setts->autoPlotOpenedFiles->isChecked());

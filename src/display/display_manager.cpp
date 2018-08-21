@@ -14,27 +14,27 @@ Display_manager::Display_manager(int _my_id, int _num_dim, QWidget *parent) :
     switch (dims) {
     case 1:
     {
-        _display = new Display_container_1d(1, this);
+        _display.reset(new Display_container_1d(1, this));
         set_no_controls(true);
     }
         break;
     case 2:
     {
-        _display = new Display_container_2d(2, this);
+        _display.reset(new Display_container_2d(2, this));
         set_no_controls(true);
     }
         break;
     case 3:
     {
-        _display = new Display_container_3d(3, this);
-        connect(ui->sld_plane, &QSlider::sliderMoved, _display, &Display_container::update_scene);
+        _display.reset(new Display_container_3d(3, this));
+        connect(ui->sld_plane, &QSlider::sliderMoved, _display.get(), &Display_container::update_scene);
         //        connect(ui->sld_plane, &QSlider::sliderMoved, this, &Display_manager::updated_display);
-        connect(_display, &Display_container::setup_ready, this, &Display_manager::initialised_display);
+        connect(_display.get(), &Display_container::setup_ready, this, &Display_manager::initialised_display);
     }
         break;
     }
 
-    ui->verticalLayout_2->addWidget(_display);
+    ui->gridLayout->addWidget(_display.get());
 }
 
 Display_manager::Display_manager(int _my_id, stir::ArrayInterface *__display, QWidget *parent) :
@@ -47,31 +47,31 @@ Display_manager::Display_manager(int _my_id, stir::ArrayInterface *__display, QW
     case 1:
     {
         stir::Array<1, float>* tmp = dynamic_cast<stir::Array<1, float>* >(__display);
-        _display = new Display_container_1d(*tmp, static_cast<int>(tmp->size()), 1, this);
+        _display.reset(new Display_container_1d(*tmp, static_cast<int>(tmp->size()), 1, this));
         set_no_controls(true);
     }
         break;
     case 2:
     {
         stir::Array<2, float>* tmp = dynamic_cast<stir::Array<2, float>* >(__display);
-        _display = new Display_container_2d(*tmp, 2, this);
+        _display.reset(new Display_container_2d(*tmp, 2, this));
         set_no_controls(true);
     }
         break;
     case 3:
     {
         stir::Array<3, float>* tmp = dynamic_cast<stir::Array<3, float>* >(__display);
-        _display = new Display_container_3d(*tmp, 3, this);
+        _display.reset(new Display_container_3d(*tmp, 3, this));
 
-        connect(ui->sld_plane, &QSlider::sliderMoved, _display, &Display_container::update_scene);
+        connect(ui->sld_plane, &QSlider::sliderMoved, _display.get(), &Display_container::update_scene);
         connect(ui->sld_plane, &QSlider::sliderMoved, this, &Display_manager::updated_display);
-        connect(_display, &Display_container::setup_ready, this, &Display_manager::initialised_display);
+        connect(_display.get(), &Display_container::setup_ready, this, &Display_manager::initialised_display);
         initialised_display();
     }
         break;
     }
 
-    ui->verticalLayout_2->addWidget(_display);
+    ui->gridLayout->addWidget(_display.get());
 }
 
 Display_manager::Display_manager(int _my_id, stir::ArrayInterface *__display,
@@ -85,36 +85,53 @@ Display_manager::Display_manager(int _my_id, stir::ArrayInterface *__display,
     case 1:
     {
         stir::Array<1, float>* tmp = dynamic_cast<stir::Array<1, float>* >(__display);
-        _display = new Display_container_1d(*tmp, static_cast<int>(tmp->size()), 1, this);
+        _display.reset(new Display_container_1d(*tmp, static_cast<int>(tmp->size()), 1, this));
         set_no_controls(true);
     }
         break;
     case 2:
     {
         stir::Array<2, float>* tmp = dynamic_cast<stir::Array<2, float>* >(__display);
-        _display = new Display_container_2d(*tmp, 2, this);
+        _display.reset(new Display_container_2d(*tmp, 2, this));
         set_no_controls(true);
     }
         break;
     case 3:
     {
         stir::Array<3, float>* tmp = dynamic_cast<stir::Array<3, float>* >(__display);
-        _display = new Display_container_3d(*tmp, 3, this);
+        _display.reset(new Display_container_3d(*tmp, 3, this));
 
-        connect(ui->sld_plane, &QSlider::sliderMoved, _display, &Display_container::update_scene);
+        connect(ui->sld_plane, &QSlider::sliderMoved, _display.get(), &Display_container::update_scene);
         connect(ui->sld_plane, &QSlider::sliderMoved, this, &Display_manager::updated_display);
-        connect(_display, &Display_container::setup_ready, this, &Display_manager::initialised_display);
+        connect(_display.get(), &Display_container::setup_ready, this, &Display_manager::initialised_display);
         initialised_display();
     }
         break;
     }
 
-    ui->verticalLayout_2->addWidget(_display);
+    ui->gridLayout->addWidget(_display.get());
+}
+
+Display_manager::Display_manager(int _my_id,
+                                 std::shared_ptr<QVector<QVector<QVector<double> > > > _prod_image,
+                                 QWidget *parent) :
+    DisplayInterface (_my_id, 3, parent),
+    ui(new Ui::Display_manager)
+{
+    ui->setupUi(this);
+
+    _display.reset(new Display_container_3d(*_prod_image, 3, this));
+    connect(ui->sld_plane, &QSlider::sliderMoved, _display.get(), &Display_container::update_scene);
+    connect(ui->sld_plane, &QSlider::sliderMoved, this, &Display_manager::updated_display);
+    connect(_display.get(), &Display_container::setup_ready, this, &Display_manager::initialised_display);
+    initialised_display();
+
+    ui->gridLayout->addWidget(_display.get());
 }
 
 Display_manager::~Display_manager()
 {
-    delete _display;
+//    delete _display;
     delete ui;
 }
 
@@ -170,4 +187,9 @@ std::shared_ptr< QVector<double> >  Display_manager::get_x_values() const
 std::shared_ptr< QVector<double> >  Display_manager::get_y_values() const
 {
     return _display->get_y_values();
+}
+
+void Display_manager::on_psh_save_image_clicked()
+{
+    //! \todo
 }

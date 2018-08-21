@@ -42,50 +42,13 @@ Display_container_3d::Display_container_3d(const  stir::Array<3, float>& _in, in
     set_display(_in);
 }
 
-void Display_container_3d::set_axis(int _offset_h, int _offset_v, int _offset_d,
-                                    float _h_spacing, float _v_spacing, float _d_spacing)
-{
-
-    offset_h = _offset_h;
-    offset_v = _offset_v;
-    offset_d = _offset_d;
-
-    h_spacing = _h_spacing;
-    v_spacing = _v_spacing;
-    d_spacing = _d_spacing;
-
-    p_raster->setInterval(Qt::XAxis, QwtInterval(static_cast<double>(offset_v) * static_cast<double>(v_spacing),
-                                                 static_cast<double>((offset_v + row_num) ) * static_cast<double>(v_spacing),
-                                                 QwtInterval::IncludeBorders));
-
-    p_raster->setInterval(Qt::YAxis, QwtInterval(static_cast<double>(offset_h) * static_cast<double>(h_spacing),
-                                                  static_cast<double>(offset_h + row_size) * static_cast<double>(h_spacing),
-                                                  QwtInterval::IncludeBorders));
-
-    if(static_cast<double>(offset_h + row_size) * static_cast<double>(h_spacing) < static_cast<double>((offset_v + row_num)) * static_cast<double>(v_spacing))
-    {
-        d_rescaler = new QwtPlotRescaler(this->canvas(),QwtPlot::xBottom, QwtPlotRescaler::Fixed);
-        d_rescaler->setExpandingDirection(QwtPlot::yLeft, QwtPlotRescaler::ExpandBoth);
-    }
-    else if (static_cast<double>(offset_h + row_size) * static_cast<double>(h_spacing) > static_cast<double>((offset_v + row_num) ) * static_cast<double>(v_spacing))
-    {
-        d_rescaler = new QwtPlotRescaler(this->canvas(),QwtPlot::yLeft, QwtPlotRescaler::Fixed);
-        d_rescaler->setExpandingDirection(QwtPlot::xBottom, QwtPlotRescaler::ExpandBoth);
-    }
-    else
-    {
-        d_rescaler = new QwtPlotRescaler(this->canvas(),QwtPlot::xBottom, QwtPlotRescaler::Fixed);
-        d_rescaler->setExpandingDirection(QwtPlot::yLeft, QwtPlotRescaler::ExpandBoth);
-    }
-}
-
-void Display_container_3d::set_display(const QVector<double>  &_array, int _row_size )
+void Display_container_3d::set_display(const QVector<double>  &_array, unsigned int _row_size )
 {
     data_num = 1;
-    row_size   = _row_size;
+    row_size = _row_size;
     row_num  = _array.size()/ row_num;
 
-    data = new QVector< QVector< double > >(1, QVector< double >( _array.size(), 0.0));
+    data.reset(new QVector< QVector< double > >(1, QVector< double >( _array.size(), 0.0)));
     min_value = new QVector<double>(data_num, 1000000);
     max_value = new QVector<double>(data_num, 0);
 
@@ -122,16 +85,17 @@ void Display_container_3d::set_display(const QVector<QVector<double> >  &_array)
 
 void Display_container_3d::set_display(const QVector<QVector<QVector<double> > > &_array)
 {
-    data_num = _array.size();
-    row_num  = _array[0].size();
-    row_size   = _array[0][0].size();
+    data_num = static_cast<unsigned int>(_array.size());
+    row_num  = static_cast<unsigned int>(_array[0].size());
+    row_size = static_cast<unsigned int>(_array[0][0].size());
 
-    data = new QVector< QVector< double > >(data_num,
-                                            QVector< double >(row_num * row_size, 0.0));
+    data.reset(new QVector< QVector< double > >(data_num,
+                                            QVector< double >(row_num * row_size, 0.0)));
     min_value = new QVector<double>(data_num, 1000000);
     max_value = new QVector<double>(data_num, 0);
 
-//    savvy::serialize_QVector(_array, *data, min_value, max_value);
+    savvy::serialize_QVector<double>(_array, *data, *min_value, *max_value);
+
     set_axis();
     update_scene();
 
@@ -140,42 +104,42 @@ void Display_container_3d::set_display(const QVector<QVector<QVector<double> > >
 
 void Display_container_3d::set_display(const stir::Array<3, float>& _array)
 {
-    data_num = static_cast<int>(_array.size());
-    row_num  = static_cast<int>(_array[0].size());
-    row_size   = static_cast<int>(_array[0][0].size());
+    data_num = _array.size();
+    row_num  = _array[0].size();
+    row_size = _array[0][0].size();
 
-    data = new QVector< QVector< double > >(data_num,
-                                            QVector< double >(row_num * row_size, 0.0));
-    min_value = new QVector<double>(data_num, 1000000);
-    max_value = new QVector<double>(data_num, 0);
+    data.reset(new QVector< QVector< double > >(data_num,
+                                            QVector< double >(row_num * row_size, 0.0)));
+    min_value = new QVector<double>(data_num, 1000000.0);
+    max_value = new QVector<double>(data_num, 0.0);
 
     savvy::Array3D_QVector2Ds(_array, *data, *min_value,  *max_value);
-    set_axis(_array.get_min_index(), _array[0].get_min_index(), _array[0][0].get_min_index());
+    const stir::VoxelsOnCartesianGrid<float> *t = dynamic_cast<const stir::VoxelsOnCartesianGrid<float>* >(&_array);
+    if (stir::is_null_ptr(t))
+    {
+        set_size(_array.get_min_index(), _array[0].get_min_index(), _array[0][0].get_min_index());
+    }
+    else
+    {
+        stir::BasicCoordinate<3,int> i = t->get_min_indices();
+
+        if (this->axisEnabled(QwtPlot::yLeft))
+        {
+            stir::BasicCoordinate<3,float> b = t->get_grid_spacing();
+            stir::BasicCoordinate<3,float> o = t->get_origin();
+
+            set_axis(i[3],i[2], i[1],
+                    o[3], o[2], o[1],
+                    b[3], b[2], b[1]);
+        }
+        else
+            set_size(i[3],i[2], i[1]);
+    }
     update_scene();
+
     emit setup_ready();
 }
 
-void Display_container_3d::set_display(void* _in)
-{
-    // to silence warning
-    if(_in)
-    {
-
-    }
-
-    //    stir::Array<3, float>* tmp =
-    //            static_cast<stir::Array<3, float>* >(_in);
-
-    //    if(stir::is_null_ptr(tmp))
-    //        return false;
-
-    //    set_array(tmp);
-    //    set_axis(tmp->get_min_index(), (*tmp)[0].get_min_index(), (*tmp)[0][0].get_min_index());
-    //    update_scene();
-    //    emit setup_ready();
-
-    //    return true;
-}
 
 //void Display_container_3d::set_array(const QVector<QVector<QVector<double> > > &_array)
 //{
@@ -276,7 +240,7 @@ void Display_container_3d::set_display(void* _in)
 //    }
 //}
 
-void Display_container_3d::set_display(const stir::Array<1, float>& a, int row_size)
+void Display_container_3d::set_display(const stir::Array<1, float>& a, unsigned int row_size)
 {
     // to silence warning
     if(a.size() || row_size)
@@ -298,15 +262,44 @@ void Display_container_3d::update_scene(int i)
 {
     if (i < data->size())
     {
-        p_raster->setValueMatrix((*data)[i], row_size);
-
-        p_raster->setInterval( Qt::ZAxis, QwtInterval((*min_value)[i],  (*max_value)[i]));
+        current_slice = i;
+        p_raster->setValueMatrix((*data)[current_slice], static_cast<int>(row_size));
         d_spectrogram->setData(p_raster);
+
+        if(auto_scale)
+        {
+            m_viz_min = (*min_value)[current_slice];
+            m_viz_max = (*max_value)[current_slice];
+            m_zInterval.setInterval(m_viz_min, m_viz_max);
+            p_raster->setInterval( Qt::ZAxis, m_zInterval);
+
+            setAxisScale( QwtPlot::yRight, m_zInterval.minValue(), m_zInterval.maxValue());
+            p_colorScale->setColorMap( m_zInterval, d_spectrogram->colorMap_sptr());
+        }
+
+        emit display_updated();
         replot();
     }
 }
 
+QVector< double > * Display_container_3d::get_current_data() const
+{
+    return get_data(current_slice);
+}
+
+void Display_container_3d::get_min_max(double& min, double& max) const
+{
+    min = m_viz_min;
+    max = m_viz_max;
+}
+
+void Display_container_3d::set_min_max(const double min, const double max)
+{
+    m_viz_min = min;
+    m_viz_max = max;
+}
+
 Display_container_3d::~Display_container_3d()
 {
-    delete data;
+    data.reset();
 }

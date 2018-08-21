@@ -21,13 +21,13 @@ class Display_container_2d : public Display_container_raster
 public:
     explicit Display_container_2d(int dims = 2, QWidget *parent = nullptr);
 
-    explicit Display_container_2d(const QVector<double>&, int row_size, int dims = 2, QWidget *parent = nullptr);
+    explicit Display_container_2d(const QVector<double>&, unsigned int row_size, int dims = 2, QWidget *parent = nullptr);
 
     explicit Display_container_2d(const QVector< QVector<double> >&, int dims = 2, QWidget *parent = nullptr);
 
     explicit Display_container_2d(const QVector<QVector< QVector<double> > >&, int dims = 2, QWidget *parent = nullptr);
 
-    explicit Display_container_2d(const stir::Array<1, float>&, int row_size, int dims = 2, QWidget *parent = nullptr);
+    explicit Display_container_2d(const stir::Array<1, float>&, unsigned int row_size, int dims = 2, QWidget *parent = nullptr);
 
     explicit Display_container_2d(const  stir::Array<2, float>&, int dims = 2, QWidget *parent = nullptr);
 
@@ -37,27 +37,17 @@ public:
      *  @{
      */
     //! Set the data array, initialise x_data and update() display, by reference
-    virtual void set_display(const QVector<double>&, int row_size);
+    virtual void set_display(const QVector<double>&, unsigned int row_size) override;
     //! Set the data array, initialise x_data and update() display, by pointer
-    virtual void set_display(const QVector< QVector<double> >&);
+    virtual void set_display(const QVector< QVector<double> >&) override;
     //! Set the data array, initialise x_data and update() display, by reference
-    virtual void set_display(const QVector<QVector< QVector<double> > >&);
+    virtual void set_display(const QVector<QVector< QVector<double> > >&) override;
     //! Set the data array, initialise x_data and update() display, by reference
-    virtual void set_display(const stir::Array<1, float>&, int _row_size);
+    virtual void set_display(const stir::Array<1, float>&, unsigned int _row_size) override;
     //! Set the data array, initialise x_data and update() display, by pointer
-    virtual void set_display(const  stir::Array<2, float>&);
+    virtual void set_display(const  stir::Array<2, float>&) override;
     //! Set the data array, initialise x_data and update() display, by reference
-   virtual void set_display(const  stir::Array<3, float>&);
-    //!
-    virtual void set_display(void*_in);
-    //! Set physical sizes of the data
-    void set_sizes(int _offset_h = 0, int _offset_v = 0,
-                   float _h_spacing = 1.f, float _v_spacing = 1.f,
-                   float _origin_x = 0.f, float  _origin_y = 0.f);
-    //! Set the axis. As a weird convention X axis is the
-    //! vertical axis and Y the horizontal.
-    void set_axis(int _offset_h = 0, int _offset_v = 0,
-                  float _h_spacing = 1, float _v_spacing = 1);
+    virtual void set_display(const  stir::Array<3, float>&) override;
     /** @}*/
 
     /** \addtogroup Getters
@@ -79,7 +69,11 @@ public:
 
 //    void clear();
 
-    virtual ~Display_container_2d();
+    virtual ~Display_container_2d() override;
+
+    virtual void get_min_max(double& min, double& max) const override;
+
+    virtual void set_min_max(const double min, const double max) override;
 
 public slots:
 
@@ -89,8 +83,6 @@ protected:
 
     void initialise();
 
-    //! QVector of data.
-    QVector< double >* data;
 };
 
 #endif // DISPLAY_CONTAINER_H

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>260</width>
-    <height>56</height>
+    <height>33</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,27 +26,19 @@
    <property name="bottomMargin">
     <number>1</number>
    </property>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Colormap: </string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="1">
     <widget class="QComboBox" name="cmb_colormap"/>
    </item>
-   <item row="3" column="0">
-    <widget class="QCheckBox" name="chk_show_cursor">
-     <property name="text">
-      <string>Show cursors</string>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label">
+     <property name="maximumSize">
+      <size>
+       <width>70</width>
+       <height>16777215</height>
+      </size>
      </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QCheckBox" name="chk_show_axis">
      <property name="text">
-      <string>Show axis</string>
+      <string>Colormap: </string>
      </property>
     </widget>
    </item>

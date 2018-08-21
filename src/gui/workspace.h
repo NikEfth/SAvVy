@@ -17,8 +17,8 @@ class Workspace;
 
 //!
 //! \brief The Workspace class
-//! The Workspace holds all stir::Arrays loaded in the memory. In a sense  tries to
-//! imetate the Matlab Workspace.
+//! The Workspace holds all stir::Arrays loaded in the memory.
+//! In a sense tries to immetate the Matlab Workspace.
 //! \todo This should move in the IO
 //! \todo names should be unique
 class Workspace : public QWidget
@@ -45,19 +45,29 @@ public:
     unsigned long int get_size_of_data_in_group() const;
 
     unsigned long int get_num_of_data_in_group() const;
-    //! Get the name of the current seleted item at ui->listOpenedFiles
-    QString get_current_name();
-    //! Get the name of  the name of the item at ui->listOpenedFiles on row _i
-    QString get_array_name(int _i);
-    //! Get a pointer to an array with index _i
-    std::shared_ptr<stir::ArrayInterface> get_array_ptr(int _i) const;
 
-    std::shared_ptr<stir::ArrayInterface> get_array_ptr(const QString& _s);
+    unsigned long int get_num_of_openned_files() const;
+
+    int get_min_max(double& min, double& max,
+                    const int i = 0,
+                    const int min_pos = -1, const int pos_range = -1) const;
+    //! Get the name of the current seleted item at ui->listOpenedFiles
+    QString get_current_name() const;
+    //! Get the name of  the name of the item at ui->listOpenedFiles on row _i
+    QString get_array_name(int _i) const;
+    //! Get a pointer to an array with index _i
+    std::shared_ptr<stir::ArrayInterface> get_array_ptr(const int _i) const;
+
+    std::shared_ptr<stir::ArrayInterface> get_array_ptr(const QString& _s) const;
 
     std::shared_ptr<stir::ArrayInterface> get_current_array_ptr();
+
+    std::shared_ptr<stir::ArrayInterface> get_new_empty_copy(const QString name = "", const int i = 0);
+
+    void go_to_top() const;
     //! Get the next groupped item. If not existing or end of list then \return
     //! -1 otherwise \return the current index.
-    int get_next_item_in_group(std::shared_ptr<stir::ArrayInterface> &ret);
+    int get_next_item_in_group(std::shared_ptr<stir::ArrayInterface> &ret) const;
     //! As get_next_item_in_group but in addition perfoms a serialisation of the
     //! array. min_slice and slice_range can be used to reduce the amount of data returned.
     //! The operation will take place as min_pos + pos_range.
@@ -73,6 +83,10 @@ public:
 
     std::shared_ptr<stir::ArrayInterface> open_array(const QString& fileName);
 
+    bool write_file_to_disk(const QString fileName, int pos = 0) const;
+
+    bool write_current_file_to_disk(const QString fileName) const;
+
 signals:
     void double_clicked_item(QString);
     //! Signal emitted when the ui->display_array is pressed.This is connected to
@@ -81,7 +95,10 @@ signals:
 
 public slots:
     //! Append a window on the  ui->listOpenedFiles
-    void append_to_workspace(std::shared_ptr<stir::ArrayInterface> data, const QString &name);
+    int append_to_workspace(std::shared_ptr<stir::ArrayInterface> data, const QString &name);
+
+    void append_to_workspace(std::shared_ptr<QVector<QVector<QVector<double> > > > data,
+                                        const QString& name);
     //! Update the state of the QWidgets on the GUI
     void updateGUI();
 
@@ -118,7 +135,7 @@ private:
     //! Create a new record in ui->listOpenedFiles with the specified name
     //    void append_to_openedFiles(const QString&);
     //! Remove from listOpenedFiles the item at row _id
-    void remove_from_workspace(int _id);
+    void remove_from_workspace(const int _id);
 
     Ui::Workspace *ui;
     //! All the openned files are held by this vector

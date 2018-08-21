@@ -8,11 +8,12 @@ Histogram_manager::Histogram_manager(int _my_id, int _num_dim, QWidget *parent) 
     ui(new Ui::Histogram_manager)
 {
     ui->setupUi(this);
-    _histogram = new Display_container_bar(0, this);
-    connect(_histogram, &Display_container_bar::settings_updated,
+    _histogram.reset(new Display_container_bar(0, this));
+
+    connect(_histogram.get(), &Display_container_bar::settings_updated,
             this, &Histogram_manager::refresh_display);
 
-    ui->verticalLayout_3->addWidget(_histogram);
+    ui->verticalLayout_3->addWidget(_histogram.get());
 }
 
 Histogram_manager::~Histogram_manager()
@@ -22,12 +23,12 @@ Histogram_manager::~Histogram_manager()
 
 void Histogram_manager::on_spinBox_valueChanged(int arg1)
 {
-    _histogram->setNumBin(static_cast<const size_t>(arg1));
+    _histogram->setNumBin_update(static_cast<const size_t>(arg1));
 }
 
 void Histogram_manager::on_doubleSpinBox_valueChanged(double arg1)
 {
-    _histogram->setCutOff(static_cast<float>(arg1));
+    _histogram->setCutOff_update(static_cast<float>(arg1));
 }
 
 void Histogram_manager::set_display(void*_in)
@@ -76,7 +77,7 @@ void Histogram_manager::set_display(const QString &_fileName)
     inFile.close();
 }
 
-Display_container_bar * Histogram_manager::get_display()
+shared_ptr<Display_container_bar> Histogram_manager::get_display() const
 {
     return _histogram;
 }

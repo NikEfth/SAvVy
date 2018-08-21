@@ -44,16 +44,9 @@ SavvyWindow::SavvyWindow(QWidget *parent) :
     else
         auto_plot_opened_files = true;
 
-    if(settings.contains("ColorMapsPath") && settings.contains("defaultColorMap"))
-        _colormaps = new ColorMap(settings.value("ColorMapsPath").toString(),
-                                  settings.value("defaultColorMap").toString());
-    else if (settings.contains("ColorMapsPath"))
-        _colormaps = new ColorMap(settings.value("ColorMapsPath").toString(),
-                                  "BW");
-    else
-        _colormaps = new ColorMap();
+    next_dataset_id = 0;
 
-    next_window_id = 0;
+    next_display_id = 0;
 
     create_interface();
 
@@ -125,6 +118,32 @@ void SavvyWindow::on_actionOpen_triggered()
         open_file(fileName, _mute);
 }
 
+bool SavvyWindow::on_actionSave_triggered()
+{
+    if(pnl_workspace->get_num_of_openned_files() == 0)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("No opened files found");
+        msgBox.setStandardButtons(QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Cancel);
+        msgBox.setIcon(QMessageBox::Critical);
+        return msgBox.exec();
+    }
+
+    const QString fileName =
+            QFileDialog::getSaveFileName(this,
+                                         "Save as",
+                                         pnl_workspace->get_current_name(),
+                                         tr("STIR Image Header (*.hv);;")
+                                            );
+
+    if (fileName.isEmpty())
+        return false;
+
+    return pnl_workspace->write_current_file_to_disk(fileName);
+}
+
+
 /*
  *
  *
@@ -170,8 +189,7 @@ bool SavvyWindow::open_file(const QString& fileName, bool _mute_open)
 void SavvyWindow::updateGUI(QMdiSubWindow * activeSubWindow)
 {
     bool hasMdiChild = (ui->mdiArea->subWindowList().size() != 0);
-    if (!hasMdiChild)
-        pnl_opened_file_controls->show_panel(0);
+
     pnl_displayed_files->setEnabled(hasMdiChild);
     ui->menuSlice_Annotations->setEnabled(hasMdiChild);
     ui->menuAdjust->setEnabled(hasMdiChild);
@@ -183,8 +201,14 @@ void SavvyWindow::updateGUI(QMdiSubWindow * activeSubWindow)
 
         if (active_display_container != previous_active)
         {
-            pnl_opened_file_controls->show_panel(active_display_container->get_num_dimensions());
+
             pnl_displayed_files->set_active(active_display_container->get_my_id());
+
+            if (!dc_contrast->isHidden())
+            {
+                ctrl_levels->unsetContainer();
+                ctrl_levels->setContainer(active_display_container);
+            }
 
             previous_active = active_display_container;
         }
@@ -201,8 +225,8 @@ void SavvyWindow::focus_sub_window(QString _id) const
 
 Display_manager *SavvyWindow::createDisplayManager(int num_dims)
 {
-    Display_manager *ret = new Display_manager(next_window_id, num_dims, this);
-    next_window_id++;
+    Display_manager *ret = new Display_manager(next_dataset_id, num_dims, this);
+    next_dataset_id++;
     return ret;
 }
 
@@ -242,25 +266,30 @@ bool SavvyWindow::append_to_mdi(Display_container *child,
     return true;
 }
 
-bool SavvyWindow::append_to_mdi(Display_manager *child,
+bool SavvyWindow::append_to_mdi(Display_manager *subWindow,
                                 bool prepend_to_recent,
-                                bool minimized) const
+                                bool minimized)
 {
 
-    QObject::connect(child, &Display_manager::aboutToClose, this, &SavvyWindow::remove_from_mdi);
+    QObject::connect(subWindow, &Display_manager::aboutToClose, this, &SavvyWindow::remove_from_mdi);
 
-    ui->mdiArea->addSubWindow(child);
-    ui->mdiArea->setFocusPolicy(Qt::StrongFocus);
-    pnl_displayed_files->appendToOpenedList(child);
+    ui->mdiArea->addSubWindow(subWindow);
+    pnl_displayed_files->appendToOpenedList(subWindow, next_display_id);
+    ++next_display_id;
 
     if (prepend_to_recent &&
-            child->get_file_name().size() > 0)
-        prependToRecentFiles(child->get_file_name());
+            subWindow->get_file_name().size() > 0)
+        prependToRecentFiles(subWindow->get_file_name());
+
+    QSize s = subWindow->get_display()->size();
+    subWindow->parentWidget()->resize(s);
 
     if (!minimized)
-        child->show();
+        subWindow->show();
     else
-        child->showMinimized();
+        subWindow->showMinimized();
+
+    subWindow->parentWidget()->setFixedSize(subWindow->size());
 
     return true;
 }
@@ -275,7 +304,7 @@ void SavvyWindow::remove_from_mdi()
     // Disconnect from tool
     //            toolMan->unsetScreen();
     // Disconnect from contrast window
-    //            contrastMan->unsetScreen();
+    ctrl_levels->unsetContainer();
     // The Math Manager must have an up-to-date list of the opened
     // files.
     //        mathMan->updateOpenedFiles();
@@ -292,9 +321,9 @@ void SavvyWindow::display_array(std::shared_ptr<stir::ArrayInterface> _array,
     switch (dims) {
     case 1:
     {
-        Display_manager * disp =  new Display_manager(next_window_id, _array.get(), this);
+        Display_manager * disp = new Display_manager(next_dataset_id, _array.get(), this);
         disp->set_file_name(_name);
-        ++next_window_id;
+        ++next_dataset_id;
 
         if (is_null_ptr(disp))
             return;
@@ -304,9 +333,9 @@ void SavvyWindow::display_array(std::shared_ptr<stir::ArrayInterface> _array,
     }
     case 2:
     {
-        Display_manager* disp = new Display_manager(next_window_id, _array.get(), this);
+        Display_manager* disp = new Display_manager(next_dataset_id, _array.get(), this);
         disp->set_file_name(_name);
-        ++next_window_id;
+        ++next_dataset_id;
 
         if (is_null_ptr(disp))
             return;
@@ -316,9 +345,9 @@ void SavvyWindow::display_array(std::shared_ptr<stir::ArrayInterface> _array,
     }
     case 3:
     {
-        Display_manager* disp = new Display_manager(next_window_id, _array.get(), this);
+        Display_manager* disp = new Display_manager(next_dataset_id, _array.get(), this);
         disp->set_file_name(_name);
-        ++next_window_id;
+        ++next_dataset_id;
 
         if (is_null_ptr(disp))
             return;
@@ -347,17 +376,6 @@ void SavvyWindow::on_actionDuplicate_triggered()
     //    pnl_opened_files->rename(active->get_my_id(), result);
 }
 
-void SavvyWindow::on_set_colormap(int i)
-{
-    Display_manager* active =
-            static_cast<Display_manager *>(ui->mdiArea->activeSubWindow()->widget());
-    if(!stir::is_null_ptr(active))
-    {
-        active->set_color_map( _colormaps->getColorMap(i));
-        return;
-    }
-}
-
 /*
  *
  *
@@ -379,9 +397,9 @@ void SavvyWindow::create_interface()
 void SavvyWindow::create_docks()
 {
     dc_contrast = new QDockWidget("Contrast and WL",this);
-    //    contrastMan = new ContrastMan(this);
-    //    dc_contrast->setWidget(contrastMan);
-
+    ctrl_levels.reset(new CTRL_Levels(this));
+    dc_contrast->setWidget(ctrl_levels.get());
+    this->addDockWidget(Qt::DockWidgetArea::TopDockWidgetArea,dc_contrast);
     dc_contrast->setFloating(true);
     dc_contrast->setVisible(false);
 
@@ -404,17 +422,11 @@ void SavvyWindow::create_docks()
             this, &SavvyWindow::focus_sub_window);
     dc_displayed_files->setWidget(pnl_displayed_files);
 
-    dc_opened_file_controls = new QDockWidget("Controls", this);
-    pnl_opened_file_controls = new Panel_opened_file_controls(_colormaps->getColormapList(), this);
-    connect(pnl_opened_file_controls, &Panel_opened_file_controls::colormap_changed,
-            this, &SavvyWindow::on_set_colormap);
-    dc_opened_file_controls->setWidget(pnl_opened_file_controls);
-
     this->addDockWidget(Qt::DockWidgetArea::TopDockWidgetArea, dc_contrast);
     this->addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, dc_tool_manager);
     this->addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, dc_opened_files);
     this->addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, dc_displayed_files);
-    this->addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, dc_opened_file_controls);
+//    this->addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, dc_opened_file_controls);
 }
 
 static inline QString recentFilesKey() { return QStringLiteral("recentFileList"); }
@@ -820,8 +832,8 @@ bool SavvyWindow::test_display_array_1d_points()
 
     stir::Array<1, float> * tmp = dynamic_cast<stir::Array<1, float> * >(test_sptr.get());
 
-    Display_manager *disp = new Display_manager(next_window_id, 1, this);
-    ++next_window_id;
+    Display_manager *disp = new Display_manager(next_dataset_id, 1, this);
+    ++next_dataset_id;
     disp->set_file_name(_name);
 
     QVector<double> y_values;
@@ -845,9 +857,9 @@ bool SavvyWindow::test_display_array_2d_in_1d_container()
 
     stir::Array<2, float> * tmp = dynamic_cast<stir::Array<2, float> * >(test2_sptr.get());
 
-    Display_manager * disp =  new Display_manager(next_window_id, 1, this);
+    Display_manager * disp =  new Display_manager(next_dataset_id, 1, this);
     disp->set_file_name(_name);
-    ++next_window_id;
+    ++next_dataset_id;
 
     if (is_null_ptr(disp))
         return false;
@@ -866,9 +878,9 @@ bool SavvyWindow::test_display_array_3d_in_1d_container()
 
     stir::Array<3, float> * tmp = dynamic_cast<stir::Array<3, float> * >(test2_sptr.get());
 
-    Display_manager * disp =  new Display_manager(next_window_id, 1, this);
+    Display_manager * disp =  new Display_manager(next_dataset_id, 1, this);
     disp->set_file_name(_name);
-    ++next_window_id;
+    ++next_dataset_id;
 
     if (is_null_ptr(disp))
         return false;
@@ -898,9 +910,9 @@ bool SavvyWindow::test_display_array_1d_in_2d_container()
 
     stir::Array<1, float> * tmp = dynamic_cast<stir::Array<1, float> * >(test_sptr.get());
 
-    Display_manager * disp =  new Display_manager(next_window_id, 2, this);
+    Display_manager * disp =  new Display_manager(next_dataset_id, 2, this);
     disp->set_file_name(_name);
-    ++next_window_id;
+    ++next_dataset_id;
 
     if (is_null_ptr(disp))
         return false;
@@ -1198,10 +1210,6 @@ void SavvyWindow::loadPlugins()
             pluginFileNames += fileName;
         }
     }
-
-    //    brushMenu->setEnabled(!brushActionGroup->actions().isEmpty());
-    //    shapesMenu->setEnabled(!shapesMenu->actions().isEmpty());
-    //    filterMenu->setEnabled(!filterMenu->actions().isEmpty());
 }
 
 void SavvyWindow::populateMenus(QObject *plugin)
@@ -1221,4 +1229,29 @@ void SavvyWindow::addToMenu(ExternalInterface *plugin, const QString text,
 
     connect(loaded_plugins.back(), SIGNAL(triggered()), plugin, SLOT(show()));
     menu->addAction(action);
+}
+
+void SavvyWindow::on_actionWindow_Level_triggered()
+{
+    if(DisplayInterface* active =
+            qobject_cast<DisplayInterface *>(ui->mdiArea->activeSubWindow()->widget()))
+    {
+        if(dc_contrast->isHidden())
+        {
+            dc_contrast->show();
+        }
+        else
+        {
+            dc_contrast->hide();
+        }
+
+        if (!dc_contrast->isHidden())
+        {
+            ctrl_levels->unsetContainer();
+            ctrl_levels->setContainer(active);
+            //disconnect(active, &Screen_manager::activeScreenUpdated, my_histogram, &BarScreen::replot_me);
+            //my_histogram->setScreen(active);
+            //connect(active, &Screen_manager::activeScreenUpdated, my_histogram, &BarScreen::replot_me);
+        }
+    }
 }

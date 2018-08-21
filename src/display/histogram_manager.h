@@ -9,6 +9,8 @@
 
 #include "common_display.h"
 
+using namespace display;
+
 namespace Ui {
 class Histogram_manager;
 }
@@ -42,7 +44,7 @@ public:
      *  @{
      */
 
-    Display_container_bar * get_display();
+    shared_ptr<Display_container_bar> get_display() const;
     /** @}*/
 
     virtual size_t get_num_points() const override;
@@ -51,9 +53,9 @@ public:
 
     void setCutOff(const float& _n);
 
-    virtual std::shared_ptr< QVector<double> >  get_x_values() const;
+    virtual std::shared_ptr< QVector<double> >  get_x_values() const override;
 
-    virtual std::shared_ptr< QVector<double> >  get_y_values() const;
+    virtual std::shared_ptr< QVector<double> >  get_y_values() const override;
 
 private slots:
     void on_spinBox_valueChanged(int arg1);
@@ -69,9 +71,9 @@ signals:
 
 
 private:
-    Ui::Histogram_manager *ui;
+    Ui::Histogram_manager *ui = nullptr;
 
-    Display_container_bar * _histogram;
+    shared_ptr<Display_container_bar> _histogram = nullptr;
 
     QString _input_file;
 

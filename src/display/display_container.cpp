@@ -1,12 +1,16 @@
 #include "display_container.h"
 #include <qwt_scale_engine.h>
+#include <qwt_plot_renderer.h>
+
+#include <QMenu>
+#include <QAction>
+#include <QFileDialog>
+#include <QPrinter>
 
 Display_container::Display_container(int _num_dim, QWidget *parent)
     :QwtPlot(parent), num_dim(_num_dim)
 {
-//    this->canvas()->setMinimumSize(150, 150);
-    this->axisScaleEngine(QwtPlot::yLeft)->setAttribute(QwtScaleEngine::Floating,true);
-    this->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating,true);
+    this->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating, true);
 }
 
 void Display_container::closeEvent(QCloseEvent *event)
@@ -20,12 +24,6 @@ void Display_container::closeEvent(QCloseEvent *event)
     emit aboutToClose();
 }
 
-void Display_container::enable_axis(bool state)
-{
-    this->enableAxis(QwtPlot::xBottom, state);
-    this->enableAxis(QwtPlot::yLeft, state);
-}
-
 Display_container::~Display_container()
 {
     delete min_value;
@@ -35,6 +33,12 @@ Display_container::~Display_container()
 int Display_container::get_num_data() const
 {
     return data_num;
+}
+
+QVector< double > *
+Display_container::get_current_data() const
+{
+    return get_data(0);
 }
 
 void Display_container::set_color_map(const QSharedPointer<QwtColorMap> i)
@@ -91,4 +95,43 @@ void Display_container::clearAllPlotItems()
         items.at(i)->detach();
 
     this->replot();
+}
+
+bool Display_container::event( QEvent *ev )
+{
+        switch( ev->type() )
+        {
+        case QEvent::MouseButtonPress:
+        {
+            const QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>( ev );
+            if(mouseEvent->buttons() == Qt::LeftButton)
+            {
+              //  this->setCOG( mouseEvent->pos() );
+            }
+            if(mouseEvent->buttons() == Qt::MiddleButton)
+            {
+                //this->resetCOG();
+            }
+
+            break;
+        }
+        case QEvent::MouseMove:
+        {
+            const QMouseEvent *mouseEvent = static_cast<QMouseEvent *>( ev );
+//            if(mouseEvent->buttons() == Qt::LeftButton)
+//                move( mouseEvent->pos() );
+
+            break;
+        }
+        case QEvent::MouseButtonRelease:
+        {
+
+            break;
+        }
+        default:
+            break;
+        }
+
+        QwtPlot::event(ev);
+    return true;
 }

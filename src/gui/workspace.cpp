@@ -90,8 +90,8 @@ void Workspace::showListContextMenu(const QPoint &pos)
     }
 }
 
-void Workspace::append_to_workspace(std::shared_ptr<stir::ArrayInterface> data,
-                                    const QString& name)
+int Workspace::append_to_workspace(std::shared_ptr<stir::ArrayInterface> data,
+                                   const QString& name)
 {
 
     QListWidgetItem* tmp_itm =  new QListWidgetItem();
@@ -104,6 +104,28 @@ void Workspace::append_to_workspace(std::shared_ptr<stir::ArrayInterface> data,
     ui->listOpenedFiles->setCurrentItem(tmp_itm);
 
     openned_files.append(data);
+
+    updateGUI();
+
+    return 1;
+}
+
+//! \todo It is not actually doing anything, yet.
+void Workspace::append_to_workspace(std::shared_ptr<QVector<QVector<QVector<double> > > > data,
+                                    const QString& name)
+{
+
+    QListWidgetItem* tmp_itm =  new QListWidgetItem();
+
+    tmp_itm->setText(name);
+    tmp_itm->setFlags(tmp_itm->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+    tmp_itm->setCheckState(Qt::Unchecked);
+
+    ui->listOpenedFiles->addItem(tmp_itm);
+    ui->listOpenedFiles->setCurrentItem(tmp_itm);
+
+
+    //    openned_files.append(data);
 
     updateGUI();
 }
@@ -122,7 +144,7 @@ void Workspace::append_to_workspace(std::shared_ptr<stir::ArrayInterface> data,
 //    updateGUI();
 //}
 
-void Workspace::remove_from_workspace(int _id)
+void Workspace::remove_from_workspace(const int _id)
 {
     if (openned_files.size() == 0)
         return;
@@ -140,7 +162,7 @@ void Workspace::on_remove_array_pressed()
 }
 
 std::shared_ptr<stir::ArrayInterface>
-Workspace::get_array_ptr(int _i) const
+Workspace::get_array_ptr(const int _i) const
 {
     if (_i < openned_files.size())
         return openned_files[_i];
@@ -148,7 +170,7 @@ Workspace::get_array_ptr(int _i) const
 }
 
 std::shared_ptr<stir::ArrayInterface>
-Workspace::get_array_ptr(const QString& _s)
+Workspace::get_array_ptr(const QString& _s) const
 {
     for (int i = 0; i < ui->listOpenedFiles->count(); ++i)
     {
@@ -165,14 +187,66 @@ Workspace::get_current_array_ptr()
     return get_array_ptr(ui->listOpenedFiles->currentRow());
 }
 
-QString Workspace::get_array_name(int _i)
+std::shared_ptr<stir::ArrayInterface>
+Workspace::get_new_empty_copy(const QString name,
+                              const int i)
+{
+
+    if(i < openned_files.size())
+    {
+
+        std::shared_ptr<stir::ArrayInterface> ar = get_array_ptr(i);
+        const int dims = ar->get_num_dimensions();
+        std::shared_ptr<stir::ArrayInterface> newArray;
+
+        switch (dims) {
+
+        case 1:
+        {
+            stir::Array<1, float> *t = dynamic_cast<stir::Array<1, float>* >(ar.get());
+            newArray.reset( new stir::Array<1, float>(t->get_index_range()) );
+            break;
+        }
+        case 2:
+        {
+            stir::Array<2, float> *t = dynamic_cast<stir::Array<2, float>* >(ar.get());
+            newArray.reset( new stir::Array<2, float>(t->get_index_range()) );
+            break;
+        }
+        case 3:
+        {
+            //check if we can create VoxelsOnCartesianGrid
+            {
+                stir::VoxelsOnCartesianGrid<float> *t = dynamic_cast<stir::VoxelsOnCartesianGrid<float> * >(ar.get());
+                if(!stir::is_null_ptr(t))
+                {
+                    newArray.reset(t->get_empty_copy());
+                    break;
+                }
+            }
+            stir::Array<3, float> *t = dynamic_cast<stir::Array<3, float>* >(ar.get());
+            newArray.reset( new stir::Array<3, float>(t->get_index_range()) );
+            break;
+        }
+        default:
+            return nullptr;
+        }
+
+        append_to_workspace(newArray, name);
+        return newArray;
+    }
+
+    return nullptr;
+}
+
+QString Workspace::get_array_name(int _i) const
 {
     if (_i < ui->listOpenedFiles->count())
         return ui->listOpenedFiles->item(_i)->text();
     return QString("");
 }
 
-QString Workspace::get_current_name()
+QString Workspace::get_current_name() const
 {
     return ui->listOpenedFiles->item( ui->listOpenedFiles->currentRow())->text();
 }
@@ -278,6 +352,11 @@ unsigned long int Workspace::get_num_of_data_in_group() const
     return 0;
 }
 
+unsigned long int Workspace::get_num_of_openned_files() const
+{
+    return openned_files.size();
+}
+
 std::shared_ptr <stir::ArrayInterface> Workspace::open_array(const QString& fileName)
 {
     std::shared_ptr<stir::ArrayInterface> input;
@@ -288,6 +367,19 @@ std::shared_ptr <stir::ArrayInterface> Workspace::open_array(const QString& file
     append_to_workspace(input,fileName);
     updateGUI();
     return input;
+}
+
+bool Workspace::write_file_to_disk(const QString fileName, int pos) const
+{
+
+    return io_manager::write_array(fileName.toStdString(),
+                              openned_files.at(pos));
+
+}
+
+bool Workspace::write_current_file_to_disk(const QString fileName) const
+{
+    return write_file_to_disk(fileName, ui->listOpenedFiles->currentRow());
 }
 
 void Workspace::on_display_array_pressed()
@@ -368,7 +460,12 @@ void Workspace::on_psh_move_down_clicked()
     }
 }
 
-int Workspace::get_next_item_in_group(std::shared_ptr<stir::ArrayInterface>& ret)
+void Workspace::go_to_top() const
+{
+    ui->listOpenedFiles->setCurrentRow(0);
+}
+
+int Workspace::get_next_item_in_group(std::shared_ptr<stir::ArrayInterface>& ret) const
 {
     if (!has_grouped_items())
         return -1;
@@ -387,7 +484,6 @@ int Workspace::get_next_item_in_group(std::shared_ptr<stir::ArrayInterface>& ret
             ui->listOpenedFiles->setCurrentRow(i+1);
             return i;
         }
-
     }
 
     return -1;
@@ -412,7 +508,7 @@ int Workspace::get_next_item_in_group_as_vector(std::shared_ptr<QVector<double> 
         ret.reset(new QVector<double>());
 
     status = savvy::Array_QVector1D(*array.get(), *ret, min, max,
-                           min_pos, pos_range);
+                                    min_pos, pos_range);
 
     return status;
 }
@@ -423,7 +519,19 @@ bool Workspace::check_all_grouped_have_same_characteristics()
     return 1;
 }
 
+int Workspace::get_min_max(double& min, double& max, const int i,
+                           const int min_pos, const int pos_range) const
+{
+    std::shared_ptr<stir::ArrayInterface> array = get_array_ptr(i);
+
+    int status = savvy::Array_MinMax(*array.get(), min, max,
+                                     min_pos, pos_range);
+
+    return status;
+}
+
 void Workspace::on_psh_info_clicked()
 {
 
 }
+
