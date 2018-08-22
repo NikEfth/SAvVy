@@ -134,6 +134,8 @@ QString open_header(std::string file_name)
     {
 //stir::read_interfile_image_header()
     }
+
+	return QString("");
 }
 
 

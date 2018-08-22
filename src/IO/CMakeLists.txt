@@ -17,4 +17,8 @@ else()
     set(HAVE_ITK OFF)
 endif()
 
+if(WIN32)
+target_link_libraries(savvy_IO PUBLIC Qt5::Core IO data_buildblock buildblock eval_buildblock listmode_buildblock modelling_buildblock numerics_buildblock Shape_buildblock display ITKCommon ${ITK_LIBRARIES})
+else()
 target_link_libraries(savvy_IO PUBLIC Qt5::Core IO buildblock ITKCommon ${ITK_LIBRARIES})
+endif()

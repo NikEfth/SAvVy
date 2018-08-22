@@ -42,6 +42,11 @@ option_with_default(CMAKE_INSTALL_LIBDIR "Directory to which libraries installed
 # Find the Qt components
 find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport Test REQUIRED)
 
+#Find Boost
+set(BOOST_ROOT CACHE PATH "root of Boost")
+find_package( Boost 1.36.0 REQUIRED )
+include_directories(${Boost_INCLUDE_DIRS})
+
 # gcc specific stuff
 if(CMAKE_COMPILER_IS_GNUCC)
 
