@@ -56,6 +56,7 @@ void Display_container_3d::set_display(const QVector<double>  &_array, unsigned 
 
     set_axis();
     update_scene();
+    this->resize(this->canvas()->sizeHint());
     emit setup_ready();
 }
 
@@ -98,7 +99,7 @@ void Display_container_3d::set_display(const QVector<QVector<QVector<double> > >
 
     set_axis();
     update_scene();
-
+        this->resize(sizeHint());
     emit setup_ready();
 }
 
@@ -136,7 +137,7 @@ void Display_container_3d::set_display(const stir::Array<3, float>& _array)
             set_size(i[3],i[2], i[1]);
     }
     update_scene();
-
+        this->resize(sizeHint());
     emit setup_ready();
 }
 

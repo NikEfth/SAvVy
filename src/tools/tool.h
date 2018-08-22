@@ -9,8 +9,8 @@
 //#include <qwt_plot_curve.h>
 //#include <qwt_plot_spectrogram.h>
 
-////#include "src/buildblock/common.h"
-//#include "src/display_buildblock/display_screen_raster.h"
+//////#include "src/buildblock/common.h"
+////#include "src/display_buildblock/display_screen_raster.h"
 
 ///*!
 // * This is the base class for all paint tools
@@ -26,7 +26,7 @@
 
 //    virtual QString get_name() const;
 
-//    virtual void finishedSelecting() = 0;
+////    virtual void finishedSelecting() = 0;
 
 //    void get_data(QVector<QPointF> &, QwtPlot*);
 //    //! Cal this function to clean before unsetting a tool.

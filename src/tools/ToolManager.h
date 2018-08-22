@@ -19,15 +19,11 @@
 ////#include "src/ui_buildblock/panelellpointer.h"
 ////#include "src/display_buildblock/screen_manager.h"
 
-//#include "stir/PixelsOnCartesianGrid.h"
-//#include "stir/recon_buildblock/RayTraceVoxelsOnCartesianGrid.h"
-//#include "stir/recon_buildblock/ProjMatrixElemsForOneBin.h"
-
-//class PointerTool;
-//class RectTool;
-//class LineTool;
+////class PointerTool;
+////class RectTool;
+////class LineTool;
 //class CrossPointerTool;
-//class EclipseTool;
+////class EclipseTool;
 
 //namespace Ui {
 //class ToolManager;
@@ -42,27 +38,27 @@
 
 //    ~ToolManager();
 
-//    inline std::shared_ptr<PointerTool> mousePointer() const;
+////    inline std::shared_ptr<PointerTool> mousePointer() const;
 
-//    inline std::shared_ptr<LineTool> mouseLinePointer() const;
+////    inline std::shared_ptr<LineTool> mouseLinePointer() const;
 
 //    inline std::shared_ptr<CrossPointerTool> mouseCrossPointer() const;
 
-//    inline std::shared_ptr<RectTool> mouseRectPointer() const;
+////    inline std::shared_ptr<RectTool> mouseRectPointer() const;
 
-//    inline std::shared_ptr<EclipseTool> mouseEllPointer() const;
+////    inline std::shared_ptr<EclipseTool> mouseEllPointer() const;
 
-//    inline std::shared_ptr<Tool>  getCurrentTool() const;
+//    inline std::shared_ptr<Tool> getCurrentTool() const;
 
-//    inline void setScreen(Screen_manager * _s);
+////    inline void setScreen(Screen_manager * _s);
 
-//    inline void unsetScreen();
+//    inline void unset();
 //    //! Returns the current selection.
 //    //! If no selection has been made the full slice will return.
-//    PixelsOnCartesianGrid<float> getSelection() const;
+////    PixelsOnCartesianGrid<float> getSelection() const;
 
 //signals:
-//    void tool_selected(std::shared_ptr<Tool>);
+////    void tool_selected(std::shared_ptr<Tool>);
 
 //public slots:
 //    void updateMenus(QWidget* _w = 0);
@@ -73,25 +69,25 @@
 
 //    void on_toolButtonCrossPointer_clicked();
 
-//    void on_toolButtonLinePointer_clicked();
+////    void on_toolButtonLinePointer_clicked();
 
-//    void on_toolButtonRectPointer_clicked();
+////    void on_toolButtonRectPointer_clicked();
 
-//    void on_toolButtonEllPointer_clicked();
+////    void on_toolButtonEllPointer_clicked();
 
-//    void processCursor(const QVector<QPointF> &_p, QwtPlot* _d);
+////    void processCursor(const QVector<QPointF> &_p, QwtPlot* _d);
 
-//    void processLine(const QVector<QPointF> & _p, QwtPlot* _d);
+////    void processLine(const QVector<QPointF> & _p, QwtPlot* _d);
 
-//    void processRect(const QVector<QPointF> & _p, QwtPlot* _d);
+////    void processRect(const QVector<QPointF> & _p, QwtPlot* _d);
 
-//    void refreshRect(const QVector<QPointF> & _p, QwtPlot* _d);
+////    void refreshRect(const QVector<QPointF> & _p, QwtPlot* _d);
 
-//    void setCursor(const Viewer::SimpleVector3D<int> & _p);
+////    void setCursor(const Viewer::SimpleVector3D<int> & _p);
 
-//    void _processCursor(const Viewer::SimpleVector3D<int> & _p);
+////    void _processCursor(const Viewer::SimpleVector3D<int> & _p);
 
-//    void on_chkShowSelection_stateChanged(int arg1);
+////    void on_chkShowSelection_stateChanged(int arg1);
 
 //private:
 
@@ -105,41 +101,41 @@
 //    //! manager to send the current active container - which ever that may be -. But this doesnot guarantee
 //    //! the the points are going to fit anymore. Finally somehow I broke it and I am not sure wether I should
 //    //! try to fix it.
-//    void refreshLine();
+////    void refreshLine();
 
-//    Ui::ToolManager *ui;
+//    Ui::ToolManager *ui = nullptr;
 //    //! Control Panel for the mouseCrossPointer_sptr
-//    panel_cross_pointer * p_cp;
+////    panel_cross_pointer * p_cp;
 //    //! Control Panel for the mouseLinePointer_sptr
-//    PanelLinePointer *p_lp;
+////    PanelLinePointer *p_lp;
 //    //! Control Panel for the mouseRectPointer_sptr
-//    PanelRectPointer *p_rp;
+////    PanelRectPointer *p_rp;
 
-//    PanelEllPointer *p_ep;
+////    PanelEllPointer *p_ep;
 
-//    std::shared_ptr<PointerTool> mousePointer_sptr;
+////    std::shared_ptr<PointerTool> mousePointer_sptr;
 
 //    std::shared_ptr<CrossPointerTool> mouseCrossPointer_sptr;
 
-//    std::shared_ptr<LineTool> mouseLinePointer_sptr;
+////    std::shared_ptr<LineTool> mouseLinePointer_sptr;
 
-//    std::shared_ptr<RectTool> mouseRectPointer_sptr;
+////    std::shared_ptr<RectTool> mouseRectPointer_sptr;
 
-//    std::shared_ptr<EclipseTool> mouseEllPointer_sptr;
+////    std::shared_ptr<EclipseTool> mouseEllPointer_sptr;
 
 //    std::shared_ptr<Tool> currentTool;
 
-//    PixelsOnCartesianGrid<float> selectedPixels;
+////    PixelsOnCartesianGrid<float> selectedPixels;
 
 //    //! Circular and line selection can benefit from this option.
 //    //! In the case of line selections the antialiazing is done by keeping
 //    //! the ray tracers propabilities.
-//    bool doAntializing;
+////    bool doAntializing;
 
 //protected:
-//    Screen_manager* sc;
+////    Screen_manager* sc;
 //};
 
-//#include "src/tools_buildblock/ToolManager.inl"
+//#include "src/tools/ToolManager.inl"
 
 //#endif // TOOLMANAGER_H

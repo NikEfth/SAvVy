@@ -276,7 +276,7 @@ void Panel_displayed_files::on_psh_zoom_in_clicked()
 
      Display_manager* dsp = get_active();
 
-     QSize cur_size = dsp->get_display()->get_default_size();
+     QSize cur_size = dsp->parentWidget()->size();
 
      dsp->parentWidget()->setFixedSize(cur_size.width()*2, cur_size.height()*2);
 }

@@ -67,8 +67,6 @@ void Display_container_raster::set_axis(int _offset_h, int _offset_v, int _offse
     v_spacing = _v_spacing;
     d_spacing = _d_spacing;
 
-    this->resize(row_size + 50, row_num + 25);
-
     p_raster->setInterval(Qt::XAxis, QwtInterval(static_cast<double>(offset_h) * h_spacing + _h_origin,
                                                  static_cast<double>(offset_h + row_size) * h_spacing + _h_origin,
                                                  QwtInterval::IncludeBorders));
@@ -76,6 +74,7 @@ void Display_container_raster::set_axis(int _offset_h, int _offset_v, int _offse
     p_raster->setInterval(Qt::YAxis, QwtInterval(static_cast<double>(offset_v) * v_spacing + _v_origin,
                                                  static_cast<double>(offset_v + row_num) * v_spacing + _v_origin,
                                                  QwtInterval::IncludeBorders));
+    this->canvas()->resize(row_size, row_num);
 }
 
 void Display_container_raster::set_size(int _offset_h, int _offset_v, int _offset_d)
@@ -85,8 +84,6 @@ void Display_container_raster::set_size(int _offset_h, int _offset_v, int _offse
     offset_v = _offset_v;
     offset_d = _offset_d;
 
-    this->resize(row_size + 50, row_num + 50);
-
     p_raster->setInterval(Qt::XAxis, QwtInterval(static_cast<double>(offset_v),
                                                  static_cast<double>((offset_v + row_num) ),
                                                  QwtInterval::IncludeBorders));
@@ -94,6 +91,7 @@ void Display_container_raster::set_size(int _offset_h, int _offset_v, int _offse
     p_raster->setInterval(Qt::YAxis, QwtInterval(static_cast<double>(offset_h),
                                                  static_cast<double>(offset_h + row_size),
                                                  QwtInterval::IncludeBorders));
+    this->canvas()->resize(row_size*2, row_num*2);
 }
 
 Display_container_raster::~Display_container_raster()

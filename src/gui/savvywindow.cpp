@@ -281,15 +281,12 @@ bool SavvyWindow::append_to_mdi(Display_manager *subWindow,
             subWindow->get_file_name().size() > 0)
         prependToRecentFiles(subWindow->get_file_name());
 
-    QSize s = subWindow->get_display()->size();
-    subWindow->parentWidget()->resize(s);
-
     if (!minimized)
         subWindow->show();
     else
         subWindow->showMinimized();
 
-    subWindow->parentWidget()->setFixedSize(subWindow->size());
+    subWindow->parentWidget()->setFixedSize(subWindow->sizeHint());
 
     return true;
 }
@@ -302,7 +299,7 @@ void SavvyWindow::remove_from_mdi()
 
     pnl_displayed_files->removeFromOpenedList(src);
     // Disconnect from tool
-    //            toolMan->unsetScreen();
+//    toolMan->unset();
     // Disconnect from contrast window
     ctrl_levels->unsetContainer();
     // The Math Manager must have an up-to-date list of the opened
@@ -404,9 +401,8 @@ void SavvyWindow::create_docks()
     dc_contrast->setVisible(false);
 
     dc_tool_manager = new QDockWidget("Tools", this);
-
-    //    toolMan = new ToolManager(dc_tool_manager);
-    //    dc_right->setWidget(toolMan);
+//    toolMan.reset(new ToolManager(this));
+//    dc_tool_manager->setWidget(toolMan.get());
 
     dc_opened_files = new QDockWidget("Opened Files", this);
     pnl_workspace.reset(new Workspace(this));

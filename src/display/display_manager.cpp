@@ -35,6 +35,7 @@ Display_manager::Display_manager(int _my_id, int _num_dim, QWidget *parent) :
     }
 
     ui->gridLayout->addWidget(_display.get());
+    this->resize(_display->sizeHint());
 }
 
 Display_manager::Display_manager(int _my_id, stir::ArrayInterface *__display, QWidget *parent) :
@@ -72,6 +73,7 @@ Display_manager::Display_manager(int _my_id, stir::ArrayInterface *__display, QW
     }
 
     ui->gridLayout->addWidget(_display.get());
+    this->resize(_display->sizeHint());
 }
 
 Display_manager::Display_manager(int _my_id, stir::ArrayInterface *__display,
@@ -110,6 +112,7 @@ Display_manager::Display_manager(int _my_id, stir::ArrayInterface *__display,
     }
 
     ui->gridLayout->addWidget(_display.get());
+    this->resize(_display->sizeHint());
 }
 
 Display_manager::Display_manager(int _my_id,
@@ -127,11 +130,12 @@ Display_manager::Display_manager(int _my_id,
     initialised_display();
 
     ui->gridLayout->addWidget(_display.get());
+    this->resize(sizeHint());
 }
 
 Display_manager::~Display_manager()
 {
-//    delete _display;
+    //    delete _display;
     delete ui;
 }
 
