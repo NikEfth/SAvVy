@@ -157,7 +157,7 @@ size_t Display_manager::get_num_points() const
 
 void Display_manager::updated_display(int position)
 {
-    ui->lbl_plane->setText(QString::number(position) + " / " + QString::number(_display->get_num_data()));
+    ui->lbl_plane->setText(QString::number(position) + " / " + QString::number(_display->get_num_data()-1));
 }
 
 

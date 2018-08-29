@@ -93,7 +93,9 @@ void StackProcessor::split_array()
     {
         QFileInfo info(nameT);
         if(info.isFile())
-            nameT = info.fileName();
+        {
+            nameT = info.baseName();
+        }
     }
 
     const stir::IndexRange<3> plane_size = current_data_set_ptr->get_index_range();
@@ -112,15 +114,18 @@ void StackProcessor::split_array()
     bool get_voxels = false;
 
     stir::VoxelsOnCartesianGrid<float>* tmpVG = dynamic_cast<stir::VoxelsOnCartesianGrid<float>* >(current_data_set_ptr);
+    stir::CartesianCoordinate3D<float> origin(0.0, 0.0, 0.0);
+    stir::BasicCoordinate<3, float> spacing = stir::make_coordinate<float>(1.0, 1.0, 1.0);
     if(!stir::is_null_ptr(tmpVG))
     {
         get_voxels = true;
+        origin = tmpVG->get_origin();
+        spacing = tmpVG->get_grid_spacing();
     }
-
-    std::shared_ptr<stir::ArrayInterface> new_image = nullptr;
 
     for (int i = 0; i < num_subsets; ++i)
     {
+        QString cur_name = nameT + "_" + QString::number(i);
         int minZ = maxZ;
 
         maxZ = minZ + split_pos;
@@ -139,11 +144,16 @@ void StackProcessor::split_array()
         const stir::IndexRange<3> trange(min_coord, max_coords);
         //        const stir::IndexRange<3> nrange(n_min_coord, n_max_coords);
 
-        new_image = m_workspace_sptr->get_new_empty_copy_current();
+        std::shared_ptr<stir::VoxelsOnCartesianGrid<float> > new_image( new stir::VoxelsOnCartesianGrid<float>(trange,
+                                                                                                                origin,
+                                                                                                                spacing));
+
 
         savvy::fill_Array(*current_data_set_ptr,
                           *new_image,
                           minZ);
+
+        m_workspace_sptr->append_to_workspace(new_image, cur_name);
 
     }
 }
