@@ -164,8 +164,8 @@ void Workspace::on_remove_array_pressed()
 std::shared_ptr<stir::ArrayInterface>
 Workspace::get_array_ptr(const int _i) const
 {
-    if (_i < openned_files.size())
-        return openned_files[_i];
+    if (_i < openned_files.size() && _i >= 0)
+        return openned_files.at(_i);
     return nullptr;
 }
 
@@ -185,6 +185,13 @@ std::shared_ptr<stir::ArrayInterface>
 Workspace::get_current_array_ptr()
 {
     return get_array_ptr(ui->listOpenedFiles->currentRow());
+}
+
+
+std::shared_ptr<stir::ArrayInterface>
+Workspace::get_new_empty_copy_current(const QString name)
+{
+    return get_new_empty_copy(name, ui->listOpenedFiles->currentRow());
 }
 
 std::shared_ptr<stir::ArrayInterface>
@@ -225,14 +232,19 @@ Workspace::get_new_empty_copy(const QString name,
                 }
             }
             stir::Array<3, float> *t = dynamic_cast<stir::Array<3, float>* >(ar.get());
-            newArray.reset( new stir::Array<3, float>(t->get_index_range()) );
+            if(!stir::is_null_ptr(t))
+            {
+                newArray.reset( new stir::Array<3, float>(t->get_index_range()) );
+                break;
+            }
             break;
         }
         default:
             return nullptr;
         }
 
-        append_to_workspace(newArray, name);
+        if (!stir::is_null_ptr(newArray))
+            append_to_workspace(newArray, name);
         return newArray;
     }
 

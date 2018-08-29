@@ -87,6 +87,8 @@ private slots:
 
     bool on_actionSave_triggered();
 
+    void on_actionProcess_Stack_triggered();
+
 private:
 
     /** \addtogroup Operations

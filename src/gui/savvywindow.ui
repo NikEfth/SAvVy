@@ -75,8 +75,8 @@
     <property name="title">
      <string>&amp;Tools</string>
     </property>
-    <addaction name="actionSlicer"/>
     <addaction name="actionThreshold"/>
+    <addaction name="actionProcess_Stack"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
@@ -224,18 +224,6 @@
     <string>&amp;Rename</string>
    </property>
   </action>
-  <action name="actionSlicer">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../../resources.qrc">
-     <normaloff>:/icons/resources/gimp-pro/images/gtk-cut.png</normaloff>:/icons/resources/gimp-pro/images/gtk-cut.png</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Slice</string>
-   </property>
-  </action>
   <action name="actionThreshold">
    <property name="enabled">
     <bool>false</bool>
@@ -281,7 +269,12 @@
      <normaloff>:/icons/resources/gimp-pro/images/gtk-save.png</normaloff>:/icons/resources/gimp-pro/images/gtk-save.png</iconset>
    </property>
    <property name="text">
-    <string>Save</string>
+    <string>&amp;Save</string>
+   </property>
+  </action>
+  <action name="actionProcess_Stack">
+   <property name="text">
+    <string>&amp;Stack Tools ...</string>
    </property>
   </action>
  </widget>

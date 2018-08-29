@@ -12,6 +12,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 target_sources(savvy_tools
     PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/imageprocessor.h"
+    "${CMAKE_CURRENT_LIST_DIR}/imageprocessor.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/stackprocessor.h"
+    "${CMAKE_CURRENT_LIST_DIR}/stackprocessor.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/stackprocessor.ui"
     "${CMAKE_CURRENT_LIST_DIR}/ToolManager.h"
     "${CMAKE_CURRENT_LIST_DIR}/ToolManager.inl"
     "${CMAKE_CURRENT_LIST_DIR}/ToolManager.cpp"

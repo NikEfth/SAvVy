@@ -64,6 +64,8 @@ public:
 
     std::shared_ptr<stir::ArrayInterface> get_new_empty_copy(const QString name = "", const int i = 0);
 
+    std::shared_ptr<stir::ArrayInterface> get_new_empty_copy_current(const QString name = "");
+
     void go_to_top() const;
     //! Get the next groupped item. If not existing or end of list then \return
     //! -1 otherwise \return the current index.

@@ -27,7 +27,7 @@ Display_manager::Display_manager(int _my_id, int _num_dim, QWidget *parent) :
     case 3:
     {
         _display.reset(new Display_container_3d(3, this));
-        connect(ui->sld_plane, &QSlider::sliderMoved, _display.get(), &Display_container::update_scene);
+        connect(ui->sld_plane, &QSlider::valueChanged, _display.get(), &Display_container::update_scene);
         //        connect(ui->sld_plane, &QSlider::sliderMoved, this, &Display_manager::updated_display);
         connect(_display.get(), &Display_container::setup_ready, this, &Display_manager::initialised_display);
     }
@@ -64,8 +64,8 @@ Display_manager::Display_manager(int _my_id, stir::ArrayInterface *__display, QW
         stir::Array<3, float>* tmp = dynamic_cast<stir::Array<3, float>* >(__display);
         _display.reset(new Display_container_3d(*tmp, 3, this));
 
-        connect(ui->sld_plane, &QSlider::sliderMoved, _display.get(), &Display_container::update_scene);
-        connect(ui->sld_plane, &QSlider::sliderMoved, this, &Display_manager::updated_display);
+        connect(ui->sld_plane, &QSlider::valueChanged, _display.get(), &Display_container::update_scene);
+        connect(ui->sld_plane, &QSlider::valueChanged, this, &Display_manager::updated_display);
         connect(_display.get(), &Display_container::setup_ready, this, &Display_manager::initialised_display);
         initialised_display();
     }
@@ -103,8 +103,8 @@ Display_manager::Display_manager(int _my_id, stir::ArrayInterface *__display,
         stir::Array<3, float>* tmp = dynamic_cast<stir::Array<3, float>* >(__display);
         _display.reset(new Display_container_3d(*tmp, 3, this));
 
-        connect(ui->sld_plane, &QSlider::sliderMoved, _display.get(), &Display_container::update_scene);
-        connect(ui->sld_plane, &QSlider::sliderMoved, this, &Display_manager::updated_display);
+        connect(ui->sld_plane, &QSlider::valueChanged, _display.get(), &Display_container::update_scene);
+        connect(ui->sld_plane, &QSlider::valueChanged, this, &Display_manager::updated_display);
         connect(_display.get(), &Display_container::setup_ready, this, &Display_manager::initialised_display);
         initialised_display();
     }
@@ -124,8 +124,8 @@ Display_manager::Display_manager(int _my_id,
     ui->setupUi(this);
 
     _display.reset(new Display_container_3d(*_prod_image, 3, this));
-    connect(ui->sld_plane, &QSlider::sliderMoved, _display.get(), &Display_container::update_scene);
-    connect(ui->sld_plane, &QSlider::sliderMoved, this, &Display_manager::updated_display);
+    connect(ui->sld_plane, &QSlider::valueChanged, _display.get(), &Display_container::update_scene);
+    connect(ui->sld_plane, &QSlider::valueChanged, this, &Display_manager::updated_display);
     connect(_display.get(), &Display_container::setup_ready, this, &Display_manager::initialised_display);
     initialised_display();
 

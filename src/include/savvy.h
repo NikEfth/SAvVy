@@ -401,6 +401,88 @@ public:
         };
     }
 
+    static int fill_Array(const stir::ArrayInterface &from,
+                          stir::ArrayInterface& to,
+                          int offset = 0, int range = 1)
+    {
+
+        int dimsFrom = from.get_num_dimensions();
+        int dimsTo = to.get_num_dimensions();
+        int flag = dimsTo;
+
+        if(dimsFrom < dimsTo)
+            flag = -1;
+
+        switch (flag) {
+        case 1:
+        {
+            const stir::Array<1, float>* s = dynamic_cast<const stir::Array<1, float>* >(&from);
+            stir::Array<1, float>* t = dynamic_cast<stir::Array<1, float>* >(&to);
+
+            if (!stir::is_null_ptr(t))
+            {
+                for (int i = t->get_min_index(); i < t->get_max_index(); ++i)
+                {
+                    (*t)[i] = s->at(i + offset);
+                }
+                return 1;
+            }
+        }
+        case 2:
+        {
+            const stir::Array<2, float>* s = dynamic_cast<const stir::Array<2, float>* >(&from);
+            stir::Array<2, float>* t = dynamic_cast<stir::Array<2, float>* >(&to);
+
+            if (!stir::is_null_ptr(t))
+            {
+                for (int i = t->get_min_index(); i < t->get_max_index(); ++i)
+                    for (int j = (*t)[i].get_min_index(); j < (*t)[i].get_max_index(); ++j)
+                    {
+                        (*t)[i][j] = (*s)[i+offset][j+offset];
+                    }
+                return 1;
+            }
+        }
+        case 3:
+        {
+            const stir::Array<3, float>* s = dynamic_cast<const stir::Array<3, float>* >(&from);
+            stir::Array<3, float>* t = dynamic_cast<stir::Array<3, float>* >(&to);
+
+            if (!stir::is_null_ptr(t))
+            {
+
+                for (int i = t->get_min_index(); i < t->get_max_index(); ++i)
+                    for (int j = (*t)[i].get_min_index(); j < (*t)[i].get_max_index(); ++j)
+                        for (int k = (*t)[i][j].get_min_index(); k < (*t)[i][j].get_max_index(); ++k)
+                    {
+                        (*t)[i][j][k] = (*s)[i+offset][j][k];
+                    }
+                return 1;
+            }
+        }
+
+        case -1:
+        {
+            const stir::Array<2, float>* s = dynamic_cast<const stir::Array<2, float>* >(&from);
+            stir::Array<3, float>* t = dynamic_cast<stir::Array<3, float>* >(&to);
+
+            if (!stir::is_null_ptr(t))
+            {
+                   int i = offset;
+//                for (int i = t->get_min_index(); i < t->get_max_index(); ++i)
+                    for (int j = (*t)[i].get_min_index(); j < (*t)[i].get_max_index(); ++j)
+                        for (int k = (*t)[i][j].get_min_index(); k < (*t)[i][j].get_max_index(); ++k)
+                    {
+                        (*t)[i][j][k] = (*s)[j][k];
+                    }
+                return 1;
+            }
+        }
+        default:
+            return -1;
+        };
+    }
+
     static int Array_QVector1D(const stir::ArrayInterface &input, QVector<double> &output, double &min, double &max,
                                int min_pos = -1, int pos_range = -1)
     {

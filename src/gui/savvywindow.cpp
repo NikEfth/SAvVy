@@ -13,6 +13,8 @@
 #include "stir/common.h"
 #include "stir/Coordinate2D.h"
 
+#include "src/tools/stackprocessor.h"
+
 #include <QFileDialog>
 #include <QSettings>
 #include <QCloseEvent>
@@ -1250,4 +1252,10 @@ void SavvyWindow::on_actionWindow_Level_triggered()
             //connect(active, &Screen_manager::activeScreenUpdated, my_histogram, &BarScreen::replot_me);
         }
     }
+}
+
+void SavvyWindow::on_actionProcess_Stack_triggered()
+{
+    StackProcessor *r = new StackProcessor(pnl_workspace);
+    r->show();
 }
