@@ -421,7 +421,7 @@ public:
 
             if (!stir::is_null_ptr(t))
             {
-                for (int i = t->get_min_index(); i < t->get_max_index(); ++i)
+                for (int i = t->get_min_index(); i <= t->get_max_index(); ++i)
                 {
                     (*t)[i] = s->at(i + offset);
                 }
@@ -435,8 +435,8 @@ public:
 
             if (!stir::is_null_ptr(t))
             {
-                for (int i = t->get_min_index(); i < t->get_max_index(); ++i)
-                    for (int j = (*t)[i].get_min_index(); j < (*t)[i].get_max_index(); ++j)
+                for (int i = t->get_min_index(); i <= t->get_max_index(); ++i)
+                    for (int j = (*t)[i].get_min_index(); j <= (*t)[i].get_max_index(); ++j)
                     {
                         (*t)[i][j] = (*s)[i+offset][j+offset];
                     }
@@ -450,13 +450,16 @@ public:
 
             if (!stir::is_null_ptr(t))
             {
-
-                for (int i = t->get_min_index(); i < t->get_max_index(); ++i)
-                    for (int j = (*t)[i].get_min_index(); j < (*t)[i].get_max_index(); ++j)
-                        for (int k = (*t)[i][j].get_min_index(); k < (*t)[i][j].get_max_index(); ++k)
+                int o = offset-1;
+                for (int i = t->get_min_index(); i <= t->get_max_index(); ++i)
+                {
+                    o += 1;
+                    for (int j = (*t)[i].get_min_index(); j <= (*t)[i].get_max_index(); ++j)
+                        for (int k = (*t)[i][j].get_min_index(); k <= (*t)[i][j].get_max_index(); ++k)
                     {
-                        (*t)[i][j][k] = (*s)[i+offset][j][k];
+                        (*t)[i][j][k] = (*s)[o][j][k];
                     }
+                }
                 return 1;
             }
         }
@@ -470,8 +473,8 @@ public:
             {
                    int i = offset;
 //                for (int i = t->get_min_index(); i < t->get_max_index(); ++i)
-                    for (int j = (*t)[i].get_min_index(); j < (*t)[i].get_max_index(); ++j)
-                        for (int k = (*t)[i][j].get_min_index(); k < (*t)[i][j].get_max_index(); ++k)
+                    for (int j = (*t)[i].get_min_index(); j <= (*t)[i].get_max_index(); ++j)
+                        for (int k = (*t)[i][j].get_min_index(); k <= (*t)[i][j].get_max_index(); ++k)
                     {
                         (*t)[i][j][k] = (*s)[j][k];
                     }

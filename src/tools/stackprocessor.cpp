@@ -57,14 +57,7 @@ void StackProcessor::on_pushButton_clicked()
 
 void StackProcessor::on_sld_slice_num_sliderMoved(int position)
 {
-    ui->label_2->setText(QString::number(position));
-    int num_datasets = ui->sld_slice_num->maximum();
-    if (position > 0)
-    {
-        num_datasets = ceil(static_cast<float>(num_datasets) / position);
-    }
 
-    ui->label_3->setText(QString::number(num_datasets));
 }
 
 void StackProcessor::on_psh_Apply_clicked()
@@ -106,10 +99,10 @@ void StackProcessor::split_array()
 
     int split_pos = ui->sld_slice_num->value();
 
-    int num_subsets = ceil(static_cast<float>(num_poss) / split_pos);
+    int num_subsets = (static_cast<float>(num_poss) / split_pos);
 
     const stir::BasicCoordinate<3,int> min_coord = stir::make_coordinate(0, plane_size[1].get_min_index(), plane_size[2].get_min_index());
-    stir::BasicCoordinate<3,int> max_coords = stir::make_coordinate(split_pos, plane_size[1].get_max_index(), plane_size[2].get_max_index());
+    stir::BasicCoordinate<3,int> max_coords = stir::make_coordinate(split_pos-1, plane_size[1].get_max_index(), plane_size[2].get_max_index());
 
     bool get_voxels = false;
 
@@ -122,20 +115,20 @@ void StackProcessor::split_array()
         origin = tmpVG->get_origin();
         spacing = tmpVG->get_grid_spacing();
     }
-
+    int minZ = 0;
     for (int i = 0; i < num_subsets; ++i)
     {
         QString cur_name = nameT + "_" + QString::number(i);
-        int minZ = maxZ;
+        minZ = i*split_pos;
 
         maxZ = minZ + split_pos;
 
-        if (maxZ >= num_poss)
+        if (maxZ > num_poss)
         {
-            split_pos -= (maxZ - num_poss);
-            maxZ = num_poss;
-
-            max_coords = stir::make_coordinate(split_pos, plane_size[1].get_max_index(), plane_size[2].get_max_index());
+            break;
+            //            split_pos -= (maxZ - num_poss);
+            //            maxZ = num_poss;
+            //            max_coords = stir::make_coordinate(split_pos, plane_size[1].get_max_index(), plane_size[2].get_max_index());
         }
 
         //        const stir::BasicCoordinate<3,int> n_min_coord = stir::make_coordinate(minZ, plane_size[1].get_min_index(), plane_size[2].get_min_index());
@@ -145,8 +138,8 @@ void StackProcessor::split_array()
         //        const stir::IndexRange<3> nrange(n_min_coord, n_max_coords);
 
         std::shared_ptr<stir::VoxelsOnCartesianGrid<float> > new_image( new stir::VoxelsOnCartesianGrid<float>(trange,
-                                                                                                                origin,
-                                                                                                                spacing));
+                                                                                                               origin,
+                                                                                                               spacing));
 
 
         savvy::fill_Array(*current_data_set_ptr,
@@ -219,8 +212,8 @@ void StackProcessor::resort()
         for (int i = 0; i < num_poss; ++i)
         {
             int indx = re_natural_order.indexOf(i);
-            if (i < 0)
-                continue;
+            if (indx < 0)
+                break;
 
             stir::Array<2, float>  d = current_data_set_ptr->at(indx);
 
@@ -233,3 +226,15 @@ void StackProcessor::resort()
 }
 
 
+
+void StackProcessor::on_sld_slice_num_valueChanged(int value)
+{
+    ui->label_2->setText(QString::number(value));
+    int num_datasets = ui->sld_slice_num->maximum();
+    if (value > 0)
+    {
+        num_datasets = ceil(static_cast<float>(num_datasets) / value);
+    }
+
+    ui->label_3->setText(QString::number(num_datasets));
+}

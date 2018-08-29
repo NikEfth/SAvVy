@@ -26,6 +26,8 @@ private slots:
 
     void on_psh_Apply_clicked();
     
+    void on_sld_slice_num_valueChanged(int value);
+
 private:
 
     void split_array();
