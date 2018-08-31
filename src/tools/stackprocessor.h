@@ -1,46 +1,30 @@
 #ifndef STACKPROCESSOR_H
 #define STACKPROCESSOR_H
 
-#include <QWidget>
-#include "imageprocessor.h"
+#include <QObject>
+
+#include <memory>
+
+#include <stir/Array.h>
+
 #include "savvy.h"
 
-namespace Ui {
-class StackProcessor;
-}
-
-class StackProcessor : public ImageProcessor
+class StackProcessor : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit StackProcessor(std::shared_ptr<Workspace> workspace = nullptr,
-                            QDialog *parent = nullptr);
-    ~StackProcessor() override;
+    explicit StackProcessor(stir::Array<3, float> *data_ptr,
+                            QObject *parent = nullptr);
 
-    virtual void apply() override;
-private slots:
-    void on_pushButton_clicked();
+    virtual bool execute() = 0;
 
-    void on_sld_slice_num_sliderMoved(int position);
+signals:
+    void finished();
 
-    void on_psh_Apply_clicked();
-    
-    void on_sld_slice_num_valueChanged(int value);
+public slots:
 
-private:
-
-    void split_array();
-
-    void resort();
-
-    Ui::StackProcessor *ui;
-
-    bool no_stack = true;
-
-    bool slice_on_slice = true;
-
-    stir::Array<3, float> *current_data_set_ptr = nullptr;
+protected:
+    stir::Array<3, float>* m_data_ptr;
 };
 
 #endif // STACKPROCESSOR_H

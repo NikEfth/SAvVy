@@ -9,7 +9,8 @@
 
 #include "stir/Array.h"
 #include "stir/VectorWithOffset.h"
-
+#include "stir/CartesianCoordinate3D.h"
+#include "stir/BasicCoordinate.h"
 
 namespace Ui {
 class Workspace;
@@ -48,6 +49,8 @@ public:
 
     unsigned long int get_num_of_openned_files() const;
 
+    unsigned long int get_num_of_groupped_files() const;
+
     int get_min_max(double& min, double& max,
                     const int i = 0,
                     const int min_pos = -1, const int pos_range = -1) const;
@@ -65,6 +68,11 @@ public:
     std::shared_ptr<stir::ArrayInterface> get_new_empty_copy(const QString name = "", const int i = 0);
 
     std::shared_ptr<stir::ArrayInterface> get_new_empty_copy_current(const QString name = "");
+
+    std::shared_ptr<stir::ArrayInterface> get_new_empty_array(const QString &name,
+                                                              const stir::IndexRange<3> &trange,
+                                                              stir::CartesianCoordinate3D<float> origin = stir::CartesianCoordinate3D<float>(0,0,0),
+                                                              stir::BasicCoordinate<3, float> spacing = stir::make_coordinate<float>(1.0, 1.0, 1.0));
 
     void go_to_top() const;
     //! Get the next groupped item. If not existing or end of list then \return
@@ -94,6 +102,10 @@ signals:
     //! Signal emitted when the ui->display_array is pressed.This is connected to
     //! SavvyWindow and triggers the create of a new MDI window.
     void display_current(std::shared_ptr<stir::ArrayInterface>, QString);
+    //! Signal emitted when new file is selected. It is primality used to notify other
+    //! classes that a new file is selected and (maybe) make initialisations but not
+    //! edits.
+    void refresh();
 
 public slots:
     //! Append a window on the  ui->listOpenedFiles

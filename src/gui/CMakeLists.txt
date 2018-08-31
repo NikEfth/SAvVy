@@ -28,7 +28,11 @@ target_sources(savvy_gui
     "${CMAKE_CURRENT_LIST_DIR}/controls_display_1d.h"
     "${CMAKE_CURRENT_LIST_DIR}/controls_display_2d.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/controls_display_2d.ui"
-    "${CMAKE_CURRENT_LIST_DIR}/controls_display_2d.h")
+    "${CMAKE_CURRENT_LIST_DIR}/controls_display_2d.h"
+    "${CMAKE_CURRENT_LIST_DIR}/stackprocessorUI.h"
+    "${CMAKE_CURRENT_LIST_DIR}/stackprocessorUI.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/stackprocessorUI.ui"
+    )
     
 include_directories( ${Stir_INCLUDE_DIRS})
 link_directories(${Stir_LIBRARIES_DIR})

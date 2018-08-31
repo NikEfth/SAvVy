@@ -20,6 +20,9 @@ Workspace::Workspace(QWidget *parent) :
 
     connect(ui->listOpenedFiles, &QListWidget::customContextMenuRequested,
             this, &Workspace::showListContextMenu);
+
+    connect(ui->listOpenedFiles, &QListWidget::itemClicked, this,
+            &Workspace::refresh);
 }
 
 Workspace::~Workspace()
@@ -369,6 +372,19 @@ unsigned long int Workspace::get_num_of_openned_files() const
     return openned_files.size();
 }
 
+unsigned long int Workspace::get_num_of_groupped_files() const
+{
+    unsigned int num = 0;
+
+    for (int i = 0; i < ui->listOpenedFiles->count(); ++i)
+        if ( ui->listOpenedFiles->item(i)->checkState() == Qt::Checked)
+        {
+            ++num;
+        }
+
+    return num;
+}
+
 std::shared_ptr <stir::ArrayInterface> Workspace::open_array(const QString& fileName)
 {
     std::shared_ptr<stir::ArrayInterface> input;
@@ -499,6 +515,20 @@ int Workspace::get_next_item_in_group(std::shared_ptr<stir::ArrayInterface>& ret
     }
 
     return -1;
+}
+
+std::shared_ptr<stir::ArrayInterface> Workspace::get_new_empty_array(const QString &name,
+                                                                     const stir::IndexRange<3>& trange,
+                                                                     const stir::CartesianCoordinate3D<float> origin,
+                                                                     const stir::BasicCoordinate<3, float> spacing)
+{
+    std::shared_ptr<stir::VoxelsOnCartesianGrid<float> > new_image( new stir::VoxelsOnCartesianGrid<float>(trange,
+                                                                                                           origin,
+                                                                                                           spacing));
+    append_to_workspace(new_image,
+                        name);
+
+    return get_array_ptr(ui->listOpenedFiles->count()-1);
 }
 
 int Workspace::get_next_item_in_group_as_vector(std::shared_ptr<QVector<double> > &ret,

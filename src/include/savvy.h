@@ -451,16 +451,43 @@ public:
             if (!stir::is_null_ptr(t))
             {
                 int o = offset-1;
-                for (int i = t->get_min_index(); i <= t->get_max_index(); ++i)
+
+                int minZ = 0;
+                int maxZ = 1;
+
+                if (t->get_min_index() <= s->get_min_index() &&
+                        t->get_max_index() > s->get_max_index())
                 {
-                    o += 1;
-                    for (int j = (*t)[i].get_min_index(); j <= (*t)[i].get_max_index(); ++j)
-                        for (int k = (*t)[i][j].get_min_index(); k <= (*t)[i][j].get_max_index(); ++k)
+                    minZ = s->get_min_index(); //s->get_min_index();
+                    maxZ = s->get_max_index();
+
+                    for (int i = minZ; i <= maxZ; ++i)
                     {
-                        (*t)[i][j][k] = (*s)[o][j][k];
+                        o += 1;
+                        for (int j = (*t)[i].get_min_index(); j <= (*t)[i].get_max_index(); ++j)
+                            for (int k = (*t)[i][j].get_min_index(); k <= (*t)[i][j].get_max_index(); ++k)
+                        {
+                            (*t)[o][j][k] = (*s)[i][j][k];
+                        }
                     }
+                    return o + 1;
                 }
-                return 1;
+                else
+                {
+                    minZ = t->get_min_index();
+                    maxZ = t->get_max_index();
+
+                    for (int i = minZ; i <= maxZ; ++i)
+                    {
+                        o += 1;
+                        for (int j = (*t)[i].get_min_index(); j <= (*t)[i].get_max_index(); ++j)
+                            for (int k = (*t)[i][j].get_min_index(); k <= (*t)[i][j].get_max_index(); ++k)
+                        {
+                            (*t)[i][j][k] = (*s)[o][j][k];
+                        }
+                    }
+                    return o;
+                }
             }
         }
 

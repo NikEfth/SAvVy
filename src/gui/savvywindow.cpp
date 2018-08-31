@@ -13,7 +13,7 @@
 #include "stir/common.h"
 #include "stir/Coordinate2D.h"
 
-#include "src/tools/stackprocessor.h"
+#include "stackprocessorUI.h"
 
 #include <QFileDialog>
 #include <QSettings>
@@ -1256,6 +1256,6 @@ void SavvyWindow::on_actionWindow_Level_triggered()
 
 void SavvyWindow::on_actionProcess_Stack_triggered()
 {
-    StackProcessor *r = new StackProcessor(pnl_workspace);
+    StackProcessorUI *r = new StackProcessorUI(pnl_workspace);
     r->show();
 }
